@@ -8,6 +8,8 @@ import { Head, Link, useForm } from '@inertiajs/react';
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
+        last_name: '',
+        phone_number: '',
         email: '',
         password: '',
         password_confirmation: '',
@@ -27,7 +29,7 @@ export default function Register() {
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="name" value="Nombre" />
 
                     <TextInput
                         id="name"
@@ -41,6 +43,43 @@ export default function Register() {
                     />
 
                     <InputError message={errors.name} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="last_name" value="Apellido" />
+
+                    <TextInput
+                        id="last_name"
+                        name="last_name"
+                        value={data.last_name}
+                        className="mt-1 block w-full"
+                        autoComplete="family-name"
+                        onChange={(e) => setData('last_name', e.target.value)}
+                        required
+                    />
+
+                    <InputError message={errors.last_name} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="phone_number" value="Número de Teléfono" />
+
+                    <TextInput
+                        id="phone_number"
+                        name="phone_number"
+                        value={data.phone_number}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            if (/^\d*$/.test(value)) {
+                                setData('phone_number', value);
+                            }
+                        }}
+                        className="mt-1 block w-full"
+                        autoComplete="tel"
+                        required
+                    />
+
+                    <InputError message={errors.phone_number} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
