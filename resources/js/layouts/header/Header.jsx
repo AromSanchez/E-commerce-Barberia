@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { ShoppingCart, Heart, User, Search } from 'lucide-react';
+import { ShoppingCart, Heart, User, Search, LogOut } from 'lucide-react';
 
 export default function Header() {
     const { auth } = usePage().props;
@@ -73,12 +73,32 @@ export default function Header() {
                         {showUserMenu && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
                                 {auth?.user ? (
-                                    <Link 
-                                        href={route('dashboard')} 
-                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    > 
-                                        Dashboard 
-                                    </Link>
+                                    <>
+                                        <Link 
+                                            href={route('profile.edit')} 
+                                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            <User className="h-4 w-4 mr-2" />
+                                            Mi Perfil
+                                        </Link>
+                                        {auth.user.role === 'admin' && (
+                                            <Link 
+                                                href={route('dashboard')} 
+                                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            > 
+                                                Dashboard 
+                                            </Link>
+                                        )}
+                                        <Link 
+                                            href={route('logout')} 
+                                            method="post" 
+                                            as="button"
+                                            className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            <LogOut className="h-4 w-4 mr-2" />
+                                            Cerrar Sesión
+                                        </Link>
+                                    </>
                                 ) : (
                                     <>
                                         <Link 
