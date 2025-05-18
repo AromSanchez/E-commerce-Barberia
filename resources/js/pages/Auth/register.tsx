@@ -53,7 +53,7 @@ export default function Register() {
                         <InputError message={errors.name} className="mt-2" />
                     </div>
 
-                    <div className="grid gap-2">
+                    <div className="grid gap-2" >
                         <Label htmlFor="email">Email address</Label>
                         <Input
                             id="email"
