@@ -55,4 +55,21 @@ class CategoryController extends Controller
         return redirect()->route('dashboard.category')
             ->with('success', 'Categoría eliminada exitosamente.');
     }
+
+    /**
+     * Update the specified category in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:100|unique:category,name,' . $id,
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $category = Category::findOrFail($id);
+        $category->update($validated);
+
+        return redirect()->route('dashboard.category')
+            ->with('success', 'Categoría actualizada exitosamente.');
+    }
 }

@@ -5,11 +5,14 @@ import { useState, useEffect } from 'react';
 import AddCategoryDialog from '@/components/DashCategory/AddCategoryDialog';
 import EditIcon from '@/components/Icons/EditIcon';
 import DeleteIcon from '@/components/Icons/DeleteIcon';
+import EditCategoryDialog from '@/components/DashCategory/EditCategoryDialog'; // Import the EditCategoryDialog component
 
 export default function DashCategory() {
     const { categories } = usePage().props;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [categoryList, setCategoryList] = useState([]);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [categoryToEdit, setCategoryToEdit] = useState(null);
 
     useEffect(() => {
         if (categories) {
@@ -25,6 +28,22 @@ export default function DashCategory() {
         router.delete(route('dashboard.category.destroy', id), {
             onSuccess: () => {
                 setCategoryList(categoryList.filter(category => category.id !== id));
+            }
+        });
+    };
+
+    const handleEditCategory = (category) => {
+        setCategoryToEdit(category);
+        setEditDialogOpen(true);
+    };
+
+    const handleUpdateCategory = (updatedCategory) => {
+        router.patch(route('dashboard.category.update', updatedCategory.id), updatedCategory, {
+            onSuccess: () => {
+                setCategoryList(categoryList.map(category => 
+                    category.id === updatedCategory.id ? updatedCategory : category
+                ));
+                setEditDialogOpen(false);
             }
         });
     };
@@ -78,7 +97,10 @@ export default function DashCategory() {
                                                             <div className="text-sm text-gray-500">{category.description}</div>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                            <button className="text-blue-600 hover:text-blue-900 mr-3">
+                                                            <button 
+                                                                className="text-blue-600 hover:text-blue-900 mr-3"
+                                                                onClick={() => handleEditCategory(category)}
+                                                            >
                                                                 <EditIcon />
                                                             </button>
                                                             <button 
@@ -112,6 +134,15 @@ export default function DashCategory() {
                 onClose={() => setIsDialogOpen(false)} 
                 onSave={handleAddCategory} 
             />
+            {/* Diálogo para editar categoría */}
+            {categoryToEdit && (
+                <EditCategoryDialog 
+                    isOpen={editDialogOpen} 
+                    category={categoryToEdit}
+                    onClose={() => setEditDialogOpen(false)} 
+                    onSave={handleUpdateCategory} 
+                />
+            )}
         </AuthenticatedLayout>
     );
 }
