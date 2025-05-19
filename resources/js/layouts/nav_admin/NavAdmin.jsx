@@ -34,7 +34,7 @@ const NavAdmin = () => {
             <nav className="flex-1 flex flex-col justify-between">
                 <ul className="space-y-2">
                     <li>
-                        <Link href="/dashboard" className="flex items-center p-3 rounded-md hover:bg-gray-800">
+                        <Link href={route('dashboard')} className="flex items-center p-3 rounded-md hover:bg-gray-800">
                             <Home className="mr-3 text-lg" />
                             <span>Dashboard</span>
                         </Link>
