@@ -58,9 +58,9 @@ const NavAdmin = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link href="/dashboard/employees" className="flex items-center p-3 rounded-md hover:bg-gray-800">
+                        <Link href={route('dashboard.brand')} className="flex items-center p-3 rounded-md hover:bg-gray-800">
                             <UserCheck className="mr-3 text-lg" />
-                            <span>Empleados</span>
+                            <span>Marcas</span>
                         </Link>
                     </li>
                     <li>

@@ -30,6 +30,10 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         ->name('dashboard.category.destroy');
 });
 
+Route::get('/dashboard/brand', function(){
+    return Inertia::render('DashAdmin/DashBrand');
+})->middleware(['auth', 'verified', 'admin'])->name('dashboard.brand');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
