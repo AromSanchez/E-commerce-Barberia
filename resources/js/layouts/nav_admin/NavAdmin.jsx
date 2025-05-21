@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
     Home, 
     Package, 
@@ -8,114 +8,144 @@ import {
     ShoppingBag, 
     Bell, 
     Settings,
-    ChevronLeft,
+    ChevronDown,
     LogOut,
-    User
+    User,
+    Grid,
+    Layers,
+    FilePlus,
+    Image,
+    Tag
 } from 'lucide-react';
-import Dropdown from '@/Components/Dropdown';
 import { Link, usePage } from '@inertiajs/react';
 
-const NavAdmin = () => {
-    const user = usePage().props.auth.user;
+const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
+    const [activeDropdown, setActiveDropdown] = useState(null);
+    const { url } = usePage();
+
+    const toggleDropdown = (name) => {
+        setActiveDropdown(activeDropdown === name ? null : name);
+    };
+
     return (
-        <div className="h-screen w-64 bg-gray-900 text-white p-4 flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center">
-                    <Scissors className="text-xl mr-2" />
-                    <h1 className="text-xl font-bold">BarberShop</h1>
-                </div>
-                <button className="text-gray-400 hover:text-white">
-                    <ChevronLeft className="text-xl" />
+        <div className={`${isCollapsed ? 'w-20' : 'w-64'} bg-white shadow-lg p-4 flex flex-col border-r border-gray-200 relative z-0 overflow-y-auto scrollbar-hide h-screen`}>
+            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} mb-8`}>
+                {!isCollapsed && (
+                    <div className="flex items-center">
+                        <img src="\images\logo.png" alt="Logo" className="h-12 w-auto" />
+                    </div>
+                )}
+                <button 
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    className="text-gray-400 hover:text-gray-600 p-3"
+                >
+                    <ChevronDown className={`h-5 w-5 transform ${isCollapsed ? '-rotate-90' : 'rotate-90'}`} />
                 </button>
             </div>
 
-            {/* Navigation Links */}
-            <nav className="flex-1 flex flex-col justify-between">
+            <h2 className={`text-gray-400 text-xs uppercase mb-4 ${isCollapsed ? 'hidden' : ''}`}>PRINCIPAL</h2>
+
+            <nav className="flex-1">
                 <ul className="space-y-2">
                     <li>
-                        <Link href={route('dashboard')} className="flex items-center p-3 rounded-md hover:bg-gray-800">
-                            <Home className="mr-3 text-lg" />
-                            <span>Dashboard</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/dashboard/products" className="flex items-center p-3 rounded-md hover:bg-gray-800">
-                            <Package className="mr-3 text-lg" />
-                            <span>Productos</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href={route('dashboard.category')} className="flex items-center p-3 rounded-md hover:bg-gray-800">
-                            <Scissors className="mr-3 text-lg" />
-                            <span>Categorías</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/dashboard/clients" className="flex items-center p-3 rounded-md hover:bg-gray-800">
-                            <Users className="mr-3 text-lg" />
-                            <span>Clientes</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href={route('dashboard.brand')} className="flex items-center p-3 rounded-md hover:bg-gray-800">
-                            <UserCheck className="mr-3 text-lg" />
-                            <span>Marcas</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/dashboard/orders" className="flex items-center p-3 rounded-md hover:bg-gray-800">
-                            <ShoppingBag className="mr-3 text-lg" />
-                            <span>Pedidos</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/dashboard/notifications" className="flex items-center p-3 rounded-md hover:bg-gray-800">
-                            <Bell className="mr-3 text-lg" />
-                            <span>Notificaciones</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/dashboard/settings" className="flex items-center p-3 rounded-md hover:bg-gray-800">
-                            <Settings className="mr-3 text-lg" />
-                            <span>Configuración</span>
+                        <Link
+                            href={route('dashboard')}
+                            className={`flex items-center p-3 rounded-lg transition-colors duration-200
+                                ${isCollapsed ? 'justify-center' : ''}
+                                ${url === '/dashboard' 
+                                    ? 'bg-blue-50 text-blue-600' 
+                                    : 'text-gray-700 hover:bg-blue-50'}
+                            `}
+                        >
+                            <Grid className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
+                            {!isCollapsed && <span>Dashboard</span>}
                         </Link>
                     </li>
                     
-                </ul>
-                
-                {/* User Profile Dropdown - Posicionado en la parte inferior */}
-                <div className="mt-auto pt-4 border-t border-gray-700">
-                    <Dropdown>
-                        <Dropdown.Trigger>
-                            <button type="button" className="flex items-center w-full p-3 rounded-md hover:bg-gray-800 text-white">
-                                <User className="mr-3 text-lg" />
-                                <span className="flex-grow text-left">{user.name}</span>
-                                <svg 
-                                    className="h-4 w-4" 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 20 20" 
-                                    fill="currentColor"
-                                >
-                                    <path 
-                                        fillRule="evenodd" 
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
-                                        clipRule="evenodd" 
-                                    />
-                                </svg>
+                    {/* Dropdowns y otros elementos */}
+                    <li>
+                        <div className="relative">
+                            <button 
+                                onClick={() => toggleDropdown('products')}
+                                className={`w-full flex items-center p-3 rounded-lg hover:bg-blue-50 transition-all duration-300 ${activeDropdown === 'products' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'} ${isCollapsed ? 'justify-center' : ''}`}
+                            >
+                                <ShoppingBag className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
+                                {!isCollapsed && (
+                                    <>
+                                        <span className="flex-grow text-left">Products</span>
+                                        <ChevronDown className={`h-4 w-4 transform transition-transform duration-300 ${activeDropdown === 'products' ? 'rotate-180' : ''}`} />
+                                    </>
+                                )}
                             </button>
-                        </Dropdown.Trigger>
+                            <div className={`pl-10 mt-2 space-y-2 overflow-hidden transition-all duration-300 ${activeDropdown === 'products' && !isCollapsed ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                <Link href="/dashboard/products/create" className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                                    Add Product
+                                </Link>
+                                <Link href="/dashboard/products" className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                                    Products
+                                </Link>
+                            </div>
+                        </div>
+                    </li>
+                    {/* Orders Dropdown */}
+                    <li>
+                        <div className="relative">
+                            <button 
+                                onClick={() => toggleDropdown('orders')}
+                                className={`w-full flex items-center p-3 rounded-lg hover:bg-blue-50 transition-all duration-300 ${activeDropdown === 'orders' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'} ${isCollapsed ? 'justify-center' : ''}`}
+                            >
+                                <FilePlus className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
+                                {!isCollapsed && (
+                                    <>
+                                        <span className="flex-grow text-left">Order</span>
+                                        <ChevronDown className={`h-4 w-4 transform transition-transform duration-300 ${activeDropdown === 'orders' ? 'rotate-180' : ''}`} />
+                                    </>
+                                )}
+                            </button>
+                            <div className={`pl-10 mt-2 space-y-2 overflow-hidden transition-all duration-300 ${activeDropdown === 'orders' && !isCollapsed ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                <Link href="/dashboard/orders" className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                                    Orders
+                                </Link>
+                                <Link href="/dashboard/order-tracking" className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                                    Tracking
+                                </Link>
+                            </div>
+                        </div>
+                    </li>
 
-                        <Dropdown.Content>
-                            <Dropdown.Link href={route('profile.edit')}>
-                                Perfil
-                            </Dropdown.Link>
-                            <Dropdown.Link href={route('logout')} method="post" as="button">
-                                Cerrar Sesión
-                            </Dropdown.Link>
-                        </Dropdown.Content>
-                    </Dropdown>
-                </div>
+                    {/* Brand*/}
+                    <li>
+                        <Link href={route('dashboard.brand')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
+                            <Layers className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
+                            {!isCollapsed && <span>Brands</span>}
+                        </Link>
+                    </li>
+
+                    {/* Category */}
+                    <li>
+                        <Link href={route('dashboard.category')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
+                            <Package className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
+                            {!isCollapsed && <span>Categories</span>}
+                        </Link>
+                    </li>
+
+                   
+                    <li>
+                        <Link href="/dashboard/coupons" className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
+                            <Tag className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
+                            {!isCollapsed && <span>Coupons</span>}
+                        </Link>
+                    </li>
+
+                    <li>
+                        <Link href="/dashboard/users" className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
+                            <Users className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
+                            {!isCollapsed && <span>User</span>}
+                        </Link>
+                    </li>
+
+                    
+                </ul>
             </nav>
         </div>
     );

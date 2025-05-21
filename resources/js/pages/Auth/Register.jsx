@@ -28,87 +28,80 @@ export default function Register() {
     };
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex h-screen">
             {/* Sección izquierda con imagen y texto */}
             <div className="hidden md:flex md:w-1/2 bg-gray-900 relative">
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/70 z-10"></div>
-                <div className="absolute inset-0 flex flex-col justify-center items-center text-white z-20 p-10">
-                    <div className="mb-8">
-                        <svg className="w-20 h-20 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M12 12L19 19M12 12L5 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                    </div>
-                    <h1 className="text-4xl font-bold mb-2">Barbería Elegante</h1>
-                    <p className="text-xl text-center">Donde el estilo se encuentra con la tradición</p>
-                </div>
-                {/* Aquí irá la imagen de fondo que mencionaste que pondrás tú */}
+                <img src="/images/logoinicio.png" alt="" className="object-cover w-full h-full" />
             </div>
 
             {/* Sección derecha con formulario */}
-            <div className="w-full md:w-1/2 flex items-center justify-center p-8">
+            <div className="w-full md:w-1/2 flex items-center justify-center p-4 overflow-y-auto">
                 <div className="w-full max-w-md">
-                    <div className="flex justify-end mb-8">
-                        <img src="/logo.svg" alt="Barber Logo" className="h-8" />
+                    <div className="flex justify-end mb-4">
+                        <img src="/images/logo.png" alt="Barber Logo" className="h-8" />
                     </div>
                     
-                    <h2 className="text-3xl font-bold mb-2">Crea tu cuenta</h2>
-                    <p className="text-gray-600 mb-8">Ingresa tus datos para registrarte</p>
+                    <h2 className="text-2xl font-bold mb-1">Crea tu cuenta</h2>
+                    <p className="text-gray-600 text-sm mb-4">Ingresa tus datos para registrarte</p>
 
-                    <form onSubmit={submit}>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <form onSubmit={submit} className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                            {/* Primera fila: Nombre y Apellido */}
                             <div>
-                                <InputLabel htmlFor="name" value="Nombres" />
+                                <InputLabel htmlFor="name" value="Nombres" className="text-sm" />
                                 <TextInput
                                     id="name"
                                     name="name"
                                     value={data.name}
-                                    className="mt-1 block w-full"
+                                    className="mt-1 block w-full py-1"
                                     autoComplete="name"
                                     isFocused={true}
                                     onChange={(e) => setData('name', e.target.value)}
                                     required
-                                    placeholder="john.doe@gmail.com"
+                                    placeholder="John"
                                 />
-                                <InputError message={errors.name} className="mt-2" />
+                                <InputError message={errors.name} className="mt-1 text-xs" />
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="last_name" value="Apellidos" />
+                                <InputLabel htmlFor="last_name" value="Apellidos" className="text-sm" />
                                 <TextInput
                                     id="last_name"
                                     name="last_name"
                                     value={data.last_name}
-                                    className="mt-1 block w-full"
+                                    className="mt-1 block w-full py-1"
                                     autoComplete="family-name"
                                     onChange={(e) => setData('last_name', e.target.value)}
                                     required
                                     placeholder="Perez"
                                 />
-                                <InputError message={errors.last_name} className="mt-2" />
+                                <InputError message={errors.last_name} className="mt-1 text-xs" />
                             </div>
                         </div>
 
-                        <div className="mt-4">
-                            <InputLabel htmlFor="email" value="Correo Electrónico" />
+                        {/* Email */}
+                        <div>
+                            <InputLabel htmlFor="email" value="Correo Electrónico" className="text-sm" />
                             <TextInput
                                 id="email"
                                 type="email"
                                 name="email"
                                 value={data.email}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full py-1"
                                 autoComplete="username"
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
                                 placeholder="john.doe@gmail.com"
                             />
-                            <InputError message={errors.email} className="mt-2" />
+                            <InputError message={errors.email} className="mt-1 text-xs" />
                         </div>
 
-                        <div className="mt-4">
-                            <InputLabel htmlFor="phone_number" value="Número Telefónico" />
+                        {/* Teléfono */}
+                        <div>
+                            <InputLabel htmlFor="phone_number" value="Número Telefónico" className="text-sm" />
                             <div className="flex">
-                                <div className="flex items-center justify-center bg-gray-100 px-3 rounded-l-md border border-gray-300">
+                                <div className="flex items-center justify-center bg-gray-100 px-3 rounded-l-md border border-gray-300 text-sm">
                                     +51
                                 </div>
                                 <TextInput
@@ -121,23 +114,25 @@ export default function Register() {
                                             setData('phone_number', value);
                                         }
                                     }}
-                                    className="mt-0 block w-full rounded-l-none"
+                                    className="mt-0 block w-full rounded-l-none py-1"
                                     autoComplete="tel"
                                     required
                                 />
                             </div>
-                            <InputError message={errors.phone_number} className="mt-2" />
+                            <InputError message={errors.phone_number} className="mt-1 text-xs" />
                         </div>
 
-                        <div className="mt-4">
-                            <InputLabel htmlFor="password" value="Contraseña" />
+                        {/* Contraseña */}
+                        <div>
+                            <InputLabel htmlFor="password" value="Contraseña" className="text-sm" />
                             <div className="relative">
                                 <TextInput
                                     id="password"
                                     type={showPassword ? "text" : "password"}
                                     name="password"
                                     value={data.password}
-                                    className="mt-1 block w-full pr-10"
+                                    className="mt-1 block w-full pr-10 py-1"
+                                    placeholder="Ingresa tu contraseña"
                                     autoComplete="new-password"
                                     onChange={(e) => setData('password', e.target.value)}
                                     required
@@ -157,13 +152,15 @@ export default function Register() {
                                     </svg>
                                 </button>
                             </div>
-                            <InputError message={errors.password} className="mt-2" />
+                            <InputError message={errors.password} className="mt-1 text-xs" />
                         </div>
 
-                        <div className="mt-4">
+                        {/* Confirmar Contraseña */}
+                        <div>
                             <InputLabel
                                 htmlFor="password_confirmation"
                                 value="Confirmar Contraseña"
+                                className="text-sm"
                             />
                             <div className="relative">
                                 <TextInput
@@ -171,7 +168,8 @@ export default function Register() {
                                     type={showConfirmPassword ? "text" : "password"}
                                     name="password_confirmation"
                                     value={data.password_confirmation}
-                                    className="mt-1 block w-full pr-10"
+                                    className="mt-1 block w-full pr-10 py-1"
+                                    placeholder="Confirma tu contraseña"
                                     autoComplete="new-password"
                                     onChange={(e) =>
                                         setData('password_confirmation', e.target.value)
@@ -195,40 +193,46 @@ export default function Register() {
                             </div>
                             <InputError
                                 message={errors.password_confirmation}
-                                className="mt-2"
+                                className="mt-1 text-xs"
                             />
                         </div>
 
-                        <div className="mt-4">
+                        {/* Términos y Condiciones */}
+                        <div className="mt-2">
                             <label className="flex items-center">
                                 <input type="checkbox" className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" required />
-                                <span className="ml-2 text-sm text-gray-600">Acepto los términos y Condiciones</span>
+                                <span className="ml-2 text-xs text-gray-600">Acepto los términos y Condiciones</span>
                             </label>
                         </div>
 
-                        <div className="mt-6">
-                            <PrimaryButton className="w-full justify-center py-3" disabled={processing}>
+                        {/* Botón de Registro */}
+                        <div className="mt-3">
+                            <PrimaryButton className="w-full justify-center py-2" disabled={processing}>
                                 Crear Cuenta
                             </PrimaryButton>
                         </div>
 
-                        <div className="mt-6 text-center">
-                            <p className="text-sm text-gray-500">O REGÍSTRATE CON</p>
-                            <div className="mt-4">
-                                <button type="button" className="w-full border border-gray-300 rounded-md py-2 flex items-center justify-center">
-                                    <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
-                                        <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#FFC107"/>
-                                        <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#FF3D00"/>
-                                        <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#4CAF50"/>
-                                        <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#1976D2"/>
-                                    </svg>
-                                    Google
-                                </button>
-                            </div>
+                        {/* Separador */}
+                        <div className="mt-3 text-center">
+                            <p className="text-xs text-gray-500">O REGÍSTRATE CON</p>
                         </div>
 
-                        <div className="mt-6 text-center">
-                            <p className="text-sm text-gray-600">
+                        {/* Botón de Google */}
+                        <div>
+                            <button type="button" className="w-full border border-gray-300 rounded-md py-2 flex items-center justify-center">
+                                <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
+                                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#FFC107"/>
+                                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#FF3D00"/>
+                                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#4CAF50"/>
+                                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#1976D2"/>
+                                </svg>
+                                <span className="text-sm">Google</span>
+                            </button>
+                        </div>
+
+                        {/* Login Link */}
+                        <div className="mt-3 text-center">
+                            <p className="text-xs text-gray-600">
                                 ¿Ya tienes una cuenta? 
                                 <Link
                                     href={route('login')}
