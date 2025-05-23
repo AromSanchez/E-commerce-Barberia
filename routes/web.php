@@ -34,6 +34,26 @@ Route::get('/dashboard/brand', function(){
     return Inertia::render('DashAdmin/DashBrand');
 })->middleware(['auth', 'verified', 'admin'])->name('dashboard.brand');
 
+Route::get('/dashboard/coupon', function(){
+    return Inertia::render('DashAdmin/DashCoupon');
+})->middleware(['auth', 'verified', 'admin'])->name('dashboard.coupon');
+
+Route::get('/dashboard/users', function(){
+    return Inertia::render('DashAdmin/DashUsers');
+})->middleware(['auth', 'verified', 'admin'])->name('dashboard.users');
+
+Route::get('/dashboard/products', function(){
+    return Inertia::render('DashAdmin/DashProducts/DashProduct');
+})->middleware(['auth', 'verified', 'admin'])->name('dashboard.product');
+
+Route::get('/dashboard/addproducts', function(){
+    return Inertia::render('DashAdmin/DashProducts/DashAddProduct');
+})->middleware(['auth', 'verified', 'admin'])->name('dashboard.addproduct');
+
+Route::get('/dashboard/orders', function(){
+    return Inertia::render('DashAdmin/DashOrders/DashOrder');
+})->middleware(['auth','verified', 'admin'])->name('dashboard.orders');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

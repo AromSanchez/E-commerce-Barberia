@@ -3,48 +3,64 @@ import { Head, usePage, router } from '@inertiajs/react';
 import HeadAdmin from '@/Layouts/head_admin/HeadAdmin';
 import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
 import { useState, useEffect } from 'react';
-import AddCategoryDialog from '@/components/DashCategory/AddCategoryDialog';
 import EditIcon from '@/components/Icons/EditIcon';
 import DeleteIcon from '@/components/Icons/DeleteIcon';
-import EditCategoryDialog from '@/components/DashCategory/EditCategoryDialog';
-import { Search, Package } from 'lucide-react';
+import { Search, ShoppingBag, Eye } from 'lucide-react';
 
-export default function DashCategory() {
-    const { categories } = usePage().props;
+export default function DashProduct() {
+    const { products } = usePage().props;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [categoryList, setCategoryList] = useState([]);
+    const [productList, setProductList] = useState([]);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
-    const [categoryToEdit, setCategoryToEdit] = useState(null);
+    const [productToEdit, setProductToEdit] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        if (categories) {
-            setCategoryList(categories);
+        if (products) {
+            setProductList(products);
+        } else {
+            // Datos de ejemplo para mostrar en la tabla si no hay datos reales
+            setProductList([
+                { 
+                    id: 6, 
+                    name: 'Product6', 
+                    slug: 'product6',
+                    price: 128.00,
+                    sale_price: 110.00,
+                    sku: 'SKU7868',
+                    category: 'Category3',
+                    brand: 'Brand2',
+                    featured: 'Yes',
+                    stock: 'instock',
+                    quantity: 11,
+                    image: null
+                }
+            ]);
         }
-    }, [categories]);
+    }, [products]);
 
-    const handleAddCategory = (newCategory) => {
-        setCategoryList([...categoryList, newCategory]);
+    const handleAddProduct = (newProduct) => {
+        setProductList([...productList, newProduct]);
     };
 
-    const handleDeleteCategory = (id) => {
-        router.delete(route('dashboard.category.destroy', id), {
+    const handleDeleteProduct = (id) => {
+        router.delete(route('dashboard.products.destroy', id), {
             onSuccess: () => {
-                setCategoryList(categoryList.filter(category => category.id !== id));
+                setProductList(productList.filter(product => product.id !== id));
             }
         });
     };
 
-    const handleEditCategory = (category) => {
-        setCategoryToEdit(category);
+    const handleEditProduct = (product) => {
+        setProductToEdit(product);
         setEditDialogOpen(true);
     };
 
-    const handleUpdateCategory = (updatedCategory) => {
-        router.patch(route('dashboard.category.update', updatedCategory.id), updatedCategory, {
+    const handleUpdateProduct = (updatedProduct) => {
+        router.patch(route('dashboard.products.update', updatedProduct.id), updatedProduct, {
             onSuccess: () => {
-                setCategoryList(categoryList.map(category => 
-                    category.id === updatedCategory.id ? updatedCategory : category
+                setProductList(productList.map(product => 
+                    product.id === updatedProduct.id ? updatedProduct : product
                 ));
                 setEditDialogOpen(false);
             }
@@ -53,15 +69,17 @@ export default function DashCategory() {
 
     const [isCollapsed, setIsCollapsed] = useState(false);
 
-    // Filtrar categorías según el término de búsqueda
-    const filteredCategories = categoryList.filter(category => 
-        category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        category.slug?.toLowerCase().includes(searchTerm.toLowerCase())
+    // Filtrar productos según el término de búsqueda
+    const filteredProducts = productList.filter(product => 
+        product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.brand?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
         <AuthenticatedLayout>
-            <Head title="Categorías" />
+            <Head title="Productos" />
             <div className="flex h-screen">
                 <div className="fixed left-0 h-full">
                     <NavAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
@@ -77,9 +95,9 @@ export default function DashCategory() {
                                 <div className="flex justify-between items-center mb-6">
                                     <div className="flex items-center gap-3">
                                         <div className="bg-blue-50 p-3 rounded-lg">
-                                            <Package className="text-blue-600 w-6 h-6" />
+                                            <ShoppingBag className="text-blue-600 w-6 h-6" />
                                         </div>
-                                        <h2 className="text-xl font-semibold">Gestión de Categorías</h2>
+                                        <h2 className="text-xl font-semibold">Gestión de Productos</h2>
                                     </div>
                                 </div>
                                 
@@ -88,7 +106,7 @@ export default function DashCategory() {
                                     <div className="relative w-full md:w-1/2">
                                         <input 
                                             type="text" 
-                                            placeholder="Buscar categoría..." 
+                                            placeholder="Buscar producto..." 
                                             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -102,11 +120,11 @@ export default function DashCategory() {
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                             <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
                                         </svg>
-                                        Añadir nueva
+                                        Añadir nuevo
                                     </button>
                                 </div>
 
-                                {/* Tabla de categorías */}
+                                {/* Tabla de productos */}
                                 <div className="flex-1 overflow-hidden">
                                     <div className="h-full overflow-y-auto">
                                         <table className="min-w-full">
@@ -114,45 +132,65 @@ export default function DashCategory() {
                                                 <tr>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">#</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Nombre</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Slug</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Productos</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Precio</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">PrecioVenta</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">SKU</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Categoría</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Marca</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Destacado</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Stock</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Cantidad</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Acción</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-100">
-                                                {filteredCategories.length > 0 ? (
-                                                    filteredCategories.map((category, index) => (
-                                                        <tr key={category.id} className="hover:bg-gray-50">
+                                                {filteredProducts.length > 0 ? (
+                                                    filteredProducts.map((product, index) => (
+                                                        <tr key={product.id} className="hover:bg-gray-50">
                                                             <td className="p-4 text-sm text-gray-600">{index + 1}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center">
-                                                                    {category.image ? (
+                                                                    {product.image ? (
                                                                         <img 
-                                                                            src={category.image} 
-                                                                            alt={category.name} 
+                                                                            src={product.image} 
+                                                                            alt={product.name} 
                                                                             className="w-10 h-10 rounded-md mr-3 object-cover"
                                                                         />
                                                                     ) : (
                                                                         <div className="w-10 h-10 bg-gray-200 rounded-md mr-3 flex items-center justify-center">
-                                                                            <Package className="w-6 h-6 text-gray-400" />
+                                                                            <ShoppingBag className="w-6 h-6 text-gray-400" />
                                                                         </div>
                                                                     )}
-                                                                    <span className="text-sm font-medium text-gray-900">{category.name}</span>
+                                                                    <div>
+                                                                        <span className="text-sm font-medium text-gray-900">{product.name}</span>
+                                                                        <p className="text-xs text-gray-500">{product.slug}</p>
+                                                                    </div>
                                                                 </div>
                                                             </td>
-                                                            <td className="p-4 text-sm text-gray-600">{category.slug || `category${index + 1}`}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{category.products_count || 0}</td>
+                                                            <td className="p-4 text-sm text-gray-600">${product.price?.toFixed(2)}</td>
+                                                            <td className="p-4 text-sm text-gray-600">${product.sale_price?.toFixed(2)}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{product.sku}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{product.category}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{product.brand}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{product.featured}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{product.stock}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{product.quantity}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
                                                                     <button 
+                                                                        className="text-blue-600 hover:text-blue-900 p-1"
+                                                                    >
+                                                                        <Eye className="h-5 w-5" />
+                                                                    </button>
+                                                                    <button 
                                                                         className="text-green-600 hover:text-green-900 p-1"
-                                                                        onClick={() => handleEditCategory(category)}
+                                                                        onClick={() => handleEditProduct(product)}
                                                                     >
                                                                         <EditIcon />
                                                                     </button>
                                                                     <button 
                                                                         className="text-red-600 hover:text-red-900 p-1"
-                                                                        onClick={() => handleDeleteCategory(category.id)}
+                                                                        onClick={() => handleDeleteProduct(product.id)}
                                                                     >
                                                                         <DeleteIcon />
                                                                     </button>
@@ -162,8 +200,8 @@ export default function DashCategory() {
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
-                                                            No hay categorías disponibles
+                                                        <td colSpan="11" className="px-6 py-4 text-center text-sm text-gray-500">
+                                                            No hay productos disponibles
                                                         </td>
                                                     </tr>
                                                 )}
@@ -177,21 +215,8 @@ export default function DashCategory() {
                 </div>
             </div>
 
-            {/* Diálogo para añadir categoría */}
-            <AddCategoryDialog 
-                isOpen={isDialogOpen} 
-                onClose={() => setIsDialogOpen(false)} 
-                onSave={handleAddCategory} 
-            />
-            {/* Diálogo para editar categoría */}
-            {categoryToEdit && (
-                <EditCategoryDialog 
-                    isOpen={editDialogOpen} 
-                    category={categoryToEdit}
-                    onClose={() => setEditDialogOpen(false)} 
-                    onSave={handleUpdateCategory} 
-                />
-            )}
+            {/* Aquí podrías añadir los componentes de diálogo para añadir y editar productos */}
+            {/* Similar a AddCategoryDialog y EditCategoryDialog */}
         </AuthenticatedLayout>
     );
 }

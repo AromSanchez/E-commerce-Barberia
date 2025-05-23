@@ -78,10 +78,10 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                                 )}
                             </button>
                             <div className={`pl-10 mt-2 space-y-2 overflow-hidden transition-all duration-300 ${activeDropdown === 'products' && !isCollapsed ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                <Link href="/dashboard/products/create" className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                                <Link href={route('dashboard.addproduct')} className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
                                     Add Product
                                 </Link>
-                                <Link href="/dashboard/products" className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                                <Link href={route('dashboard.product')} className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
                                     Products
                                 </Link>
                             </div>
@@ -103,7 +103,7 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                                 )}
                             </button>
                             <div className={`pl-10 mt-2 space-y-2 overflow-hidden transition-all duration-300 ${activeDropdown === 'orders' && !isCollapsed ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                <Link href="/dashboard/orders" className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                                <Link href={route('dashboard.orders')} className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
                                     Orders
                                 </Link>
                                 <Link href="/dashboard/order-tracking" className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
@@ -111,14 +111,6 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                                 </Link>
                             </div>
                         </div>
-                    </li>
-
-                    {/* Brand*/}
-                    <li>
-                        <Link href={route('dashboard.brand')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
-                            <Layers className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
-                            {!isCollapsed && <span>Brands</span>}
-                        </Link>
                     </li>
 
                     {/* Category */}
@@ -129,16 +121,23 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                         </Link>
                     </li>
 
-                   
+                    {/* Brand*/}
                     <li>
-                        <Link href="/dashboard/coupons" className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
+                        <Link href={route('dashboard.brand')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
+                            <Layers className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
+                            {!isCollapsed && <span>Brands</span>}
+                        </Link>
+                    </li>
+
+                    <li>
+                        <Link href={route('dashboard.coupon')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
                             <Tag className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
                             {!isCollapsed && <span>Coupons</span>}
                         </Link>
                     </li>
 
                     <li>
-                        <Link href="/dashboard/users" className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
+                        <Link href={route('dashboard.users')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
                             <Users className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
                             {!isCollapsed && <span>User</span>}
                         </Link>
