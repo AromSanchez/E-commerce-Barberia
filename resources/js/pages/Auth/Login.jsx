@@ -39,7 +39,7 @@ export default function Login({ status, canResetPassword }) {
             <div className="w-full md:w-1/2 flex items-center justify-center p-8">
                 <div className="w-full max-w-md">
                     <div className="text-right mb-8">
-                        <img src="/images/logo.png" alt="BarberShop" className="h-8 inline-block" />
+                        <img src="/images/logo.png" alt="BarberShop" className="h-12 inline-block" />
                     </div>
 
                     <h1 className="text-3xl font-bold mb-2">Bienvenido a BarberShop</h1>

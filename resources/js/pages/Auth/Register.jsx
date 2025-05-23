@@ -39,7 +39,7 @@ export default function Register() {
             <div className="w-full md:w-1/2 flex items-center justify-center p-4 overflow-y-auto">
                 <div className="w-full max-w-md">
                     <div className="flex justify-end mb-4">
-                        <img src="/images/logo.png" alt="Barber Logo" className="h-8" />
+                        <img src="/images/logo.png" alt="Barber Logo" className="h-12" />
                     </div>
                     
                     <h2 className="text-2xl font-bold mb-1">Crea tu cuenta</h2>
@@ -59,7 +59,6 @@ export default function Register() {
                                     isFocused={true}
                                     onChange={(e) => setData('name', e.target.value)}
                                     required
-                                    placeholder="John"
                                 />
                                 <InputError message={errors.name} className="mt-1 text-xs" />
                             </div>
@@ -74,7 +73,6 @@ export default function Register() {
                                     autoComplete="family-name"
                                     onChange={(e) => setData('last_name', e.target.value)}
                                     required
-                                    placeholder="Perez"
                                 />
                                 <InputError message={errors.last_name} className="mt-1 text-xs" />
                             </div>
@@ -92,7 +90,7 @@ export default function Register() {
                                 autoComplete="username"
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
-                                placeholder="john.doe@gmail.com"
+                                placeholder="Ingresa tu correo electronico"
                             />
                             <InputError message={errors.email} className="mt-1 text-xs" />
                         </div>
@@ -212,26 +210,8 @@ export default function Register() {
                             </PrimaryButton>
                         </div>
 
-                        {/* Separador */}
-                        <div className="mt-3 text-center">
-                            <p className="text-xs text-gray-500">O REGÍSTRATE CON</p>
-                        </div>
-
-                        {/* Botón de Google */}
-                        <div>
-                            <button type="button" className="w-full border border-gray-300 rounded-md py-2 flex items-center justify-center">
-                                <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
-                                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#FFC107"/>
-                                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#FF3D00"/>
-                                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#4CAF50"/>
-                                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#1976D2"/>
-                                </svg>
-                                <span className="text-sm">Google</span>
-                            </button>
-                        </div>
-
                         {/* Login Link */}
-                        <div className="mt-3 text-center">
+                        <div className="mt-6 text-center"> {/* Cambiado de mt-3 a mt-6 */}
                             <p className="text-xs text-gray-600">
                                 ¿Ya tienes una cuenta? 
                                 <Link

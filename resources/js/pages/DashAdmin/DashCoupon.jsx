@@ -3,65 +3,65 @@ import { Head, usePage, router } from '@inertiajs/react';
 import HeadAdmin from '@/Layouts/head_admin/HeadAdmin';
 import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
 import { useState, useEffect } from 'react';
-import AddCategoryDialog from '@/components/DashCategory/AddCategoryDialog';
 import EditIcon from '@/components/Icons/EditIcon';
 import DeleteIcon from '@/components/Icons/DeleteIcon';
-import EditCategoryDialog from '@/components/DashCategory/EditCategoryDialog';
-import { Search, Package } from 'lucide-react';
+import { Search, Tag } from 'lucide-react';
 
-export default function DashCategory() {
-    const { categories } = usePage().props;
+export default function DashCoupon() {
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [categoryList, setCategoryList] = useState([]);
+    const [couponList, setCouponList] = useState([]);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
-    const [categoryToEdit, setCategoryToEdit] = useState(null);
+    const [couponToEdit, setCouponToEdit] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Aquí podrías cargar los cupones desde props
+    // const { coupons } = usePage().props;
+    // useEffect(() => {
+    //     if (coupons) {
+    //         setCouponList(coupons);
+    //     }
+    // }, [coupons]);
+
+    // Datos de ejemplo para mostrar en la tabla
     useEffect(() => {
-        if (categories) {
-            setCategoryList(categories);
-        }
-    }, [categories]);
+        setCouponList([
+            { id: 1, code: 'WELCOME10', type: 'Porcentaje', value: '10%', cart_value: '$50.00', expiry_date: '2023-12-31' },
+            { id: 2, code: 'SUMMER20', type: 'Porcentaje', value: '20%', cart_value: '$100.00', expiry_date: '2023-09-30' },
+            { id: 3, code: 'FREESHIP', type: 'Fijo', value: '$15.00', cart_value: '$75.00', expiry_date: '2023-10-15' }
+        ]);
+    }, []);
 
-    const handleAddCategory = (newCategory) => {
-        setCategoryList([...categoryList, newCategory]);
+    const handleAddCoupon = (newCoupon) => {
+        setCouponList([...couponList, newCoupon]);
     };
 
-    const handleDeleteCategory = (id) => {
-        router.delete(route('dashboard.category.destroy', id), {
-            onSuccess: () => {
-                setCategoryList(categoryList.filter(category => category.id !== id));
-            }
-        });
+    const handleDeleteCoupon = (id) => {
+        // Implementar la lógica de eliminación
+        setCouponList(couponList.filter(coupon => coupon.id !== id));
     };
 
-    const handleEditCategory = (category) => {
-        setCategoryToEdit(category);
+    const handleEditCoupon = (coupon) => {
+        setCouponToEdit(coupon);
         setEditDialogOpen(true);
     };
 
-    const handleUpdateCategory = (updatedCategory) => {
-        router.patch(route('dashboard.category.update', updatedCategory.id), updatedCategory, {
-            onSuccess: () => {
-                setCategoryList(categoryList.map(category => 
-                    category.id === updatedCategory.id ? updatedCategory : category
-                ));
-                setEditDialogOpen(false);
-            }
-        });
+    const handleUpdateCoupon = (updatedCoupon) => {
+        setCouponList(couponList.map(coupon => 
+            coupon.id === updatedCoupon.id ? updatedCoupon : coupon
+        ));
+        setEditDialogOpen(false);
     };
 
-    const [isCollapsed, setIsCollapsed] = useState(false);
-
-    // Filtrar categorías según el término de búsqueda
-    const filteredCategories = categoryList.filter(category => 
-        category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        category.slug?.toLowerCase().includes(searchTerm.toLowerCase())
+    // Filtrar cupones según el término de búsqueda
+    const filteredCoupons = couponList.filter(coupon => 
+        coupon.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        coupon.type?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
         <AuthenticatedLayout>
-            <Head title="Categorías" />
+            <Head title="Cupones" />
             <div className="flex h-screen">
                 <div className="fixed left-0 h-full">
                     <NavAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
@@ -77,9 +77,9 @@ export default function DashCategory() {
                                 <div className="flex justify-between items-center mb-6">
                                     <div className="flex items-center gap-3">
                                         <div className="bg-blue-50 p-3 rounded-lg">
-                                            <Package className="text-blue-600 w-6 h-6" />
+                                            <Tag className="text-blue-600 w-6 h-6" />
                                         </div>
-                                        <h2 className="text-xl font-semibold">Gestión de Categorías</h2>
+                                        <h2 className="text-xl font-semibold">Gestión de Cupones</h2>
                                     </div>
                                 </div>
                                 
@@ -88,7 +88,7 @@ export default function DashCategory() {
                                     <div className="relative w-full md:w-1/2">
                                         <input 
                                             type="text" 
-                                            placeholder="Buscar categoría..." 
+                                            placeholder="Buscar cupón..." 
                                             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -102,57 +102,53 @@ export default function DashCategory() {
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                             <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
                                         </svg>
-                                        Añadir nueva
+                                        Añadir nuevo
                                     </button>
                                 </div>
 
-                                {/* Tabla de categorías */}
+                                {/* Tabla de cupones */}
                                 <div className="flex-1 overflow-hidden">
                                     <div className="h-full overflow-y-auto">
                                         <table className="min-w-full">
                                             <thead className="sticky top-0 bg-white z-10 shadow-sm">
                                                 <tr>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">#</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Nombre</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Slug</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Productos</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Acción</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Code</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Type</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Value</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Cart Value</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Expiry Date</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-100">
-                                                {filteredCategories.length > 0 ? (
-                                                    filteredCategories.map((category, index) => (
-                                                        <tr key={category.id} className="hover:bg-gray-50">
+                                                {filteredCoupons.length > 0 ? (
+                                                    filteredCoupons.map((coupon, index) => (
+                                                        <tr key={coupon.id} className="hover:bg-gray-50">
                                                             <td className="p-4 text-sm text-gray-600">{index + 1}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center">
-                                                                    {category.image ? (
-                                                                        <img 
-                                                                            src={category.image} 
-                                                                            alt={category.name} 
-                                                                            className="w-10 h-10 rounded-md mr-3 object-cover"
-                                                                        />
-                                                                    ) : (
-                                                                        <div className="w-10 h-10 bg-gray-200 rounded-md mr-3 flex items-center justify-center">
-                                                                            <Package className="w-6 h-6 text-gray-400" />
-                                                                        </div>
-                                                                    )}
-                                                                    <span className="text-sm font-medium text-gray-900">{category.name}</span>
+                                                                    <div className="w-10 h-10 bg-blue-100 rounded-md mr-3 flex items-center justify-center">
+                                                                        <Tag className="w-6 h-6 text-blue-600" />
+                                                                    </div>
+                                                                    <span className="text-sm font-medium text-gray-900">{coupon.code}</span>
                                                                 </div>
                                                             </td>
-                                                            <td className="p-4 text-sm text-gray-600">{category.slug || `category${index + 1}`}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{category.products_count || 0}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{coupon.type}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{coupon.value}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{coupon.cart_value}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{coupon.expiry_date}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
                                                                     <button 
                                                                         className="text-green-600 hover:text-green-900 p-1"
-                                                                        onClick={() => handleEditCategory(category)}
+                                                                        onClick={() => handleEditCoupon(coupon)}
                                                                     >
                                                                         <EditIcon />
                                                                     </button>
                                                                     <button 
                                                                         className="text-red-600 hover:text-red-900 p-1"
-                                                                        onClick={() => handleDeleteCategory(category.id)}
+                                                                        onClick={() => handleDeleteCoupon(coupon.id)}
                                                                     >
                                                                         <DeleteIcon />
                                                                     </button>
@@ -162,8 +158,8 @@ export default function DashCategory() {
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
-                                                            No hay categorías disponibles
+                                                        <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
+                                                            No hay cupones disponibles
                                                         </td>
                                                     </tr>
                                                 )}
@@ -177,21 +173,8 @@ export default function DashCategory() {
                 </div>
             </div>
 
-            {/* Diálogo para añadir categoría */}
-            <AddCategoryDialog 
-                isOpen={isDialogOpen} 
-                onClose={() => setIsDialogOpen(false)} 
-                onSave={handleAddCategory} 
-            />
-            {/* Diálogo para editar categoría */}
-            {categoryToEdit && (
-                <EditCategoryDialog 
-                    isOpen={editDialogOpen} 
-                    category={categoryToEdit}
-                    onClose={() => setEditDialogOpen(false)} 
-                    onSave={handleUpdateCategory} 
-                />
-            )}
+            {/* Aquí puedes añadir los componentes de diálogo para añadir y editar cupones */}
+            {/* Similar a AddCategoryDialog y EditCategoryDialog */}
         </AuthenticatedLayout>
     );
 }
