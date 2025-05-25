@@ -7,6 +7,7 @@ import DeleteIcon from '@/components/Icons/DeleteIcon';
 import { useState, useEffect } from 'react';
 import { Search, Layers } from 'lucide-react';
 import AddBrandDialog from '@/components/DashBrand/addBrandDialog';
+import EditBrandDialog from '@/components/DashBrand/editBrandDialog';
 
 export default function DashBrand() {
     const { brands } = usePage().props; // Obtener las marcas desde las props
@@ -14,6 +15,9 @@ export default function DashBrand() {
     const [searchTerm, setSearchTerm] = useState('');
     const [brandList, setBrandList] = useState(brands || []); // Inicializar con las marcas obtenidas
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [brandToEdit, setBrandToEdit] = useState(null);
+    
     useEffect(() => {
         if (brands) {
             setBrandList(brands);
@@ -35,6 +39,17 @@ export default function DashBrand() {
                 console.error(errors);
             },
         });
+    };
+
+    const handleEditBrand = (brand) => {
+        setBrandToEdit(brand);
+        setIsEditDialogOpen(true);
+    };
+
+    const handleUpdateBrand = (updatedBrand) => {
+        setBrandList(brandList.map(brand => 
+            brand.id === updatedBrand.id ? updatedBrand : brand
+        ));
     };
 
     return (
@@ -126,6 +141,7 @@ export default function DashBrand() {
                                                                 <div className="flex items-center space-x-2">
                                                                     <button
                                                                         className="text-green-600 hover:text-green-900 p-1"
+                                                                        onClick={() => handleEditBrand(brand)}
                                                                     >
                                                                         <EditIcon />
                                                                     </button>
@@ -158,6 +174,12 @@ export default function DashBrand() {
                 isOpen={isDialogOpen}
                 onClose={() => setIsDialogOpen(false)}
                 onSave={handleSaveBrand}
+            />
+            <EditBrandDialog
+                isOpen={isEditDialogOpen}
+                onClose={() => setIsEditDialogOpen(false)}
+                onSave={handleUpdateBrand}
+                brand={brandToEdit}
             />
         </AuthenticatedLayout>
     );

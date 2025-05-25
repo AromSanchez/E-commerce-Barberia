@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Brand;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
@@ -17,7 +18,6 @@ class BrandController extends Controller
         return Inertia::render('DashAdmin/DashBrand', [
             'brands' => $brands
         ]);
-        
     }
 
     /**
@@ -42,7 +42,7 @@ class BrandController extends Controller
             $validated['logo'] = $request->file('logo')->store('logos', 'public');
         }
         Brand::create($validated);
-        
+
         return redirect()->route('dashboard.brand');
     }
 
@@ -65,9 +65,27 @@ class BrandController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $brand = Brand::findOrFail($id);
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'logo' => 'nullable|image|max:2048', // 2MB max
+        ]);
+        
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($brand->logo) {
+                Storage::disk('public')->delete($brand->logo);
+            }
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
+        }
+        
+        $brand->update($validated);
+        
+        return redirect()->route('dashboard.brand');
     }
 
     /**
@@ -75,6 +93,5 @@ class BrandController extends Controller
      */
     public function destroy(string $id)
     {
-        //
     }
 }

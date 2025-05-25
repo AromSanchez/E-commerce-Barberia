@@ -41,6 +41,9 @@ Route::post('/dashboard/brand', [BrandController::class, 'store'])
     ->middleware(['auth','verified', 'admin'])
     ->name('dashboard.brand.store');
 
+Route::patch('/dashboard/brand/{id}', [BrandController::class, 'update'])
+    ->middleware(['auth','verified', 'admin'])
+    ->name('dashboard.brand.update');
 
 
 
