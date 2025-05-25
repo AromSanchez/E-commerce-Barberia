@@ -55,8 +55,10 @@ export default function DashCategory() {
 
     // Filtrar categorías según el término de búsqueda
     const filteredCategories = categoryList.filter(category => 
-        category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        category.slug?.toLowerCase().includes(searchTerm.toLowerCase())
+        category && (
+            (category.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (category.description?.toLowerCase().includes(searchTerm.toLowerCase()))
+        )
     );
 
     return (
@@ -114,7 +116,7 @@ export default function DashCategory() {
                                                 <tr>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">#</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Nombre</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Slug</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Descripción</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Productos</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Acción</th>
                                                 </tr>
@@ -126,21 +128,17 @@ export default function DashCategory() {
                                                             <td className="p-4 text-sm text-gray-600">{index + 1}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center">
-                                                                    {category.image ? (
-                                                                        <img 
-                                                                            src={category.image} 
-                                                                            alt={category.name} 
-                                                                            className="w-10 h-10 rounded-md mr-3 object-cover"
-                                                                        />
-                                                                    ) : (
-                                                                        <div className="w-10 h-10 bg-gray-200 rounded-md mr-3 flex items-center justify-center">
-                                                                            <Package className="w-6 h-6 text-gray-400" />
-                                                                        </div>
-                                                                    )}
+                                                                    
                                                                     <span className="text-sm font-medium text-gray-900">{category.name}</span>
                                                                 </div>
                                                             </td>
-                                                            <td className="p-4 text-sm text-gray-600">{category.slug || `category${index + 1}`}</td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                {category.description ? (
+                                                                    <div className="max-w-xs truncate">{category.description}</div>
+                                                                ) : (
+                                                                    <span className="text-gray-400">Sin descripción</span>
+                                                                )}
+                                                            </td>
                                                             <td className="p-4 text-sm text-gray-600">{category.products_count || 0}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
