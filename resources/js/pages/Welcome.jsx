@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import Header from '@/layouts/header/Header';
 import Footer from '@/layouts/footer/Footer';
+import MainHome from '@/layouts/main_home/MainHome';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const handleImageError = () => {
@@ -17,6 +18,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     return (
         <>
             <Header />
+            <MainHome />
             <Footer />
             
         </>

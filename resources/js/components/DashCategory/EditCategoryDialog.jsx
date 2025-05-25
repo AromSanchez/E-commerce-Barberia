@@ -5,62 +5,16 @@ import { X } from 'lucide-react';
 
 export default function EditCategoryDialog({ isOpen, onClose, onSave, category }) {
     const [name, setName] = useState('');
-    const [slug, setSlug] = useState('');
-    const [image, setImage] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
+    const [description, setDescription] = useState('');
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
 
     useEffect(() => {
         if (category && isOpen) {
             setName(category.name || '');
-            setSlug(category.slug || '');
-            setImagePreview(category.image || null);
+            setDescription(category.description || '');
         }
     }, [category, isOpen]);
-
-    // Generar slug automáticamente a partir del nombre si el usuario no ha modificado manualmente el slug
-    useEffect(() => {
-        if (name && !slug) {
-            const generatedSlug = name
-                .toLowerCase()
-                .replace(/\s+/g, '-')
-                .replace(/[^\w\-]+/g, '')
-                .replace(/\-\-+/g, '-')
-                .replace(/^-+/, '')
-                .replace(/-+$/, '');
-            setSlug(generatedSlug);
-        }
-    }, [name, slug]);
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files[0];
-        if (file) {
-            setImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleDragOver = (e) => {
-        e.preventDefault();
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -69,10 +23,7 @@ export default function EditCategoryDialog({ isOpen, onClose, onSave, category }
         const formData = new FormData();
         formData.append('_method', 'PATCH');
         formData.append('name', name);
-        formData.append('slug', slug);
-        if (image) {
-            formData.append('image', image);
-        }
+        formData.append('description', description);
 
         router.post(route('dashboard.category.update', category.id), formData, {
             onSuccess: () => {
@@ -80,8 +31,7 @@ export default function EditCategoryDialog({ isOpen, onClose, onSave, category }
                 onSave({
                     ...category,
                     name,
-                    slug,
-                    image: imagePreview
+                    description
                 });
                 onClose();
             },
@@ -111,7 +61,7 @@ export default function EditCategoryDialog({ isOpen, onClose, onSave, category }
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                                Category Name <span className="text-red-500">*</span>
+                                Nombre de Categoría <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -119,7 +69,7 @@ export default function EditCategoryDialog({ isOpen, onClose, onSave, category }
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Category name"
+                                placeholder="Nombre de categoría"
                                 required
                             />
                             {errors.name && (
@@ -128,62 +78,20 @@ export default function EditCategoryDialog({ isOpen, onClose, onSave, category }
                         </div>
                         
                         <div className="mb-4">
-                            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-1">
-                                Category Slug <span className="text-red-500">*</span>
+                            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                                Descripción <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="text"
-                                id="slug"
-                                value={slug}
-                                onChange={(e) => setSlug(e.target.value)}
+                            <textarea
+                                id="description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Category Slug"
+                                placeholder="Descripción de la categoría"
+                                rows="4"
                                 required
-                            />
-                            {errors.slug && (
-                                <p className="mt-1 text-sm text-red-600">{errors.slug}</p>
-                            )}
-                        </div>
-                        
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Upload images <span className="text-red-500">*</span>
-                            </label>
-                            <div 
-                                className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center cursor-pointer"
-                                onDrop={handleDrop}
-                                onDragOver={handleDragOver}
-                                onClick={() => document.getElementById('image-upload-edit').click()}
-                            >
-                                {imagePreview ? (
-                                    <div className="flex flex-col items-center">
-                                        <img 
-                                            src={imagePreview} 
-                                            alt="Preview" 
-                                            className="max-h-40 mb-2 object-contain" 
-                                        />
-                                        <p className="text-sm text-gray-500">Haz clic para cambiar la imagen</p>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center">
-                                        <div className="mb-2">
-                                            <svg className="mx-auto h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                            </svg>
-                                        </div>
-                                        <p className="text-sm text-gray-600">Drop your images here or select <span className="text-blue-500">click to browse</span></p>
-                                    </div>
-                                )}
-                                <input
-                                    id="image-upload-edit"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                    className="hidden"
-                                />
-                            </div>
-                            {errors.image && (
-                                <p className="mt-1 text-sm text-red-600">{errors.image}</p>
+                            ></textarea>
+                            {errors.description && (
+                                <p className="mt-1 text-sm text-red-600">{errors.description}</p>
                             )}
                         </div>
                         
@@ -193,7 +101,7 @@ export default function EditCategoryDialog({ isOpen, onClose, onSave, category }
                                 disabled={processing}
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                             >
-                                {processing ? 'Guardando...' : 'Save'}
+                                {processing ? 'Guardando...' : 'Guardar'}
                             </button>
                         </div>
                     </form>
