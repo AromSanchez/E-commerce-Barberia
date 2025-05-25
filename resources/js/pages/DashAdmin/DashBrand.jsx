@@ -6,27 +6,41 @@ import EditIcon from '@/components/Icons/EditIcon';
 import DeleteIcon from '@/components/Icons/DeleteIcon';
 import { useState, useEffect } from 'react';
 import { Search, Layers } from 'lucide-react';
+import AddBrandDialog from '@/components/DashBrand/addBrandDialog';
 
 export default function DashBrand() {
+    const { brands } = usePage().props; // Obtener las marcas desde las props
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [brandList, setBrandList] = useState([]);
-    
-    // Aquí podrías agregar la lógica para cargar las marcas desde props
-    // const { brands } = usePage().props;
-    // useEffect(() => {
-    //     if (brands) {
-    //         setBrandList(brands);
-    //     }
-    // }, [brands]);
-    
-    // Filtrar marcas según el término de búsqueda (cuando tengas datos reales)
-    const filteredBrands = [
-        { id: 1, name: 'Ejemplo Marca', description: 'Descripción de ejemplo' }
-    ];
-    
+    const [brandList, setBrandList] = useState(brands || []); // Inicializar con las marcas obtenidas
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    useEffect(() => {
+        if (brands) {
+            setBrandList(brands);
+        }
+    }, [brands]);
+
+    // Filtrar marcas según el término de búsqueda
+    const filteredBrands = brandList.filter(brand =>
+        brand.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleSaveBrand = (formData) => {
+        router.post(route('dashboard.brand.store'), formData, {
+            forceFormData: true,
+            onSuccess: () => {
+                setIsDialogOpen(false);
+            },
+            onError: (errors) => {
+                console.error(errors);
+            },
+        });
+    };
+
     return (
+
         <AuthenticatedLayout>
+            
             <Head title="Marcas" />
             <div className="flex h-screen">
                 <div className="fixed left-0 h-full">
@@ -48,21 +62,22 @@ export default function DashBrand() {
                                         <h2 className="text-xl font-semibold">Gestión de Marcas</h2>
                                     </div>
                                 </div>
-                                
+
                                 {/* Barra de búsqueda y botón de añadir */}
                                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
                                     <div className="relative w-full md:w-1/2">
-                                        <input 
-                                            type="text" 
-                                            placeholder="Buscar marca..." 
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar marca..."
                                             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                                     </div>
-                                    <button 
+                                    <button
                                         className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center"
+                                        onClick={() => setIsDialogOpen(true)}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                             <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
@@ -91,10 +106,10 @@ export default function DashBrand() {
                                                             <td className="p-4 text-sm text-gray-600">{index + 1}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center">
-                                                                    {brand.image ? (
-                                                                        <img 
-                                                                            src={brand.image} 
-                                                                            alt={brand.name} 
+                                                                    {brand.logo ? (
+                                                                        <img
+                                                                            src={`/storage/${brand.logo}`}
+                                                                            alt={brand.name}
                                                                             className="w-10 h-10 rounded-md mr-3 object-cover"
                                                                         />
                                                                     ) : (
@@ -109,12 +124,12 @@ export default function DashBrand() {
                                                             <td className="p-4 text-sm text-gray-600">{brand.products_count || 0}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
-                                                                    <button 
+                                                                    <button
                                                                         className="text-green-600 hover:text-green-900 p-1"
                                                                     >
                                                                         <EditIcon />
                                                                     </button>
-                                                                    <button 
+                                                                    <button
                                                                         className="text-red-600 hover:text-red-900 p-1"
                                                                     >
                                                                         <DeleteIcon />
@@ -139,6 +154,12 @@ export default function DashBrand() {
                     </div>
                 </div>
             </div>
+            <AddBrandDialog
+                isOpen={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                onSave={handleSaveBrand}
+            />
         </AuthenticatedLayout>
     );
 }
+

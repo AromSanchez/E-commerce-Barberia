@@ -40,8 +40,7 @@ class CategoryController extends Controller
 
         $category = Category::create($validated);
 
-        return redirect()->route('dashboard.category')
-            ->with('success', 'Categoría creada exitosamente.');
+        return redirect()->route('dashboard.category');
     }
 
     /**

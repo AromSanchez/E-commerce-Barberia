@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Brand;
+use Inertia\Inertia;
 
 class BrandController extends Controller
 {
@@ -11,7 +13,11 @@ class BrandController extends Controller
      */
     public function index()
     {
-        //
+        $brands = Brand::all();
+        return Inertia::render('DashAdmin/DashBrand', [
+            'brands' => $brands
+        ]);
+        
     }
 
     /**
@@ -19,7 +25,7 @@ class BrandController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('DashAdmin/DashBrand');
     }
 
     /**
@@ -27,7 +33,17 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'logo' => 'nullable|image|max:2048', // 2MB máx
+        ]);
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
+        }
+        Brand::create($validated);
+        
+        return redirect()->route('dashboard.brand');
     }
 
     /**

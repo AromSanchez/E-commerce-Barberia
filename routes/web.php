@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CategoryController; 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\BrandController; 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,6 +20,7 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified', 'admin'])->name('dashboard');
 
+// Category Routes 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/dashboard/category', [CategoryController::class, 'index'])
         ->name('dashboard.category');
@@ -30,9 +32,17 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         ->name('dashboard.category.destroy');
 });
 
-Route::get('/dashboard/brand', function(){
-    return Inertia::render('DashAdmin/DashBrand');
-})->middleware(['auth', 'verified', 'admin'])->name('dashboard.brand');
+// Brands Routes
+Route::get('/dashboard/brand', [BrandController::class, 'index'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('dashboard.brand');
+
+Route::post('/dashboard/brand', [BrandController::class, 'store'])
+    ->middleware(['auth','verified', 'admin'])
+    ->name('dashboard.brand.store');
+
+
+
 
 Route::get('/dashboard/coupon', function(){
     return Inertia::render('DashAdmin/DashCoupon');
