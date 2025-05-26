@@ -1,23 +1,38 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
-class Brand extends Model
+class Product extends Model
 {
     use HasFactory;
     protected $fillable = [
         'name',
         'slug',
-        'short_description',
-        'long_description',
+        'regular_price',
+        'sale_price',
+        'category_id',
+        'brand_id',
+        'is_featured',
+        'stock',
         'image',
-        
+        'short_description',
+        'long_description'
     ];
+
+    // Relación con Brand
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    // Relación con Category
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 
     protected static function boot()
     {
@@ -30,10 +45,5 @@ class Brand extends Model
         static::updating(function ($brand) {
             $brand->slug = Str::slug($brand->name);
         });
-    }
-
-    public function products()
-    {
-        return $this->hasMany(Product::class);
     }
 }

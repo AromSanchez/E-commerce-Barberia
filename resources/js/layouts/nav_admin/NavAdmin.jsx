@@ -72,17 +72,17 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                                 <ShoppingBag className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
                                 {!isCollapsed && (
                                     <>
-                                        <span className="flex-grow text-left">Products</span>
+                                        <span className="flex-grow text-left">Productos</span>
                                         <ChevronDown className={`h-4 w-4 transform transition-transform duration-300 ${activeDropdown === 'products' ? 'rotate-180' : ''}`} />
                                     </>
                                 )}
                             </button>
                             <div className={`pl-10 mt-2 space-y-2 overflow-hidden transition-all duration-300 ${activeDropdown === 'products' && !isCollapsed ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
                                 <Link href={route('dashboard.addproduct')} className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                                    Add Product
+                                    Añadir Producto
                                 </Link>
                                 <Link href={route('dashboard.product')} className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                                    Products
+                                    Ver Productos
                                 </Link>
                             </div>
                         </div>
@@ -104,10 +104,10 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                             </button>
                             <div className={`pl-10 mt-2 space-y-2 overflow-hidden transition-all duration-300 ${activeDropdown === 'orders' && !isCollapsed ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
                                 <Link href={route('dashboard.orders')} className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                                    Orders
+                                    Ordenes
                                 </Link>
                                 <Link href="/dashboard/order-tracking" className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                                    Tracking
+                                    Seguimiento
                                 </Link>
                             </div>
                         </div>
@@ -117,7 +117,7 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                     <li>
                         <Link href={route('dashboard.category')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
                             <Package className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
-                            {!isCollapsed && <span>Categories</span>}
+                            {!isCollapsed && <span>Categorias</span>}
                         </Link>
                     </li>
 
@@ -125,21 +125,21 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                     <li>
                         <Link href={route('dashboard.brand')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
                             <Layers className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
-                            {!isCollapsed && <span>Brands</span>}
+                            {!isCollapsed && <span>Marcas</span>}
                         </Link>
                     </li>
 
                     <li>
                         <Link href={route('dashboard.coupon')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
                             <Tag className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
-                            {!isCollapsed && <span>Coupons</span>}
+                            {!isCollapsed && <span>Cupones</span>}
                         </Link>
                     </li>
 
                     <li>
                         <Link href={route('dashboard.users')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
                             <Users className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
-                            {!isCollapsed && <span>User</span>}
+                            {!isCollapsed && <span>Usuarios</span>}
                         </Link>
                     </li>
 
@@ -147,7 +147,7 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                 </ul>
             </nav>
         </div>
-    );
+    );z
 };
 
 export default NavAdmin;

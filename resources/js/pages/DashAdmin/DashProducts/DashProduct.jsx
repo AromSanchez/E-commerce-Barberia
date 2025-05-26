@@ -163,8 +163,8 @@ export default function DashProduct() {
                                                                     </div>
                                                                 </div>
                                                             </td>
-                                                            <td className="p-4 text-sm text-gray-600">S/{product.price?.toFixed(2)}</td>
-                                                            <td className="p-4 text-sm text-gray-600">S/{product.sale_price?.toFixed(2)}</td>
+                                                            <td className="p-4 text-sm text-gray-600">S/{product.regular_price ? Number(product.regular_price).toFixed(2) : '0.00'}</td>
+                                                            <td className="p-4 text-sm text-gray-600">S/{product.sale_price ? Number(product.sale_price).toFixed(2) : '0.00'}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.category}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.brand}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.featured}</td>

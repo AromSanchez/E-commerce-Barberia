@@ -22,11 +22,17 @@ class Category extends Model
         parent::boot();
 
         static::creating(function ($category) {
-            $category->slug = \Illuminate\Support\Str::slug($category->name);
+            $category->slug = Str::slug($category->name);
         });
 
         static::updating(function ($category) {
-            $category->slug = \Illuminate\Support\Str::slug($category->name);
+            $category->slug = Str::slug($category->name);
         });
+    }
+    
+    // Relación con Product
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 }
