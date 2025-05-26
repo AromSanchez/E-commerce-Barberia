@@ -27,12 +27,10 @@ export default function DashProduct() {
                     slug: 'product6',
                     price: 128.00,
                     sale_price: 110.00,
-                    sku: 'SKU7868',
                     category: 'Category3',
                     brand: 'Brand2',
                     featured: 'Yes',
-                    stock: 'instock',
-                    quantity: 11,
+                    stock: 11,
                     image: null
                 }
             ]);
@@ -134,12 +132,10 @@ export default function DashProduct() {
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Nombre</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Precio</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">PrecioVenta</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">SKU</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Categoría</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Marca</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Destacado</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Stock</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Cantidad</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Acción</th>
                                                 </tr>
                                             </thead>
@@ -167,14 +163,12 @@ export default function DashProduct() {
                                                                     </div>
                                                                 </div>
                                                             </td>
-                                                            <td className="p-4 text-sm text-gray-600">${product.price?.toFixed(2)}</td>
-                                                            <td className="p-4 text-sm text-gray-600">${product.sale_price?.toFixed(2)}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{product.sku}</td>
+                                                            <td className="p-4 text-sm text-gray-600">S/{product.price?.toFixed(2)}</td>
+                                                            <td className="p-4 text-sm text-gray-600">S/{product.sale_price?.toFixed(2)}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.category}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.brand}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.featured}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.stock}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{product.quantity}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
                                                                     <button 

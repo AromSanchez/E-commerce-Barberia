@@ -91,7 +91,13 @@ class BrandController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
+        $brand = Brand::findOrFail($id);
+        if ($brand->logo) {
+            Storage::disk('public')->delete($brand->logo);
+        }
+        $brand->delete();
+        return redirect()->route('dashboard.brand');
     }
 }

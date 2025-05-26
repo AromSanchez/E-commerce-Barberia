@@ -32,18 +32,19 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         ->name('dashboard.category.destroy');
 });
 
+
 // Brands Routes
-Route::get('/dashboard/brand', [BrandController::class, 'index'])
-    ->middleware(['auth', 'verified', 'admin'])
-    ->name('dashboard.brand');
 
-Route::post('/dashboard/brand', [BrandController::class, 'store'])
-    ->middleware(['auth','verified', 'admin'])
-    ->name('dashboard.brand.store');
-
-Route::patch('/dashboard/brand/{id}', [BrandController::class, 'update'])
-    ->middleware(['auth','verified', 'admin'])
-    ->name('dashboard.brand.update');
+Route::middleware(['auth','verified', 'admin'])->group(function () {
+    Route::get('/dashboard/brand', [BrandController::class, 'index'])
+        ->name('dashboard.brand');
+    Route::post('/dashboard/brand', [BrandController::class, 'store'])
+        ->name('dashboard.brand.store');
+    Route::patch('/dashboard/brand/{id}', [BrandController::class, 'update'])
+        ->name('dashboard.brand.update');
+    Route::delete('/dashboard/brand/{id}', [BrandController::class, 'destroy'])
+        ->name('dashboard.brand.destroy');
+});
 
 
 

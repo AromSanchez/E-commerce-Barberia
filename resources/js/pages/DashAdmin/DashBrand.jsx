@@ -41,6 +41,17 @@ export default function DashBrand() {
         });
     };
 
+    const handleDeleteBrand = (brandId) => {
+        router.delete(route('dashboard.brand.destroy', brandId), {
+            onSuccess: () => {
+                setBrandList(brandList.filter(brand => brand.id !== brandId));
+            },
+            onError: (errors) => {
+                console.error(errors);
+            }
+        })
+    }
+
     const handleEditBrand = (brand) => {
         setBrandToEdit(brand);
         setIsEditDialogOpen(true);
@@ -146,7 +157,7 @@ export default function DashBrand() {
                                                                         <EditIcon />
                                                                     </button>
                                                                     <button
-                                                                        className="text-red-600 hover:text-red-900 p-1"
+                                                                        className="text-red-600 hover:text-red-900 p-1" onClick={() => handleDeleteBrand(brand.id)}
                                                                     >
                                                                         <DeleteIcon />
                                                                     </button>
