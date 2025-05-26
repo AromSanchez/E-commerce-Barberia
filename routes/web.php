@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\BrandController; 
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\ProductController; 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -56,9 +57,8 @@ Route::get('/dashboard/users', function(){
     return Inertia::render('DashAdmin/DashUsers');
 })->middleware(['auth', 'verified', 'admin'])->name('dashboard.users');
 
-Route::get('/dashboard/products', function(){
-    return Inertia::render('DashAdmin/DashProducts/DashProduct');
-})->middleware(['auth', 'verified', 'admin'])->name('dashboard.product');
+Route::get('/dashboard/products', [ProductController::class, 'index']
+)->middleware(['auth', 'verified', 'admin'])->name('dashboard.product');
 
 Route::get('/dashboard/addproducts', function(){
     return Inertia::render('DashAdmin/DashProducts/DashAddProduct');
