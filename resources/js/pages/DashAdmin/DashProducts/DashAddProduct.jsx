@@ -2,22 +2,23 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage, router } from '@inertiajs/react';
 import HeadAdmin from '@/Layouts/head_admin/HeadAdmin';
 import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
-import { useState, useEffect } from 'react';
-import { ShoppingBag, Package } from 'lucide-react';
+import { useState} from 'react';
+import { ShoppingBag } from 'lucide-react';
 
 export default function DashAddProduct() {
     const { categories, brands } = usePage().props;
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
-        short_description: '',
-        description: '',
         regular_price: '',
         sale_price: '',
-        category_id: '',
+        category_id: '',                                    
         brand_id: '',
-        featured: 'No',
-        stock_status: 'instock'
+        is_featured: 'no',
+        stock: '',
+        image: null,
+        short_description: '',
+        long_description: ''
     });
     const [mainImage, setMainImage] = useState(null);
     const [mainImagePreview, setMainImagePreview] = useState(null);
@@ -27,18 +28,18 @@ export default function DashAddProduct() {
     const [processing, setProcessing] = useState(false);
 
     // Generar slug automáticamente a partir del nombre
-    useEffect(() => {
-        if (formData.name) {
-            const generatedSlug = formData.name
-                .toLowerCase()
-                .replace(/\s+/g, '-')
-                .replace(/[^\w\-]+/g, '')
-                .replace(/\-\-+/g, '-')
-                .replace(/^-+/, '')
-                .replace(/-+$/, '');
-            setFormData(prev => ({ ...prev, slug: generatedSlug }));
-        }
-    }, [formData.name]);
+    // useEffect(() => {
+    //     if (formData.name) {
+    //         const generatedSlug = formData.name
+    //             .toLowerCase()
+    //             .replace(/\s+/g, '-')
+    //             .replace(/[^\w\-]+/g, '')
+    //             .replace(/\-\-+/g, '-')
+    //             .replace(/^-+/, '')
+    //             .replace(/-+$/, '');
+    //         setFormData(prev => ({ ...prev, slug: generatedSlug }));
+    //     }
+    // }, [formData.name]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -57,27 +58,27 @@ export default function DashAddProduct() {
         }
     };
 
-    const handleGalleryImagesChange = (e) => {
-        const files = Array.from(e.target.files);
-        if (files.length > 0) {
-            setGalleryImages(prev => [...prev, ...files]);
+    // const handleGalleryImagesChange = (e) => {
+    //     const files = Array.from(e.target.files);
+    //     if (files.length > 0) {
+    //         setGalleryImages(prev => [...prev, ...files]);
             
-            // Crear previsualizaciones para las imágenes de la galería
-            const readers = files.map(file => {
-                return new Promise(resolve => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        resolve(reader.result);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            });
+    //         // Crear previsualizaciones para las imágenes de la galería
+    //         const readers = files.map(file => {
+    //             return new Promise(resolve => {
+    //                 const reader = new FileReader();
+    //                 reader.onloadend = () => {
+    //                     resolve(reader.result);
+    //                 };
+    //                 reader.readAsDataURL(file);
+    //             });
+    //         });
 
-            Promise.all(readers).then(results => {
-                setGalleryImagePreviews(prev => [...prev, ...results]);
-            });
-        }
-    };
+    //         Promise.all(readers).then(results => {
+    //             setGalleryImagePreviews(prev => [...prev, ...results]);
+    //         });
+    //     }
+    // };
 
     const handleMainImageDrop = (e) => {
         e.preventDefault();
@@ -121,36 +122,28 @@ export default function DashAddProduct() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log('Enviando datos...', formData);
+      
         setProcessing(true);
-
+      
         const productData = new FormData();
-        
-        // Añadir todos los campos del formulario
-        Object.keys(formData).forEach(key => {
-            productData.append(key, formData[key]);
+        Object.keys(formData).forEach(key => productData.append(key, formData[key]));
+        if (mainImage) productData.append('image', mainImage);
+      
+        console.log('Ruta submit:', route('dashboard.addproduct.store'));
+      
+        router.post(route('dashboard.addproduct.store'), productData, {
+          onSuccess: () => {
+            setProcessing(false);
+            router.visit(route('dashboard.product'));
+          },
+          onError: (errors) => {
+            setProcessing(false);
+            setErrors(errors);
+            console.log('Errores:', errors);
+          },
         });
-
-        // Añadir imagen principal
-        if (mainImage) {
-            productData.append('image', mainImage);
-        }
-
-        // Añadir imágenes de galería
-        galleryImages.forEach((image, index) => {
-            productData.append(`gallery[${index}]`, image);
-        });
-
-        router.post(route('dashboard.product.store'), productData, {
-            onSuccess: () => {
-                setProcessing(false);
-                router.visit(route('dashboard.product'));
-            },
-            onError: (errors) => {
-                setProcessing(false);
-                setErrors(errors);
-            },
-        });
-    };
+      };
 
     return (
         <AuthenticatedLayout>
@@ -272,21 +265,21 @@ export default function DashAddProduct() {
 
                                             {/* Descripción completa */}
                                             <div>
-                                                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                                                <label htmlFor="long_description" className="block text-sm font-medium text-gray-700 mb-1">
                                                     Descripción <span className="text-red-500">*</span>
                                                 </label>
                                                 <textarea
-                                                    id="description"
-                                                    name="description"
-                                                    value={formData.description}
+                                                    id="long_description"
+                                                    name="long_description"
+                                                    value={formData.long_description}
                                                     onChange={handleChange}
                                                     rows="6"
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                                     placeholder="Ingrese una descripción detallada"
                                                     required
                                                 ></textarea>
-                                                {errors.description && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+                                                {errors.long_description && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.long_description}</p>
                                                 )}
                                                 <p className="text-xs text-gray-500 mt-1">No exceder 100 caracteres cuando escriba la descripción del producto.</p>
                                             </div>
@@ -338,7 +331,7 @@ export default function DashAddProduct() {
                                             </div>
 
                                             {/* Subir imágenes de galería */}
-                                            <div>
+                                            {/* <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                                     Subir imágenes de galería
                                                 </label>
@@ -382,7 +375,7 @@ export default function DashAddProduct() {
                                                 {errors.gallery && (
                                                     <p className="mt-1 text-sm text-red-600">{errors.gallery}</p>
                                                 )}
-                                            </div>
+                                            </div> */}
 
                                             {/* Precio regular */}
                                             <div>
@@ -427,35 +420,38 @@ export default function DashAddProduct() {
 
                                             {/* Stock */}
                                             <div>
-                                                <label htmlFor="stock_status" className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Stock
+                                                <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Stock <span className="text-red-500">*</span>
                                                 </label>
-                                                <select
-                                                    id="stock_status"
-                                                    name="stock_status"
-                                                    value={formData.stock_status}
+                                                <input
+                                                    type="number"
+                                                    id="stock"
+                                                    name="stock"
+                                                    value={formData.stock}
                                                     onChange={handleChange}
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                >
-                                                    <option value="instock">En stock</option>
-                                                    <option value="outofstock">Agotado</option>
-                                                </select>
+                                                    placeholder="Ingrese cantidad en stock"
+                                                    required
+                                                />
+                                                {errors.stock && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.stock}</p>
+                                                )}
                                             </div>
 
                                             {/* Destacado */}
                                             <div>
-                                                <label htmlFor="featured" className="block text-sm font-medium text-gray-700 mb-1">
+                                                <label htmlFor="is_featured" className="block text-sm font-medium text-gray-700 mb-1">
                                                     Destacado
                                                 </label>
                                                 <select
-                                                    id="featured"
-                                                    name="featured"
-                                                    value={formData.featured}
+                                                    id="is_featured"
+                                                    name="is_featured"
+                                                    value={formData.is_featured}
                                                     onChange={handleChange}
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                                 >
-                                                    <option value="No">No</option>
-                                                    <option value="Yes">Sí</option>
+                                                    <option value="no">No</option>
+                                                    <option value="yes">Sí</option>
                                                 </select>
                                             </div>
                                         </div>

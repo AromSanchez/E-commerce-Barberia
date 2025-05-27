@@ -9,12 +9,13 @@ import { Search, ShoppingBag, Eye } from 'lucide-react';
 
 export default function DashProduct() {
     const { products } = usePage().props;
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [productList, setProductList] = useState([]);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    
+    
     useEffect(() => {
         if (products) {
             setProductList(products);
@@ -95,8 +96,7 @@ export default function DashProduct() {
                                         />
                                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                                     </div>
-                                    <button 
-                                        onClick={() => setIsDialogOpen(true)}
+                                    <button onClick={() => router.visit(route('dashboard.addproduct'))}
                                         className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -132,8 +132,8 @@ export default function DashProduct() {
                                                                 <div className="flex items-center">
                                                                     {product.image ? (
                                                                         <img 
-                                                                            src={product.image} 
-                                                                            alt={product.name} 
+                                                                        src={`/storage/${product.image}`}
+                                                                            alt={product.name}
                                                                             className="w-10 h-10 rounded-md mr-3 object-cover"
                                                                         />
                                                                     ) : (
@@ -149,9 +149,9 @@ export default function DashProduct() {
                                                             </td>
                                                             <td className="p-4 text-sm text-gray-600">S/{product.regular_price ? Number(product.regular_price).toFixed(2) : '0.00'}</td>
                                                             <td className="p-4 text-sm text-gray-600">S/{product.sale_price ? Number(product.sale_price).toFixed(2) : '0.00'}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{product.category}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{product.brand}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{product.featured}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{product.category?.name || "Sin Categoría"}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{product.brand?.name || "Sin Marca"}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{product.is_featured==="yes"? "Si": "No"}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.stock}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">

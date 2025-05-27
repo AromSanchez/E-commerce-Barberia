@@ -57,12 +57,11 @@ Route::get('/dashboard/coupon', function(){
 Route::get('/dashboard/users', [UsersController::class, 'index'])->middleware(['auth','verified', 'admin'])->name('dashboard.users');
 Route::put('/dashboard/users/{id}', [UsersController::class, 'updateRole'])->middleware(['auth','verified', 'admin'])->name('dashboard.users.update-role');
 
-Route::get('/dashboard/products', [ProductController::class, 'index']
-)->middleware(['auth', 'verified', 'admin'])->name('dashboard.product');
+Route::get('/dashboard/products', [ProductController::class, 'index'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.product');
+Route::delete('/dashboard/products/{id}', [ProductController::class, 'destroy'])->name('dashboard.products.destroy');
 
-Route::get('/dashboard/addproducts', function(){
-    return Inertia::render('DashAdmin/DashProducts/DashAddProduct');
-})->middleware(['auth', 'verified', 'admin'])->name('dashboard.addproduct');
+Route::get('/dashboard/addproducts', [ProductController::class, 'create'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.addproduct');
+Route::post('/dashboard/addproducts', [ProductController::class, 'store'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.addproduct.store');
 
 Route::get('/dashboard/orders', function(){
     return Inertia::render('DashAdmin/DashOrders/DashOrder');

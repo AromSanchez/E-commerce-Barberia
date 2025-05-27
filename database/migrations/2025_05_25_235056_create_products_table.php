@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('sale_price', 10, 2)->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
             $table->unsignedBigInteger('brand_id')->nullable(); 
-            $table->boolean('is_featured')->default(false);
+            $table->enum('is_featured', ['yes', 'no'])->default('no');
             $table->integer('stock')->default(0);
             $table->string('image')->nullable(); 
             $table->text('short_description')->nullable();
