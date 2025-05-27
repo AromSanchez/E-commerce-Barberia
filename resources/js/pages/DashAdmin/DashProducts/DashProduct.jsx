@@ -14,8 +14,8 @@ export default function DashProduct() {
     const [productToEdit, setProductToEdit] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
-    
-    
+
+
     useEffect(() => {
         if (products) {
             setProductList(products);
@@ -35,14 +35,13 @@ export default function DashProduct() {
     };
 
     const handleEditProduct = (product) => {
-        setProductToEdit(product);
-        setEditDialogOpen(true);
+        router.visit(route('dashboard.products.edit', product.id));
     };
 
     const handleUpdateProduct = (updatedProduct) => {
         router.patch(route('dashboard.products.update', updatedProduct.id), updatedProduct, {
             onSuccess: () => {
-                setProductList(productList.map(product => 
+                setProductList(productList.map(product =>
                     product.id === updatedProduct.id ? updatedProduct : product
                 ));
                 setEditDialogOpen(false);
@@ -53,7 +52,7 @@ export default function DashProduct() {
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     // Filtrar productos según el término de búsqueda
-    const filteredProducts = productList.filter(product => 
+    const filteredProducts = productList.filter(product =>
         product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -83,13 +82,13 @@ export default function DashProduct() {
                                         <h2 className="text-xl font-semibold">Gestión de Productos</h2>
                                     </div>
                                 </div>
-                                
+
                                 {/* Barra de búsqueda y botón de añadir */}
                                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
                                     <div className="relative w-full md:w-1/2">
-                                        <input 
-                                            type="text" 
-                                            placeholder="Buscar producto..." 
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar producto..."
                                             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -131,8 +130,8 @@ export default function DashProduct() {
                                                             <td className="p-4">
                                                                 <div className="flex items-center">
                                                                     {product.image ? (
-                                                                        <img 
-                                                                        src={`/storage/${product.image}`}
+                                                                        <img
+                                                                            src={`/storage/${product.image}`}
                                                                             alt={product.name}
                                                                             className="w-10 h-10 rounded-md mr-3 object-cover"
                                                                         />
@@ -151,22 +150,22 @@ export default function DashProduct() {
                                                             <td className="p-4 text-sm text-gray-600">S/{product.sale_price ? Number(product.sale_price).toFixed(2) : '0.00'}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.category?.name || "Sin Categoría"}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.brand?.name || "Sin Marca"}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{product.is_featured==="yes"? "Si": "No"}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{product.is_featured === "yes" ? "Si" : "No"}</td>
                                                             <td className="p-4 text-sm text-gray-600">{product.stock}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
-                                                                    <button 
+                                                                    <button
                                                                         className="text-blue-600 hover:text-blue-900 p-1"
                                                                     >
                                                                         <Eye className="h-5 w-5" />
                                                                     </button>
-                                                                    <button 
+                                                                    <button
                                                                         className="text-green-600 hover:text-green-900 p-1"
                                                                         onClick={() => handleEditProduct(product)}
                                                                     >
                                                                         <EditIcon />
                                                                     </button>
-                                                                    <button 
+                                                                    <button
                                                                         className="text-red-600 hover:text-red-900 p-1"
                                                                         onClick={() => handleDeleteProduct(product.id)}
                                                                     >

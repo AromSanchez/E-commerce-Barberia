@@ -63,6 +63,9 @@ Route::delete('/dashboard/products/{id}', [ProductController::class, 'destroy'])
 Route::get('/dashboard/addproducts', [ProductController::class, 'create'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.addproduct');
 Route::post('/dashboard/addproducts', [ProductController::class, 'store'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.addproduct.store');
 
+Route::get('/dashboard/products/{product}/edit/', [ProductController::class, 'edit'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.products.edit');
+Route::patch('/dashboard/products/{product}/edit/', [ProductController::class, 'update'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.products.update');
+
 Route::get('/dashboard/orders', function(){
     return Inertia::render('DashAdmin/DashOrders/DashOrder');
 })->middleware(['auth','verified', 'admin'])->name('dashboard.orders');

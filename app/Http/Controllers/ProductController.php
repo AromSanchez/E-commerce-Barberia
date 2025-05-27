@@ -55,7 +55,8 @@ class ProductController extends Controller
         return redirect()->route('dashboard.product');
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
 
         $product = Product::findOrFail($id);
 
@@ -65,6 +66,49 @@ class ProductController extends Controller
         }
 
         $product->delete();
+    }
 
+    public function edit(Product $product)
+    {
+        $categories = Category::all(['id', 'name']);
+        $brands = Brand::all(['id', 'name']);
+
+        return Inertia::render('DashAdmin/DashProducts/DashEditProduct', [
+            'product' => $product,
+            'categories' => $categories,
+            'brands' => $brands,
+        ]);
+    }
+
+
+    public function update(Request $request, Product $product)
+    {
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'regular_price' => 'required|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0|lt:regular_price',
+            'category_id' => 'nullable|exists:category,id', // Cambiado de categories a category
+            'brand_id' => 'nullable|exists:brands,id',
+            'is_featured' => 'in:yes,no',
+            'stock' => 'required|integer|min:0',
+            'image' => 'nullable|image|max:2048',
+            'short_description' => 'nullable|string',
+            'long_description' => 'nullable|string',
+        ]);
+
+        // Si llega una nueva imagen, eliminar la anterior y guardar la nueva
+        if ($request->hasFile('image')) {
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        // Actualizar el producto con los datos validados
+        $product->update($validated);
+
+        // Redirigir a la lista o detalle with mensaje de éxito
+        return redirect()->route('dashboard.product')->with('success', 'Producto actualizado correctamente.');
     }
 }

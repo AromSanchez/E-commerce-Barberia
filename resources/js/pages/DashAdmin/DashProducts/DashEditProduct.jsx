@@ -2,120 +2,89 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage, router } from '@inertiajs/react';
 import HeadAdmin from '@/Layouts/head_admin/HeadAdmin';
 import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
-import { useState} from 'react';
+import { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
 
-export default function DashAddProduct() {
-    const { categories, brands } = usePage().props;
-    const [isCollapsed, setIsCollapsed] = useState(false);
+export default function DashEditProduct({ product, categories, brands }) {
     const [formData, setFormData] = useState({
-        name: '',
-        regular_price: '',
-        sale_price: '',
-        category_id: '',                                    
-        brand_id: '',
-        is_featured: 'no',
-        stock: '',
+        name: product.name || '',
+        regular_price: product.regular_price || '',
+        sale_price: product.sale_price || '',
+        category_id: product.category_id || '',
+        brand_id: product.brand_id || '',
+        is_featured: product.is_featured || 'no',
+        stock: product.stock || '',
+        short_description: product.short_description || '',
+        long_description: product.long_description || '',
         image: null,
-        short_description: '',
-        long_description: ''
     });
-    const [mainImage, setMainImage] = useState(null);
-    const [mainImagePreview, setMainImagePreview] = useState(null);
-    const [galleryImages, setGalleryImages] = useState([]);
-    const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
+
+    const [imagePreview, setImagePreview] = useState(product.image ? `/storage/${product.image}` : null);
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
-    
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+    function handleChange(e) {
+        const { name, value, files } = e.target;
 
-    const handleMainImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setMainImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setMainImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+        if (name === 'image' && files.length > 0) {
+            setFormData((prev) => ({ ...prev, image: files[0] }));
+            setImagePreview(URL.createObjectURL(files[0]));
+        } else {
+            setFormData((prev) => ({ ...prev, [name]: value }));
         }
-    };
-
-    
-
-    const handleMainImageDrop = (e) => {
+    }
+    function handleMainImageDrop(e) {
         e.preventDefault();
         const file = e.dataTransfer.files[0];
         if (file) {
-            setMainImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setMainImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            setFormData((prev) => ({ ...prev, image: file }));
+            setImagePreview(URL.createObjectURL(file));
         }
-    };
+    }
 
-    const handleGalleryImagesDrop = (e) => {
+    function handleDragOver(e) {
         e.preventDefault();
-        const files = Array.from(e.dataTransfer.files);
-        if (files.length > 0) {
-            setGalleryImages(prev => [...prev, ...files]);
-            
-            // Crear previsualizaciones para las imágenes de la galería
-            const readers = files.map(file => {
-                return new Promise(resolve => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        resolve(reader.result);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            });
+    }
 
-            Promise.all(readers).then(results => {
-                setGalleryImagePreviews(prev => [...prev, ...results]);
-            });
+    function handleMainImageChange(e) {
+        const file = e.target.files[0];
+        if (file) {
+            setFormData((prev) => ({ ...prev, image: file }));
+            setImagePreview(URL.createObjectURL(file));
         }
-    };
+    }
 
-    const handleDragOver = (e) => {
+    function handleSubmit(e) {
         e.preventDefault();
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Enviando datos...', formData);
-      
         setProcessing(true);
-      
-        const productData = new FormData();
-        Object.keys(formData).forEach(key => productData.append(key, formData[key]));
-        if (mainImage) productData.append('image', mainImage);
-      
-        console.log('Ruta submit:', route('dashboard.addproduct.store'));
-      
-        router.post(route('dashboard.addproduct.store'), productData, {
-          onSuccess: () => {
-            setProcessing(false);
-            router.visit(route('dashboard.product'));
-          },
-          onError: (errors) => {
-            setProcessing(false);
-            setErrors(errors);
-            console.log('Errores:', errors);
-          },
+
+        const data = new FormData();
+
+        for (const key in formData) {
+            if (formData[key] !== null && formData[key] !== '') {
+                data.append(key, formData[key]);
+            }
+        }
+
+        data.append('_method', 'PATCH'); // Asegúrate de que sea PATCH
+
+        router.post(route('dashboard.products.update', product.id), data, {
+            onSuccess: () => {
+                setProcessing(false);
+                router.visit(route('dashboard.product')); // Redirección después del éxito
+            },
+            onError: (errors) => {
+                setErrors(errors);
+                setProcessing(false);
+            },
         });
-      };
+    }
 
     return (
         <AuthenticatedLayout>
-            <Head title="Añadir Producto" />
+            <Head title={`Editar Producto - ${formData.name || 'Producto'}`} />
             <div className="flex h-screen">
                 <div className="fixed left-0 h-full">
                     <NavAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
@@ -132,32 +101,29 @@ export default function DashAddProduct() {
                                     <div className="bg-blue-50 p-3 rounded-lg">
                                         <ShoppingBag className="text-blue-600 w-6 h-6" />
                                     </div>
-                                    <h2 className="text-xl font-semibold">Añadir Producto</h2>
+                                    <h2 className="text-xl font-semibold">Editar Producto</h2>
                                 </div>
 
-                                <form onSubmit={handleSubmit}>
+                                <form onSubmit={handleSubmit} encType="multipart/form-data">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         {/* Columna izquierda */}
                                         <div className="space-y-6">
-                                            {/* Nombre del producto */}
+                                            {/* Nombre */}
                                             <div>
                                                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Nombre del producto <span className="text-red-500">*</span>
+                                                    Nombre <span className="text-red-500">*</span>
                                                 </label>
                                                 <input
-                                                    type="text"
                                                     id="name"
                                                     name="name"
+                                                    type="text"
                                                     value={formData.name}
                                                     onChange={handleChange}
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                    placeholder="Ingrese nombre del producto"
+                                                    maxLength={255}
                                                     required
                                                 />
-                                                {errors.name && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                                                )}
-                                                <p className="text-xs text-gray-500 mt-1">No exceder 100 caracteres cuando escriba el nombre del producto.</p>
+                                                {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
                                             </div>
 
                                             {/* Categoría */}
@@ -174,15 +140,13 @@ export default function DashAddProduct() {
                                                     required
                                                 >
                                                     <option value="">Seleccione categoría</option>
-                                                    {categories && categories.map(category => (
-                                                        <option key={category.id} value={category.id}>
-                                                            {category.name}
+                                                    {categories.map(cat => (
+                                                        <option key={cat.id} value={cat.id}>
+                                                            {cat.name}
                                                         </option>
                                                     ))}
                                                 </select>
-                                                {errors.category_id && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.category_id}</p>
-                                                )}
+                                                {errors.category_id && <p className="mt-1 text-sm text-red-600">{errors.category_id}</p>}
                                             </div>
 
                                             {/* Marca */}
@@ -199,21 +163,19 @@ export default function DashAddProduct() {
                                                     required
                                                 >
                                                     <option value="">Seleccione marca</option>
-                                                    {brands && brands.map(brand => (
+                                                    {brands.map(brand => (
                                                         <option key={brand.id} value={brand.id}>
                                                             {brand.name}
                                                         </option>
                                                     ))}
                                                 </select>
-                                                {errors.brand_id && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.brand_id}</p>
-                                                )}
+                                                {errors.brand_id && <p className="mt-1 text-sm text-red-600">{errors.brand_id}</p>}
                                             </div>
 
                                             {/* Descripción corta */}
                                             <div>
                                                 <label htmlFor="short_description" className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Descripción corta <span className="text-red-500">*</span>
+                                                    Descripción corta
                                                 </label>
                                                 <textarea
                                                     id="short_description"
@@ -221,20 +183,17 @@ export default function DashAddProduct() {
                                                     value={formData.short_description}
                                                     onChange={handleChange}
                                                     rows="3"
+                                                    maxLength={100}
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                    placeholder="Ingrese una descripción corta"
-                                                    required
-                                                ></textarea>
-                                                {errors.short_description && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.short_description}</p>
-                                                )}
-                                                <p className="text-xs text-gray-500 mt-1">No exceder 100 caracteres cuando escriba la descripción del producto.</p>
+                                                />
+                                                {errors.short_description && <p className="mt-1 text-sm text-red-600">{errors.short_description}</p>}
+                                                <p className="text-xs text-gray-500 mt-1">No exceder 100 caracteres.</p>
                                             </div>
 
                                             {/* Descripción completa */}
                                             <div>
                                                 <label htmlFor="long_description" className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Descripción <span className="text-red-500">*</span>
+                                                    Descripción completa
                                                 </label>
                                                 <textarea
                                                     id="long_description"
@@ -242,49 +201,61 @@ export default function DashAddProduct() {
                                                     value={formData.long_description}
                                                     onChange={handleChange}
                                                     rows="6"
+                                                    maxLength={1000}
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                    placeholder="Ingrese una descripción detallada"
-                                                    required
-                                                ></textarea>
-                                                {errors.long_description && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.long_description}</p>
-                                                )}
-                                                <p className="text-xs text-gray-500 mt-1">No exceder 100 caracteres cuando escriba la descripción del producto.</p>
+                                                />
+                                                {errors.long_description && <p className="mt-1 text-sm text-red-600">{errors.long_description}</p>}
+                                                <p className="text-xs text-gray-500 mt-1">No exceder 1000 caracteres.</p>
                                             </div>
                                         </div>
 
                                         {/* Columna derecha */}
                                         <div className="space-y-6">
-                                            {/* Subir imágenes principales */}
+                                            {/* Imagen */}
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                                     Subir imágenes <span className="text-red-500">*</span>
                                                 </label>
-                                                <div 
+
+                                                <div
                                                     className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center cursor-pointer"
                                                     onDrop={handleMainImageDrop}
                                                     onDragOver={handleDragOver}
                                                     onClick={() => document.getElementById('main-image-upload').click()}
                                                 >
-                                                    {mainImagePreview ? (
+                                                    {imagePreview ? (
                                                         <div className="flex flex-col items-center">
-                                                            <img 
-                                                                src={mainImagePreview} 
-                                                                alt="Vista previa" 
-                                                                className="max-h-40 mb-2 object-contain" 
+                                                            <img
+                                                                src={imagePreview}
+                                                                alt="Vista previa"
+                                                                className="max-h-40 mb-2 object-contain"
                                                             />
                                                             <p className="text-sm text-gray-500">Haz clic para cambiar la imagen</p>
                                                         </div>
                                                     ) : (
                                                         <div className="flex flex-col items-center">
                                                             <div className="mb-2">
-                                                                <svg className="mx-auto h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                                <svg
+                                                                    className="mx-auto h-12 w-12 text-blue-500"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    fill="none"
+                                                                    viewBox="0 0 24 24"
+                                                                    stroke="currentColor"
+                                                                >
+                                                                    <path
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        strokeWidth={2}
+                                                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                                                    />
                                                                 </svg>
                                                             </div>
-                                                            <p className="text-sm text-gray-600">Arrastra tus imágenes aquí o <span className="text-blue-500">haz clic para buscar</span></p>
+                                                            <p className="text-sm text-gray-600">
+                                                                Arrastra tus imágenes aquí o <span className="text-blue-500">haz clic para buscar</span>
+                                                            </p>
                                                         </div>
                                                     )}
+
                                                     <input
                                                         id="main-image-upload"
                                                         type="file"
@@ -293,31 +264,30 @@ export default function DashAddProduct() {
                                                         className="hidden"
                                                     />
                                                 </div>
+
                                                 {errors.image && (
                                                     <p className="mt-1 text-sm text-red-600">{errors.image}</p>
                                                 )}
                                             </div>
 
-                                           
+
                                             {/* Precio regular */}
                                             <div>
                                                 <label htmlFor="regular_price" className="block text-sm font-medium text-gray-700 mb-1">
                                                     Precio regular <span className="text-red-500">*</span>
                                                 </label>
                                                 <input
-                                                    type="number"
-                                                    step="0.01"
                                                     id="regular_price"
                                                     name="regular_price"
+                                                    type="number"
+                                                    step="0.01"
                                                     value={formData.regular_price}
                                                     onChange={handleChange}
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                    placeholder="Ingrese precio regular"
+                                                    min="0"
                                                     required
                                                 />
-                                                {errors.regular_price && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.regular_price}</p>
-                                                )}
+                                                {errors.regular_price && <p className="mt-1 text-sm text-red-600">{errors.regular_price}</p>}
                                             </div>
 
                                             {/* Precio de venta */}
@@ -326,18 +296,16 @@ export default function DashAddProduct() {
                                                     Precio de venta
                                                 </label>
                                                 <input
-                                                    type="number"
-                                                    step="0.01"
                                                     id="sale_price"
                                                     name="sale_price"
+                                                    type="number"
+                                                    step="0.01"
                                                     value={formData.sale_price}
                                                     onChange={handleChange}
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                    placeholder="Ingrese precio de venta"
+                                                    min="0"
                                                 />
-                                                {errors.sale_price && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.sale_price}</p>
-                                                )}
+                                                {errors.sale_price && <p className="mt-1 text-sm text-red-600">{errors.sale_price}</p>}
                                             </div>
 
                                             {/* Stock */}
@@ -346,18 +314,16 @@ export default function DashAddProduct() {
                                                     Stock <span className="text-red-500">*</span>
                                                 </label>
                                                 <input
-                                                    type="number"
                                                     id="stock"
                                                     name="stock"
+                                                    type="number"
                                                     value={formData.stock}
                                                     onChange={handleChange}
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                    placeholder="Ingrese cantidad en stock"
+                                                    min="0"
                                                     required
                                                 />
-                                                {errors.stock && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.stock}</p>
-                                                )}
+                                                {errors.stock && <p className="mt-1 text-sm text-red-600">{errors.stock}</p>}
                                             </div>
 
                                             {/* Destacado */}
@@ -379,14 +345,14 @@ export default function DashAddProduct() {
                                         </div>
                                     </div>
 
-                                    {/* Botón de envío */}
-                                    <div className="mt-8">
+                                    {/* Botón Guardar */}
+                                    <div className="mt-8 flex justify-end">
                                         <button
                                             type="submit"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md transition"
                                             disabled={processing}
-                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                                         >
-                                            {processing ? 'Guardando...' : 'Añadir producto'}
+                                            {processing ? 'Guardando...' : 'Guardar cambios'}
                                         </button>
                                     </div>
                                 </form>
@@ -396,5 +362,6 @@ export default function DashAddProduct() {
                 </div>
             </div>
         </AuthenticatedLayout>
+
     );
 }
