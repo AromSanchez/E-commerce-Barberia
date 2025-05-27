@@ -4,8 +4,8 @@ import HeadAdmin from '@/Layouts/head_admin/HeadAdmin';
 import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
 import { useState, useEffect } from 'react';
 import EditIcon from '@/components/Icons/EditIcon';
-import DeleteIcon from '@/components/Icons/DeleteIcon';
-import { Search, Users } from 'lucide-react';
+// Importamos los iconos necesarios
+import { Search, Users, ShoppingCart, Mail } from 'lucide-react';
 
 export default function DashUsers() {
     const { users } = usePage().props;
@@ -19,19 +19,31 @@ export default function DashUsers() {
     useEffect(() => {
         if (users) {
             setUserList(users);
-        } else {
-            // Datos de ejemplo para mostrar en la tabla si no hay datos reales
-            setUserList([
-                { id: 1, name: 'Admin', role: 'ADM', phone: '1234567890', email: 'admin@surfsidemedia.in', total_orders: 0 }
-            ]);
         }
     }, [users]);
 
-    const handleDeleteUser = (id) => {
-        router.delete(route('dashboard.users.destroy', id), {
-            onSuccess: () => {
-                setUserList(userList.filter(user => user.id !== id));
+    // Cambiamos la función para ver compras en lugar de eliminar
+    const handleViewPurchases = (userId) => {
+        // Aquí puedes implementar la navegación a la vista de compras del usuario
+        console.log(`Ver compras del usuario ${userId}`);
+        // Por ejemplo: router.get(route('dashboard.users.purchases', userId));
+    };
+
+    // Función para cambiar el rol del usuario
+    const handleRoleChange = (userId, newRole) => {
+        // Aquí implementarías la lógica para actualizar el rol en la base de datos
+        console.log(`Cambiar rol del usuario ${userId} a ${newRole}`);
+        
+        // Actualizar el estado local para reflejar el cambio inmediatamente
+        setUserList(userList.map(user => {
+            if (user.id === userId) {
+                return { ...user, role: newRole };
             }
+            return user;
+        }));
+  
+        router.put(route('dashboard.users.update-role', userId), {
+        role: newRole
         });
     };
 
@@ -96,6 +108,8 @@ export default function DashUsers() {
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Teléfono</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Email</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Total Órdenes</th>
+                                                    {/* Nueva columna para el rol */}
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Rol</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Acción</th>
                                                 </tr>
                                             </thead>
@@ -106,41 +120,45 @@ export default function DashUsers() {
                                                             <td className="p-4 text-sm text-gray-600">{index + 1}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center">
-                                                                    {user.avatar ? (
-                                                                        <img 
-                                                                            src={user.avatar} 
-                                                                            alt={user.name} 
-                                                                            className="w-10 h-10 rounded-md mr-3 object-cover"
-                                                                        />
-                                                                    ) : (
-                                                                        <div className="w-10 h-10 bg-gray-200 rounded-md mr-3 flex items-center justify-center">
-                                                                            <Users className="w-6 h-6 text-gray-400" />
-                                                                        </div>
-                                                                    )}
+                                                                    
                                                                     <div>
                                                                         <span className="text-sm font-medium text-gray-900">{user.name}</span>
-                                                                        {user.role && (
-                                                                            <p className="text-xs text-gray-500">{user.role}</p>
-                                                                        )}
                                                                     </div>
                                                                 </div>
                                                             </td>
-                                                            <td className="p-4 text-sm text-gray-600">{user.phone}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{user.phone_number}</td>
                                                             <td className="p-4 text-sm text-gray-600">{user.email}</td>
                                                             <td className="p-4 text-sm text-gray-600">{user.total_orders || 0}</td>
+                                                            {/* Nueva celda para el selector de rol */}
+                                                            <td className="p-4">
+                                                                <select 
+                                                                    value={user.role} 
+                                                                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                                                    className="text-sm border rounded-md p-1 px-3 pr-8
+                                                                        focus:outline-none focus:ring-2 focus:ring-blue-500
+                                                                        bg-white hover:bg-gray-50 transition-colors
+                                                                        cursor-pointer"
+                                                                >
+                                                                    <option value="admin">Admin</option>
+                                                                    <option value="user">Cliente</option>
+                                                                </select>
+                                                            </td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
+                                                                    
+                                                                    {/* Botón para ver compras */}
                                                                     <button 
-                                                                        className="text-green-600 hover:text-green-900 p-1"
-                                                                        onClick={() => handleEditUser(user)}
+                                                                        className="text-blue-600 hover:text-blue-900 p-1"
+                                                                        onClick={() => handleViewPurchases(user.id)}
                                                                     >
-                                                                        <EditIcon />
+                                                                        <ShoppingCart className="h-5 w-5" />
                                                                     </button>
+                                                                    {/* Nuevo botón para enviar email */}
                                                                     <button 
-                                                                        className="text-red-600 hover:text-red-900 p-1"
-                                                                        onClick={() => handleDeleteUser(user.id)}
+                                                                        className="text-purple-600 hover:text-purple-900 p-1"
+                                                                        onClick={() => handleSendEmail(user.id, user.email)}
                                                                     >
-                                                                        <DeleteIcon />
+                                                                        <Mail className="h-5 w-5" />
                                                                     </button>
                                                                 </div>
                                                             </td>
@@ -148,7 +166,7 @@ export default function DashUsers() {
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
+                                                        <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
                                                             No hay usuarios disponibles
                                                         </td>
                                                     </tr>
@@ -167,3 +185,4 @@ export default function DashUsers() {
         </AuthenticatedLayout>
     );
 }
+

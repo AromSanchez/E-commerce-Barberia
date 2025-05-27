@@ -6,6 +6,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ProductController; 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UsersController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -53,9 +54,8 @@ Route::get('/dashboard/coupon', function(){
     return Inertia::render('DashAdmin/DashCoupon');
 })->middleware(['auth', 'verified', 'admin'])->name('dashboard.coupon');
 
-Route::get('/dashboard/users', function(){
-    return Inertia::render('DashAdmin/DashUsers');
-})->middleware(['auth', 'verified', 'admin'])->name('dashboard.users');
+Route::get('/dashboard/users', [UsersController::class, 'index'])->middleware(['auth','verified', 'admin'])->name('dashboard.users');
+Route::put('/dashboard/users/{id}', [UsersController::class, 'updateRole'])->middleware(['auth','verified', 'admin'])->name('dashboard.users.update-role');
 
 Route::get('/dashboard/products', [ProductController::class, 'index']
 )->middleware(['auth', 'verified', 'admin'])->name('dashboard.product');
