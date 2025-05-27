@@ -18,22 +18,6 @@ export default function DashProduct() {
     useEffect(() => {
         if (products) {
             setProductList(products);
-        } else {
-            // Datos de ejemplo para mostrar en la tabla si no hay datos reales
-            setProductList([
-                { 
-                    id: 6, 
-                    name: 'Product6', 
-                    slug: 'product6',
-                    price: 128.00,
-                    sale_price: 110.00,
-                    category: 'Category3',
-                    brand: 'Brand2',
-                    featured: 'Yes',
-                    stock: 11,
-                    image: null
-                }
-            ]);
         }
     }, [products]);
 
