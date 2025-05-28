@@ -219,9 +219,193 @@ const MainHome = () => {
       </div>
       {/* Seccion 3 */}
       <div >
+        <h1>Productos Destacads</h1>
         <CardProduct />
       </div>
+      {/* =========== SECCIÓN 4: CUATRO BLOQUES DE PRODUCTOS =========== */}
+      <div className="w-full max-w-screen-2xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"> {/* Usar grid-cols-2 lg:grid-cols-4 para mejor responsividad y gap en grid */}
+    {/* Cuadro 1 - Productos Populares */}
+    <div className="h-[664px] bg-white col-span-1 p-6 md:p-8 flex flex-col justify-between rounded-lg shadow-lg"> {/* Añadido rounded-lg y shadow-lg para consistencia visual */}
+      <div>
+        {/* Placeholder para imagen: Ajustado altura y margen inferior */}
+        <div className="h-80 mb-6 bg-slate-200 rounded-md flex items-center justify-center">
+          <span className="text-slate-500">Imagen Producto 1</span> {/* Texto placeholder mejorado */}
+        </div>
+        <h3 className="text-black text-4xl font-bold mb-3 leading-tight">
+          Productos Populares
+        </h3>
+        <p className="text-gray-600 text-2x leading-relaxed">
+          Las herramientas esenciales para cortes y estilos profesionales.
+        </p>
+      </div>
+      <button
+        type="button"
+        className="
+          w-full mt-6 flex py-3 px-6 justify-center items-center gap-2 rounded-md
+          border border-black text-black 
+          font-semibold text-base /* Ajustado font */
+          hover:bg-black hover:text-white transition-colors
+        "
+      >
+        Shop Now {/* Cambiado a Shop Now como en la imagen */}
+      </button>
+    </div>
 
+    {/* Cuadro 2 - Kit de Cuidado para Barba */}
+    <div className="h-[664px] bg-[#F9F9F9] col-span-1 p-6 md:p-8 flex flex-col justify-between rounded-lg shadow-lg">
+      <div>
+        <div className="h-80 mb-6 bg-slate-200 rounded-md flex items-center justify-center">
+          <span className="text-slate-500">Imagen Producto 2</span>
+        </div>
+        <h3 className="text-black text-4xl font-bold mb-3 leading-tight">
+          Kit de Cuidado para Barba
+        </h3>
+        <p className="text-gray-600 text-2x leading-relaxed">
+          Incluye aceite y cepillo de madera. Para barbas suaves y con estilo.
+        </p>
+      </div>
+      <button
+        type="button"
+        className="
+          w-full mt-6 flex py-3 px-6 justify-center items-center gap-2 rounded-md
+          border border-black text-black 
+          font-semibold text-base
+          hover:bg-black hover:text-white transition-colors
+        "
+      >
+        Shop Now
+      </button>
+    </div>
+
+    {/* Cuadro 3 - Tijeras Premium Japan Steel */}
+    <div className="h-[664px] bg-[#EAEAEA] col-span-1 p-6 md:p-8 flex flex-col justify-between rounded-lg shadow-lg">
+      <div>
+        <div className="h-80 mb-6 bg-slate-200 rounded-md flex items-center justify-center">
+          <span className="text-slate-500">Imagen Producto 3</span>
+        </div>
+        <h3 className="text-black text-4xl font-bold mb-3 leading-tight">
+          Tijeras Premium Japan Steel
+        </h3>
+        <p className="text-gray-600 text-2x leading-relaxed">
+          Tijeras de acero japonés, ergonómicas y afiladas para cortes profesionales.
+        </p>
+      </div>
+      <button
+        type="button"
+        className="
+          w-full mt-6 flex py-3 px-6 justify-center items-center gap-2 rounded-md
+          border border-black text-black 
+          font-semibold text-base
+          hover:bg-black hover:text-white transition-colors
+        "
+      >
+        Shop Now
+      </button>
+    </div>
+
+    {/* Cuadro 4 - Silla de Barbería Classic Pro */}
+    <div className="h-[664px] bg-[#625F53] col-span-1 p-6 md:p-8 flex flex-col justify-between rounded-lg shadow-lg">
+      <div>
+        <div className="h-80 mb-6 bg-slate-700 rounded-md flex items-center justify-center"> {/* Placeholder más oscuro para fondo oscuro */}
+          <span className="text-slate-400">Imagen Producto 4</span>
+        </div>
+        <h3 className="text-white text-4xl font-bold mb-3 leading-tight">
+          Silla de Barbería Classic Pro
+        </h3>
+        <p className="text-gray-300 text-2x leading-relaxed">
+          Diseño vintage, reclinable, y ultra cómoda. El centro de tu barbería.
+        </p>
+      </div>
+      {/* Botón con estilos adaptados para fondo oscuro */}
+      <button
+        type="button"
+        className="
+          w-full mt-6 flex py-3 px-6 justify-center items-center gap-2 rounded-md
+          border border-white text-white /* Borde y texto blanco */
+          font-semibold text-base
+          hover:bg-white hover:text-[#625F53] transition-colors /* Hover invierte colores */
+        "
+      >
+        Shop Now
+      </button>
+    </div>
+  </div>
+      </div>
+
+      {/* =========== SECCIÓN 5:=========== */}
+      <div>
+        <h1>Recomendaciones</h1>
+        <h2>Para ti</h2>
+      </div>
+
+      {/* =========== SECCIÓN 6:=========== */}
+      <section 
+  className="
+    flex flex-col justify-center items-center
+    gap-4
+    h-[448px]
+    self-stretch
+    bg-gray-400
+    bg-center bg-cover bg-no-repeat
+    shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]
+    w-full max-w-screen-2xl mx-auto
+    relative
+  "
+  style={{ 
+    backgroundImage: `url('/images/Banner2.jpg')` 
+  }}
+>
+  {/* Overlay opcional para mejorar legibilidad */}
+  <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+  
+  {/* Contenido centrado con z-index para estar sobre el overlay */}
+  <div className="relative z-10 text-center max-w-2xl px-6">
+    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+      Suscríbete Ahora
+    </h2>
+    <p className="text-lg md:text-xl text-white mb-8 font-light opacity-90">
+      Y recibe un descuento por tu primera compra
+    </p>
+    
+    {/* Formulario de suscripción */}
+    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+      <input 
+        type="email" 
+        placeholder="Ingresa tu email"
+        className="
+          px-6 py-3 
+          bg-white bg-opacity-20 
+          backdrop-blur-sm 
+          border border-white border-opacity-30 
+          rounded-full 
+          text-white placeholder-white placeholder-opacity-70
+          focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50
+          min-w-[300px]
+        "
+      />
+      <button className="
+        px-8 py-3 
+        bg-white 
+        text-gray-900 
+        font-semibold 
+        rounded-full 
+        hover:bg-gray-100 
+        transition-all duration-300 
+        transform hover:scale-105
+        shadow-lg
+        min-w-[140px]
+      ">
+        Suscribirse
+      </button>
+    </div>
+    
+    {/* Texto adicional */}
+    <p className="text-sm text-white opacity-75">
+      *Descuento válido solo para nuevos suscriptores
+    </p>
+  </div>
+</section>
     </Main>
   );
 };
