@@ -5,6 +5,8 @@ import { ShoppingCart, Heart, User, Search, LogOut } from 'lucide-react';
 export default function Header() {
     const { auth } = usePage().props;
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const { url } = usePage()
+    const isActive = (path) => url === path
 
     const toggleUserMenu = () => {
         setShowUserMenu(!showUserMenu);
@@ -15,9 +17,9 @@ export default function Header() {
             {/* Logo */}
             <div className="flex items-center">
                 <Link href="/">
-                    <img 
-                        src="/images/logo.png" 
-                        alt="Barber Logo" 
+                    <img
+                        src="/images/logo.png"
+                        alt="Barber Logo"
                         className="h-10"
                     />
                 </Link>
@@ -25,9 +27,9 @@ export default function Header() {
 
             {/* Barra de búsqueda */}
             <div className="hidden md:flex items-center relative max-w-md w-full mx-4">
-                <input 
-                    type="text" 
-                    placeholder="Buscar Productos" 
+                <input
+                    type="text"
+                    placeholder="Buscar Productos"
                     className="w-full py-2 px-4 rounded-md focus:outline-none text-sm"
                     style={{ border: '1px solid #989898' }}
                 />
@@ -36,16 +38,32 @@ export default function Header() {
 
             {/* Navegación */}
             <nav className="hidden md:flex items-center space-x-6">
-                <Link href="/" className="text-black hover:text-black transition-colors text-sm font-medium">
+                <Link
+                    href="/"
+                    className={`transition-colors text-sm font-medium ${isActive('/') ? 'text-black' : 'text-[#656565]'
+                        }`}
+                >
                     Inicio
                 </Link>
-                <Link href="/quienes-somos" className="hover:text-black transition-colors text-sm font-medium" style={{ color: '#656565' }}>
+                <Link
+                    href="/quienes-somos"
+                    className={`transition-colors text-sm font-medium ${isActive('/quienes-somos') ? 'text-black' : 'text-[#656565]'
+                        }`}
+                >
                     Quienes Somos
                 </Link>
-                <Link href="/productos" className="hover:text-black transition-colors text-sm font-medium" style={{ color: '#656565' }}>
+                <Link
+                    href="/productos"
+                    className={`transition-colors text-sm font-medium ${isActive('/productos') ? 'text-black' : 'text-[#656565]'
+                        }`}
+                >
                     Productos
                 </Link>
-                <Link href="/faq" className="hover:text-black transition-colors text-sm font-medium" style={{ color: '#656565' }}>
+                <Link
+                    href="/faq"
+                    className={`transition-colors text-sm font-medium ${isActive('/faq') ? 'text-black' : 'text-[#656565]'
+                        }`}
+                >
                     FAQ
                 </Link>
             </nav>
@@ -59,20 +77,20 @@ export default function Header() {
                     <ShoppingCart className="h-5 w-5" />
                 </Link>
                 <div className="relative">
-                    <button 
-                        onClick={toggleUserMenu} 
+                    <button
+                        onClick={toggleUserMenu}
                         className="hover:opacity-75 transition-opacity focus:outline-none flex items-center"
                         style={{ color: '#656565' }}
                     >
                         <User className="h-5 w-5" />
                     </button>
-                    
+
                     {showUserMenu && (
                         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border" style={{ borderColor: '#B3B3B3' }}>
                             {auth?.user ? (
                                 <>
-                                    <Link 
-                                        href={route('profile.edit')} 
+                                    <Link
+                                        href={route('profile.edit')}
                                         className="flex items-center px-4 py-2 text-sm hover:bg-gray-100"
                                         style={{ color: '#656565' }}
                                     >
@@ -80,17 +98,17 @@ export default function Header() {
                                         Mi Perfil
                                     </Link>
                                     {auth.user.role === 'admin' && (
-                                        <Link 
-                                            href={route('dashboard')} 
+                                        <Link
+                                            href={route('dashboard')}
                                             className="flex items-center px-4 py-2 text-sm hover:bg-gray-100"
                                             style={{ color: '#656565' }}
-                                        > 
-                                            Dashboard 
+                                        >
+                                            Dashboard
                                         </Link>
                                     )}
-                                    <Link 
-                                        href={route('logout')} 
-                                        method="post" 
+                                    <Link
+                                        href={route('logout')}
+                                        method="post"
                                         as="button"
                                         className="flex items-center w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                                         style={{ color: '#656565' }}
@@ -101,19 +119,19 @@ export default function Header() {
                                 </>
                             ) : (
                                 <>
-                                    <Link 
-                                        href={route('login')} 
+                                    <Link
+                                        href={route('login')}
                                         className="block px-4 py-2 text-sm hover:bg-gray-100"
                                         style={{ color: '#656565' }}
-                                    > 
-                                        Log in 
+                                    >
+                                        Log in
                                     </Link>
-                                    <Link 
-                                        href={route('register')} 
+                                    <Link
+                                        href={route('register')}
                                         className="block px-4 py-2 text-sm hover:bg-gray-100"
                                         style={{ color: '#656565' }}
-                                    > 
-                                        Register 
+                                    >
+                                        Register
                                     </Link>
                                 </>
                             )}

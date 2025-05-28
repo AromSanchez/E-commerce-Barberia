@@ -3,7 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
-use App\Http\Controllers\ProductController; 
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PublicProductController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
@@ -17,6 +18,8 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+Route::get('/productos', [PublicProductController::class, 'index'])->name('products.index');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

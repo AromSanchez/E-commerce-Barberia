@@ -96,6 +96,7 @@ class ProductController extends Controller
             'short_description' => 'nullable|string',
             'long_description' => 'nullable|string',
         ]);
+        $validated['sale_price'] = $request->input('sale_price') !== '' ? $request->input('sale_price') : null;
 
         // Si llega una nueva imagen, eliminar la anterior y guardar la nueva
         if ($request->hasFile('image')) {
