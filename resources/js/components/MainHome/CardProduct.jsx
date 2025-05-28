@@ -13,7 +13,7 @@ const CardProduct = ({ name, price, image }) => {
       w-full max-w-[268px]                  /* width: 100%, max-width: 268px */
       h-[408px]                             /* height: 408px (fixed) */
       py-6 px-4                             /* padding: 24px (py-6) 16px (px-4) */
-      bg-[#c0bfbf]                          /* background: #F6F6F6 */
+      bg-[#ebe9e9]                          /* background: #F6F6F6 */
       rounded-[9px]                         /* border-radius: 9px */
       shadow-md                             /* Sombra suave para dar profundidad */
       overflow-hidden                       /* Para asegurar que el contenido se ajuste */
@@ -45,7 +45,7 @@ const CardProduct = ({ name, price, image }) => {
 
       {/* Botón de Comprar */}
       <button className="mt-auto bg-black text-white py-2.5 px-6 rounded-lg w-full hover:bg-gray-800 transition-colors text-sm font-medium">
-        Añador al Carrito
+        Añadir al Carrito
       </button>
     </div>
   );
