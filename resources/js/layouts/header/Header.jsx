@@ -11,113 +11,114 @@ export default function Header() {
     };
 
     return (
-        <header className="w-full py-4 border-b border-gray-200">
-            <div className="container mx-auto px-4 flex items-center justify-between">
-                {/* Logo */}
-                <div className="flex items-center">
-                    <Link href="/">
-                        {/* Aquí colocarás tu imagen de logo */}
-                        <img 
-                            src="/images/logo.png" 
-                            alt="Barber Logo" 
-                            className="h-10"
-                        />
-                    </Link>
-                </div>
-
-                {/* Barra de búsqueda */}
-                <div className="hidden md:flex items-center relative max-w-md w-full mx-4">
-                    <input 
-                        type="text" 
-                        placeholder="Buscar Productos" 
-                        className="w-full py-2 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"
+        <header className="flex px-40 py-4 justify-between items-center w-full border-b bg-white" style={{ borderBottomColor: '#B5B5B5' }}>
+            {/* Logo */}
+            <div className="flex items-center">
+                <Link href="/">
+                    <img 
+                        src="/images/logo.png" 
+                        alt="Barber Logo" 
+                        className="h-10"
                     />
-                    <Search className="absolute right-3 h-5 w-5 text-gray-400" />
-                </div>
+                </Link>
+            </div>
 
-                {/* Navegación */}
-                <nav className="hidden md:flex items-center space-x-6">
-                    <Link href="/" className="text-gray-700 hover:text-black transition-colors">
-                        Inicio
-                    </Link>
-                    <Link href="/quienes-somos" className="text-gray-700 hover:text-black transition-colors">
-                        Quienes Somos
-                    </Link>
-                    <Link href="/productos" className="text-gray-700 hover:text-black transition-colors">
-                        Productos
-                    </Link>
-                    <Link href="/faq" className="text-gray-700 hover:text-black transition-colors">
-                        FAQ
-                    </Link>
-                </nav>
+            {/* Barra de búsqueda */}
+            <div className="hidden md:flex items-center relative max-w-md w-full mx-4">
+                <input 
+                    type="text" 
+                    placeholder="Buscar Productos" 
+                    className="w-full py-2 px-4 rounded-md focus:outline-none text-sm"
+                    style={{ border: '1px solid #989898' }}
+                />
+                <Search className="absolute right-3 h-5 w-5" style={{ color: '#989898' }} />
+            </div>
 
-                {/* Iconos de acción */}
-                <div className="flex items-center space-x-4">
-                    <Link href="/favoritos" className="text-gray-700 hover:text-black transition-colors">
-                        <Heart className="h-6 w-6" />
-                    </Link>
-                    <Link href="/carrito" className="text-gray-700 hover:text-black transition-colors relative">
-                        <ShoppingCart className="h-6 w-6" />
-                        <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                            0
-                        </span>
-                    </Link>
-                    <div className="relative">
-                        <button 
-                            onClick={toggleUserMenu} 
-                            className="text-gray-700 hover:text-black transition-colors focus:outline-none"
-                        >
-                            <User className="h-6 w-6" />
-                        </button>
-                        
-                        {showUserMenu && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
-                                {auth?.user ? (
-                                    <>
+            {/* Navegación */}
+            <nav className="hidden md:flex items-center space-x-6">
+                <Link href="/" className="text-black hover:text-black transition-colors text-sm font-medium">
+                    Inicio
+                </Link>
+                <Link href="/quienes-somos" className="hover:text-black transition-colors text-sm font-medium" style={{ color: '#656565' }}>
+                    Quienes Somos
+                </Link>
+                <Link href="/productos" className="hover:text-black transition-colors text-sm font-medium" style={{ color: '#656565' }}>
+                    Productos
+                </Link>
+                <Link href="/faq" className="hover:text-black transition-colors text-sm font-medium" style={{ color: '#656565' }}>
+                    FAQ
+                </Link>
+            </nav>
+
+            {/* Iconos de acción */}
+            <div className="flex items-center space-x-4">
+                <Link href="/favoritos" className="hover:opacity-75 transition-opacity" style={{ color: '#656565' }}>
+                    <Heart className="h-5 w-5" />
+                </Link>
+                <Link href="/carrito" className="hover:opacity-75 transition-opacity relative" style={{ color: '#656565' }}>
+                    <ShoppingCart className="h-5 w-5" />
+                </Link>
+                <div className="relative">
+                    <button 
+                        onClick={toggleUserMenu} 
+                        className="hover:opacity-75 transition-opacity focus:outline-none flex items-center"
+                        style={{ color: '#656565' }}
+                    >
+                        <User className="h-5 w-5" />
+                    </button>
+                    
+                    {showUserMenu && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border" style={{ borderColor: '#B3B3B3' }}>
+                            {auth?.user ? (
+                                <>
+                                    <Link 
+                                        href={route('profile.edit')} 
+                                        className="flex items-center px-4 py-2 text-sm hover:bg-gray-100"
+                                        style={{ color: '#656565' }}
+                                    >
+                                        <User className="h-4 w-4 mr-2" />
+                                        Mi Perfil
+                                    </Link>
+                                    {auth.user.role === 'admin' && (
                                         <Link 
-                                            href={route('profile.edit')} 
-                                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            <User className="h-4 w-4 mr-2" />
-                                            Mi Perfil
-                                        </Link>
-                                        {auth.user.role === 'admin' && (
-                                            <Link 
-                                                href={route('dashboard')} 
-                                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            > 
-                                                Dashboard 
-                                            </Link>
-                                        )}
-                                        <Link 
-                                            href={route('logout')} 
-                                            method="post" 
-                                            as="button"
-                                            className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            <LogOut className="h-4 w-4 mr-2" />
-                                            Cerrar Sesión
-                                        </Link>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Link 
-                                            href={route('login')} 
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            href={route('dashboard')} 
+                                            className="flex items-center px-4 py-2 text-sm hover:bg-gray-100"
+                                            style={{ color: '#656565' }}
                                         > 
-                                            Log in 
+                                            Dashboard 
                                         </Link>
-                                        <Link 
-                                            href={route('register')} 
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        > 
-                                            Register 
-                                        </Link>
-                                    </>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                                    )}
+                                    <Link 
+                                        href={route('logout')} 
+                                        method="post" 
+                                        as="button"
+                                        className="flex items-center w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                                        style={{ color: '#656565' }}
+                                    >
+                                        <LogOut className="h-4 w-4 mr-2" />
+                                        Cerrar Sesión
+                                    </Link>
+                                </>
+                            ) : (
+                                <>
+                                    <Link 
+                                        href={route('login')} 
+                                        className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                        style={{ color: '#656565' }}
+                                    > 
+                                        Log in 
+                                    </Link>
+                                    <Link 
+                                        href={route('register')} 
+                                        className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                        style={{ color: '#656565' }}
+                                    > 
+                                        Register 
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </header>
