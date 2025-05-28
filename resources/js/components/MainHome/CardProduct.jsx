@@ -45,7 +45,7 @@ const CardProduct = ({ name, price, image }) => {
 
       {/* Botón de Comprar */}
       <button className="mt-auto bg-black text-white py-2.5 px-6 rounded-lg w-full hover:bg-gray-800 transition-colors text-sm font-medium">
-        Comprar Ahora
+        Añadir al Carrito
       </button>
     </div>
   );
