@@ -2,17 +2,29 @@ import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import CardProduct from '@/components/MainHome/CardProduct'
 import FiltroCheckbox from '@/components/MainProducts/FilterCheckbox'
+import PriceFilter from '@/components/MainProducts/PriceFilter'
 import Main from "../Main/Main";
 
 export default function MainProducts({ productos = [], categorias = [], marcas = [] }) {
+    // Obtener el precio máximo al cargar los productos (solo una vez)
+    const maxPrecio = Math.round(productos.reduce((max, producto) => {
+        const precioProducto = producto.sale_price ?? producto.regular_price;
+        return precioProducto > max ? precioProducto : max;
+    }, 0));
+
     const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState([]);
     const [marcasSeleccionadas, setMarcasSeleccionadas] = useState([]);
-
+    // Ahora el max es dinámico pero fijo, el min lo puedes dejar en 0 o lo que quieras
+    const [precio, setPrecio] = useState({ min: 0, max: maxPrecio });
 
     const productosFiltrados = productos.filter(producto => {
-        const pasaCategoria = categoriasSeleccionadas.length === 0 || categoriasSeleccionadas.includes(producto.category_id);
-        const pasaMarca = marcasSeleccionadas.length === 0 || marcasSeleccionadas.includes(producto.brand_id);
-        return pasaCategoria && pasaMarca;
+        const precioProducto = producto.sale_price ?? producto.regular_price;
+
+        return (
+            (categoriasSeleccionadas.length === 0 || categoriasSeleccionadas.includes(producto.category_id)) &&
+            (marcasSeleccionadas.length === 0 || marcasSeleccionadas.includes(producto.brand_id)) &&
+            precioProducto >= precio.min && precioProducto <= precio.max
+        );
     });
 
     return (
@@ -42,6 +54,13 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                         seleccionados={marcasSeleccionadas}
                         setSeleccionados={setMarcasSeleccionadas}
                     />
+                    <PriceFilter
+                        min={0}
+                        max={maxPrecio}
+                        value={precio}
+                        setValue={setPrecio}
+                    />
+
                 </div>
 
                 {/* Lista de productos */}
@@ -65,5 +84,4 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
             </div>
         </Main>
     );
-
 }
