@@ -13,7 +13,7 @@ export default function FiltroCheckbox({ titulo = 'XXXXX', opciones = [], selecc
     }
 
     return (
-        <div className="border-b pb-2 mb-4 w-52">
+        <div className="pb-2 mb-4 w-52">
             {/* Encabezado */}
             <div
                 className="flex items-center justify-between mb-4 border-b pb-2 border-[#B5B5B5] cursor-pointer select-none"
@@ -29,7 +29,7 @@ export default function FiltroCheckbox({ titulo = 'XXXXX', opciones = [], selecc
                     {opciones.map((opcion, index) => (
                         <label
                             key={index}
-                            className="flex items-center space-x-2 cursor-pointer"
+                            className="flex items-center gap-2 cursor-pointer"
                         >
                             <input
                                 type="checkbox"
@@ -37,10 +37,23 @@ export default function FiltroCheckbox({ titulo = 'XXXXX', opciones = [], selecc
                                 onChange={() => toggleOpcion(opcion.valor)}
                                 className="accent-black w-4 h-4"
                             />
+
+                            {/* Si hay logo, mostrarlo */}
+                            {opcion.logo && (
+                                <img
+                                    src={opcion.logo}
+                                    alt={opcion.nombre}
+                                    className="w-14 h-10 object-contain rounded bg-white border"
+                                />
+                            )}
+
                             <span className="text-sm text-black font-medium">
                                 {opcion.nombre}
                             </span>
-                            <span className="text-sm text-gray-500">{opcion.total}</span>
+
+                            <span className="text-sm text-gray-500">
+                                ({opcion.total})
+                            </span>
                         </label>
                     ))}
                 </div>

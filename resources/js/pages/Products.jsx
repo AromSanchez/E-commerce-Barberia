@@ -5,12 +5,12 @@ import { usePage } from '@inertiajs/react';
 
 
 export default function Products() {
-    const { productos, categorias } = usePage().props;
+    const { productos, categorias, marcas} = usePage().props;
 
     return (
         <>
             <Header />
-            <MainProducts productos={productos} categorias={categorias} />
+            <MainProducts productos={productos} categorias={categorias} marcas={marcas} />
             <Footer />
         </>
     );
