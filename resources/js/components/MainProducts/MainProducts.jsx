@@ -64,7 +64,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                 </div>
 
                 {/* Lista de productos */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-3/4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 justify-items-center w-3/4">
                     {productosFiltrados.length > 0 ? (
                         productosFiltrados.map(producto => (
                             <CardProduct

@@ -405,7 +405,7 @@ const MainHome = () => {
       *Descuento válido solo para nuevos suscriptores
     </p>
   </div>
-</section>
+      </section>
     </Main>
   );
 };
