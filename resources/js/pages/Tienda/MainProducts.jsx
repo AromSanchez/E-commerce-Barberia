@@ -75,7 +75,6 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                             <Breadcrumb 
                                 baseItems={['Inicio', 'Tienda']}
                                 categoriaSeleccionada={categorias.find(cat => categoriasSeleccionadas.includes(cat.id))}
-                                marcaSeleccionada={marcas.find(marca => marcasSeleccionadas.includes(marca.id))}
                                 currentPage={currentPage}
                                 onResetFilters={() => {
                                     setCategoriasSeleccionadas([]);
@@ -88,10 +87,6 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                     setMarcasSeleccionadas([]);
                                     setCurrentPage(1);
                                 }}
-                                onMarcaClick={(marca) => {
-                                    setMarcasSeleccionadas([marca.id]);
-                                    setCurrentPage(1);
-                                }}
                                 onHomeClick={() => {
                                     window.location.href = '/';
                                 }}
@@ -99,7 +94,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                         </div>
                         
                         {/* Filtros: Sidebar izquierdo */}
-                        <div className="flex flex-col divide-y-2 divide-gray-200 p-5 rounded-2xl border border-gray-300 h-fit">
+                        <div className="flex flex-col divide-y-2 divide-gray-100 p-5 h-fit">
                             <div className="-mb-3">
                                 <CategoryFilter
                                     titulo="Categorías"
@@ -139,7 +134,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                     </div>
                     
                     {/* Área principal de productos */}
-                    <div className="flex-1 w-full md:w-4/5 mt-8">
+                    <div className="flex-1 w-full md:w-4/5 mt-12">
                         {/* Controles superiores */}
                         <div className="flex justify-between items-center mb-8">
                             {/* Título dinámico */}

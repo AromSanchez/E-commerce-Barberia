@@ -8,6 +8,7 @@ export default function PriceFilter({
 }) {
     const sliderRef = useRef(null);
     const [dragging, setDragging] = useState(null);
+    const [tempValues, setTempValues] = useState(value);
 
     const porcentaje = (val) => ((val - min) / (max - min)) * 100;
 
@@ -22,13 +23,20 @@ export default function PriceFilter({
         const newValue = Math.round(min + (percent / 100) * (max - min));
 
         if (dragging === 'min') {
-            setValue((prev) => ({ ...prev, min: Math.min(newValue, value.max - 1) }));
+            setTempValues(prev => ({ ...prev, min: Math.min(newValue, value.max - 1) }));
         } else {
-            setValue((prev) => ({ ...prev, max: Math.max(newValue, value.min + 1) }));
+            setTempValues(prev => ({ ...prev, max: Math.max(newValue, value.min + 1) }));
         }
     };
 
-    const handleMouseUp = () => setDragging(null);
+    const handleMouseUp = () => {
+        setDragging(null);
+        setValue(tempValues);
+    };
+
+    useEffect(() => {
+        setTempValues(value);
+    }, [value]);
 
     useEffect(() => {
         if (dragging) {
@@ -43,71 +51,67 @@ export default function PriceFilter({
 
     const handleChange = (e, type) => {
         const newValue = Math.max(min, Math.min(max, +e.target.value));
+        const newTempValues = { ...tempValues };
+        
         if (type === 'min') {
-            setValue(prev => ({ ...prev, min: Math.min(newValue, value.max - 1) }));
+            newTempValues.min = Math.min(newValue, tempValues.max - 1);
         } else {
-            setValue(prev => ({ ...prev, max: Math.max(newValue, value.min + 1) }));
+            newTempValues.max = Math.max(newValue, tempValues.min + 1);
         }
+        setTempValues(newTempValues);
+    };
+
+    const handleFilter = () => {
+        setValue(tempValues);
     };
 
     return (
-        <div className="w-full md:w-48 mb-4">
-            <h3 className="font-semibold text-lg mb-2">Precio S/</h3>
+        <div className="pb-2 mb-4 w-52 text-left">
+            <h2 className="font-bold text-xl mb-3">Precio</h2>
 
-            <div ref={sliderRef} className="relative h-2 bg-gray-200 rounded-full cursor-pointer mb-4">
+            <div ref={sliderRef} className="relative h-1 bg-gray-200 rounded-full cursor-pointer mb-4">
                 {/* Barra del filtro */}
                 <div
-                    className="absolute h-2 bg-black rounded-full transition-all duration-200"
+                    className="absolute h-1 bg-gray-900 rounded-full transition-all duration-200"
                     style={{
-                        left: `${porcentaje(value.min)}%`,
-                        width: `${porcentaje(value.max) - porcentaje(value.min)}%`
+                        left: `${porcentaje(tempValues.min)}%`,
+                        width: `${porcentaje(tempValues.max) - porcentaje(tempValues.min)}%`
                     }}
                 />
                 {/* Controlador mínimo */}
                 <div
-                    className="absolute w-4 h-4 bg-white border-2 border-black rounded-full -translate-x-1/2 -translate-y-1/2 top-1/2 cursor-pointer"
-                    style={{ left: `${porcentaje(value.min)}%` }}
+                    className="absolute w-3 h-3 bg-white border border-gray-900 rounded-full -translate-x-1/2 -translate-y-1/2 top-1/2 cursor-pointer hover:scale-110 transition-transform"
+                    style={{ left: `${porcentaje(tempValues.min)}%` }}
                     onMouseDown={() => handleMouseDown('min')}
                     role="slider"
                     aria-label="Precio mínimo"
                     aria-valuemin={min}
                     aria-valuemax={max}
-                    aria-valuenow={value.min}
+                    aria-valuenow={tempValues.min}
                 />
                 {/* Controlador máximo */}
                 <div
-                    className="absolute w-4 h-4 bg-white border-2 border-black rounded-full -translate-x-1/2 -translate-y-1/2 top-1/2 cursor-pointer"
-                    style={{ left: `${porcentaje(value.max)}%` }}
+                    className="absolute w-3 h-3 bg-white border border-gray-900 rounded-full -translate-x-1/2 -translate-y-1/2 top-1/2 cursor-pointer hover:scale-110 transition-transform"
+                    style={{ left: `${porcentaje(tempValues.max)}%` }}
                     onMouseDown={() => handleMouseDown('max')}
                     role="slider"
                     aria-label="Precio máximo"
                     aria-valuemin={min}
                     aria-valuemax={max}
-                    aria-valuenow={value.max}
+                    aria-valuenow={tempValues.max}
                 />
             </div>
 
-            {/* Entrada de los valores de precio */}
-            <div className="flex items-center gap-2">
-                <input
-                    type="number"
-                    className="w-20 text-sm border border-gray-300 rounded px-2 py-1"
-                    value={value.min}
-                    onChange={(e) => handleChange(e, 'min')}
-                    min={min}
-                    max={value.max - 1}
-                    aria-label="Precio mínimo"
-                />
-                <span className="text-gray-500">—</span>
-                <input
-                    type="number"
-                    className="w-20 text-sm border border-gray-300 rounded px-2 py-1"
-                    value={value.max}
-                    onChange={(e) => handleChange(e, 'max')}
-                    min={value.min + 1}
-                    max={max}
-                    aria-label="Precio máximo"
-                />
+            <div className="flex items-center justify-between gap-2">
+                <span className="text-sm text-gray-600">
+                    S/{tempValues.min} — S/{tempValues.max}
+                </span>
+                <button
+                    onClick={handleFilter}
+                    className="bg-gray-900 text-white py-1.5 px-4 rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
+                >
+                    FILTRAR
+                </button>
             </div>
         </div>
     );

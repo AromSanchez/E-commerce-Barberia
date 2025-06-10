@@ -4,11 +4,9 @@ import { Link } from '@inertiajs/react';
 export default function Breadcrumb({ 
     baseItems = [], 
     categoriaSeleccionada = null,
-    marcaSeleccionada = null,
     currentPage = 1,
     onResetFilters,
     onCategoriaClick,
-    onMarcaClick,
     onHomeClick
 }) {
     // Construir los items del breadcrumb dinámicamente
@@ -18,11 +16,6 @@ export default function Breadcrumb({
         // Agregar categoría si está seleccionada
         if (categoriaSeleccionada) {
             items.push(categoriaSeleccionada.name);
-        }
-
-        // Agregar marca si está seleccionada
-        if (marcaSeleccionada) {
-            items.push(marcaSeleccionada.name);
         }
 
         // Agregar número de página si es mayor a 1
@@ -44,11 +37,6 @@ export default function Breadcrumb({
             case 2: // Categoría
                 if (categoriaSeleccionada) {
                     onCategoriaClick?.(categoriaSeleccionada);
-                }
-                break;
-            case 3: // Marca
-                if (marcaSeleccionada) {
-                    onMarcaClick?.(marcaSeleccionada);
                 }
                 break;
             default:
