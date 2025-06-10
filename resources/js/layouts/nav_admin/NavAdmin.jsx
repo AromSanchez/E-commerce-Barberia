@@ -1,20 +1,12 @@
 import React, { useState } from 'react';
-import { 
-    Home, 
+import {  
     Package, 
-    Scissors, 
-    Users, 
-    UserCheck, 
+    Users,  
     ShoppingBag, 
-    Bell, 
-    Settings,
     ChevronDown,
-    LogOut,
-    User,
     Grid,
     Layers,
     FilePlus,
-    Image,
     Tag
 } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';

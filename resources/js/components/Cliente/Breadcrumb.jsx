@@ -1,0 +1,84 @@
+import React from 'react';
+import { Link } from '@inertiajs/react';
+
+export default function Breadcrumb({ 
+    baseItems = [], 
+    categoriaSeleccionada = null,
+    marcaSeleccionada = null,
+    currentPage = 1,
+    onResetFilters,
+    onCategoriaClick,
+    onMarcaClick,
+    onHomeClick
+}) {
+    // Construir los items del breadcrumb dinámicamente
+    const buildBreadcrumbItems = () => {
+        let items = [...baseItems];
+
+        // Agregar categoría si está seleccionada
+        if (categoriaSeleccionada) {
+            items.push(categoriaSeleccionada.name);
+        }
+
+        // Agregar marca si está seleccionada
+        if (marcaSeleccionada) {
+            items.push(marcaSeleccionada.name);
+        }
+
+        // Agregar número de página si es mayor a 1
+        if (currentPage > 1) {
+            items.push(`Página ${currentPage}`);
+        }
+
+        return items;
+    };
+
+    const handleItemClick = (index, item) => {
+        switch(index) {
+            case 0: // Inicio
+                onHomeClick?.();
+                break;
+            case 1: // Tienda
+                onResetFilters?.();
+                break;
+            case 2: // Categoría
+                if (categoriaSeleccionada) {
+                    onCategoriaClick?.(categoriaSeleccionada);
+                }
+                break;
+            case 3: // Marca
+                if (marcaSeleccionada) {
+                    onMarcaClick?.(marcaSeleccionada);
+                }
+                break;
+            default:
+                break;
+        }
+    };
+
+    const breadcrumbItems = buildBreadcrumbItems();
+
+    return (
+        <nav aria-label="Breadcrumb">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-500">
+                {breadcrumbItems.map((item, index) => (
+                    <React.Fragment key={index}>
+                        {index > 0 && <span className="text-gray-400" aria-hidden="true">›</span>}
+                        <span 
+                            className={`${
+                                index === breadcrumbItems.length - 1 
+                                    ? 'text-gray-900' 
+                                    : 'hover:text-gray-900 cursor-pointer transition-colors duration-200'
+                            }`}
+                            onClick={() => handleItemClick(index, item)}
+                            role="button"
+                            tabIndex={0}
+                        >
+                            {item}
+                        </span>
+                    </React.Fragment>
+                ))}
+            </div>
+        </nav>
+    );
+}

@@ -25,6 +25,7 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <div className="flex min-h-screen">
+            <Head title="Iniciar Sesión" />
             {/* Sección izquierda con imagen y texto */}
             <div className="hidden md:flex md:w-1/2 relative bg-black overflow-hidden">
                 <img src="\images\logoinicio.png" alt="imagen-login" className="absolute inset-0 w-full h-full object-cover" />

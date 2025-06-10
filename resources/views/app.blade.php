@@ -3,8 +3,9 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <link rel="icon" href="{{ asset('images/logo-ventana.png') }}" type="image/png">
+        <link rel="apple-touch-icon" href="{{ asset('images/logo-ventana.png') }}">
+        <title inertia>{{ config('app.name', 'BarberShop') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

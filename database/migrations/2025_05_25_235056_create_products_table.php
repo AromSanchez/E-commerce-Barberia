@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('category_id')->nullable();
             $table->unsignedBigInteger('brand_id')->nullable(); 
             $table->enum('is_featured', ['yes', 'no'])->default('no');
+            $table->enum('is_new', ['yes', 'no'])->default('yes');
             $table->integer('stock')->default(0);
             $table->string('image')->nullable(); 
             $table->text('short_description')->nullable();

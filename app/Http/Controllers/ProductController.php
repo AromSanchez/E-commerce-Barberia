@@ -39,6 +39,7 @@ class ProductController extends Controller
             'category_id' => 'nullable|exists:category,id',
             'brand_id' => 'nullable|exists:brands,id',
             'is_featured' => 'in:yes,no',
+            'is_new' => 'in:yes,no',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|max:2048',
             'short_description' => 'nullable|string',
@@ -91,6 +92,7 @@ class ProductController extends Controller
             'category_id' => 'nullable|exists:category,id', // Cambiado de categories a category
             'brand_id' => 'nullable|exists:brands,id',
             'is_featured' => 'in:yes,no',
+            'is_new' => 'in:yes,no',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|max:2048',
             'short_description' => 'nullable|string',

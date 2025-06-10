@@ -15,6 +15,7 @@ export default function DashAddProduct() {
         category_id: '',                                    
         brand_id: '',
         is_featured: 'no',
+        is_new: 'yes',
         stock: '',
         image: null,
         short_description: '',
@@ -369,6 +370,23 @@ export default function DashAddProduct() {
                                                     id="is_featured"
                                                     name="is_featured"
                                                     value={formData.is_featured}
+                                                    onChange={handleChange}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                                >
+                                                    <option value="no">No</option>
+                                                    <option value="yes">Sí</option>
+                                                </select>
+                                            </div>
+
+                                            {/* Nuevo */}
+                                            <div>
+                                                <label htmlFor="is_new" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Nuevo
+                                                </label>
+                                                <select
+                                                    id="is_new"
+                                                    name="is_new"
+                                                    value={formData.is_new}
                                                     onChange={handleChange}
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                                 >

@@ -29,6 +29,7 @@ export default function Register() {
 
     return (
         <div className="flex h-screen">
+            <Head title="Crear Cuenta" />
             {/* Sección izquierda con imagen y texto */}
             <div className="hidden md:flex md:w-1/2 bg-gray-900 relative">
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/70 z-10"></div>

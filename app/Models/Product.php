@@ -16,6 +16,7 @@ class Product extends Model
         'category_id',
         'brand_id',
         'is_featured',
+        'is_new',
         'stock',
         'image',
         'short_description',

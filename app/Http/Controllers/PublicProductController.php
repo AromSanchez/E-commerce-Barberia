@@ -11,11 +11,11 @@ class PublicProductController extends Controller
 {
     public function index()
     {
-        $productos = Product::all(); // o con relaciones, filtros, etc.
+        $productos = Product::with(['brand', 'category'])->get(); // Cargar las relaciones
         $categorias = Category::withCount('products')->get();
         $marcas = Brand::withCount('products')->get();
 
-        return Inertia::render('Products', [
+        return Inertia::render('Tienda', [
             'productos' => $productos,
             'categorias' => $categorias,
             'marcas' => $marcas,
