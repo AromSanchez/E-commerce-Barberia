@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CardProduct from '@/components/Cliente/CardProduct';
 import FiltroCheckbox from './FilterCheckbox';
 import PriceFilter from './PriceFilter';
@@ -9,10 +9,17 @@ import CategoryFilter from './CategoryFilter';
 
 export default function MainProducts({ productos = [], categorias = [], marcas = [] }) {
     // Estados y configuración
-    const maxPrecio = Math.round(productos.reduce((max, producto) => {
-        const precioProducto = producto.sale_price ?? producto.regular_price;
-        return precioProducto > max ? precioProducto : max;
-    }, 0));
+    const [maxPrecio, setMaxPrecio] = useState(0);
+
+    useEffect(() => {
+        if (productos.length > 0) {
+            const nuevoMax = Math.round(
+                Math.max(...productos.map(p => p.sale_price ?? p.regular_price))
+            );
+            setMaxPrecio(nuevoMax);
+            setPrecio(prev => ({ ...prev, max: nuevoMax })); // Opcional, si quieres sincronizar
+        }
+    }, [productos]);
 
     const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState([]);
     const [marcasSeleccionadas, setMarcasSeleccionadas] = useState([]);
@@ -72,7 +79,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                     {/* Navegación de breadcrumb */}
                     <div className="w-full md:w-1/5">
                         <div className="mb-4">
-                            <Breadcrumb 
+                            <Breadcrumb
                                 baseItems={['Inicio', 'Tienda']}
                                 categoriaSeleccionada={categorias.find(cat => categoriasSeleccionadas.includes(cat.id))}
                                 currentPage={currentPage}
@@ -92,7 +99,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                 }}
                             />
                         </div>
-                        
+
                         {/* Filtros: Sidebar izquierdo */}
                         <div className="flex flex-col divide-y-2 divide-gray-100 p-5 h-fit">
                             <div className="-mb-3">
@@ -102,7 +109,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                         nombre: categoria.name,
                                         valor: categoria.id,
                                         total: categoria.products_count
-                                    }))} 
+                                    }))}
                                     seleccionados={categoriasSeleccionadas}
                                     setSeleccionados={setCategoriasSeleccionadas}
                                 />
@@ -116,7 +123,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                         valor: marca.id,
                                         total: marca.products_count,
                                         logo: marca.logo ? `/storage/${marca.logo}` : null
-                                    }))} 
+                                    }))}
                                     seleccionados={marcasSeleccionadas}
                                     setSeleccionados={setMarcasSeleccionadas}
                                 />
@@ -132,7 +139,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* Área principal de productos */}
                     <div className="flex-1 w-full md:w-4/5 mt-12">
                         {/* Controles superiores */}
@@ -155,13 +162,12 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                     <div className="flex gap-1 items-center">
                                         {[9, 12, 18, 24].map((num) => (
                                             <button
-                                            key={num}
-                                            onClick={() => handleProductosPorPaginaChange(num)}
-                                            className={`px-2 py-1 text-sm border transition-colors ${
-                                                    productosPorPagina === num
+                                                key={num}
+                                                onClick={() => handleProductosPorPaginaChange(num)}
+                                                className={`px-2 py-1 text-sm border transition-colors ${productosPorPagina === num
                                                         ? 'border-gray-900 bg-gray-900 text-white'
                                                         : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                                                } rounded`}
+                                                    } rounded`}
                                             >
                                                 {num}
                                             </button>
@@ -224,11 +230,10 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                         </div>
 
                         {/* Grid de productos */}
-                        <div className={`grid gap-4 ${
-                            columnas === 2 ? 'grid-cols-2 md:grid-cols-2' :
-                            columnas === 3 ? 'grid-cols-2 md:grid-cols-3' :
-                            'grid-cols-2 md:grid-cols-4'
-                        } grid-flow-row-dense`}>
+                        <div className={`grid gap-4 ${columnas === 2 ? 'grid-cols-2 md:grid-cols-2' :
+                                columnas === 3 ? 'grid-cols-2 md:grid-cols-3' :
+                                    'grid-cols-2 md:grid-cols-4'
+                            } grid-flow-row-dense`}>
                             {productosFiltrados.length > 0 ? (
                                 ordenarProductos(productosFiltrados)
                                     .slice((currentPage - 1) * productosPorPagina, currentPage * productosPorPagina)
