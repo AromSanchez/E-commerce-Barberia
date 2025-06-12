@@ -48,7 +48,7 @@ export default function Breadcrumb({
 
     return (
         <nav aria-label="Breadcrumb">
-            <div className="flex items-center gap-2 text-sm font-semibold text-gray-500">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-500 whitespace-nowrap">
                 {breadcrumbItems.map((item, index) => (
                     <React.Fragment key={index}>
                         {index > 0 && <span className="text-gray-400" aria-hidden="true">›</span>}

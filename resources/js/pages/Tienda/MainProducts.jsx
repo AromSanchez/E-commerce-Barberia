@@ -4,10 +4,20 @@ import FiltroCheckbox from './FilterCheckbox';
 import PriceFilter from './PriceFilter';
 import Pagination from '@/components/Cliente/Pagination';
 import Breadcrumb from '@/components/Cliente/Breadcrumb';
+import Select from 'react-select';
 import { TfiLayoutGrid2, TfiLayoutGrid3, TfiLayoutGrid4 } from 'react-icons/tfi';
 import CategoryFilter from './CategoryFilter';
 
 export default function MainProducts({ productos = [], categorias = [], marcas = [] }) {
+
+    const options = [
+        { value: 'predeterminado', label: 'Orden Predeterminado' },
+        { value: 'precioAsc', label: 'Precio: Menor a Mayor' },
+        { value: 'precioDesc', label: 'Precio: Mayor a Menor' },
+        { value: 'popularidad', label: 'Por popularidad' },
+        { value: 'nuevos', label: 'Más recientes' }
+    ];
+
     // Estados y configuración
     const [maxPrecio, setMaxPrecio] = useState(0);
 
@@ -143,90 +153,181 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                     {/* Área principal de productos */}
                     <div className="flex-1 w-full md:w-4/5 mt-12">
                         {/* Controles superiores */}
-                        <div className="flex justify-between items-center mb-8">
-                            {/* Título dinámico */}
-                            <h1 className="text-3xl font-bold font-inter text-gray-900">
-                                {categorias.find(cat => categoriasSeleccionadas.includes(cat.id))?.name || 'Tienda'}
-                                {marcasSeleccionadas.length > 0 && categorias.find(cat => categoriasSeleccionadas.includes(cat.id)) && (
-                                    <span className="text-gray-500 ml-2 font-medium">
-                                        × {marcas.find(marca => marcasSeleccionadas.includes(marca.id))?.name}
-                                    </span>
-                                )}
-                            </h1>
+                        <div className="flex flex-col mb-8">
+                            {/* Título y controles */}
+                            <div className="flex justify-between items-center">
+                                <h1 className="text-3xl font-bold font-inter text-gray-900">
+                                    {categorias.find(cat => categoriasSeleccionadas.includes(cat.id))?.name || 'Tienda'}
+                                </h1>
 
-                            {/* Contenedor de controles */}
-                            <div className="flex items-center space-x-4">
-                                {/* Control de productos por página */}
-                                <div className="flex items-center gap-3">
-                                    <span className="text-sm text-gray-500">Mostrar:</span>
-                                    <div className="flex gap-1 items-center">
-                                        {[9, 12, 18, 24].map((num) => (
-                                            <button
-                                                key={num}
-                                                onClick={() => handleProductosPorPaginaChange(num)}
-                                                className={`px-2 py-1 text-sm border transition-colors ${productosPorPagina === num
-                                                        ? 'border-gray-900 bg-gray-900 text-white'
-                                                        : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                                                    } rounded`}
-                                            >
-                                                {num}
-                                            </button>
-                                        ))}
+                                {/* Contenedor de controles */}
+                                <div className="flex items-center space-x-4">
+                                    {/* Control de productos por página */}
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-sm text-gray-500">Mostrar:</span>
+                                        <div className="flex gap-1 items-center">
+                                            {[9, 12, 18, 24].map((num) => (
+                                                <button
+                                                    key={num}
+                                                    onClick={() => handleProductosPorPaginaChange(num)}
+                                                    className={`px-2 py-1 text-sm border transition-colors ${productosPorPagina === num
+                                                            ? 'border-gray-900 bg-gray-900 text-white'
+                                                            : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                                                        } rounded`}
+                                                >
+                                                    {num}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Separador vertical */}
+                                    <div className="w-px h-6 bg-gray-300"></div>
+
+                                    {/* Selector de columnas */}
+                                    <div className="flex items-center border border-gray-300 rounded-md">
+                                        <button
+                                            onClick={() => handleColumnasChange(2)}
+                                            className={`px-2 py-1.5 ${columnas === 2 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'} border-r border-gray-300`}
+                                            title="2 Columnas"
+                                        >
+                                            <TfiLayoutGrid2 size={16} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleColumnasChange(3)}
+                                            className={`px-2 py-1.5 ${columnas === 3 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'} border-r border-gray-300`}
+                                            title="3 Columnas"
+                                        >
+                                            <TfiLayoutGrid3 size={16} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleColumnasChange(4)}
+                                            className={`px-2 py-1.5 ${columnas === 4 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'}`}
+                                            title="4 Columnas"
+                                        >
+                                            <TfiLayoutGrid4 size={16} />
+                                        </button>
+                                    </div>
+
+                                    {/* Separador vertical */}
+                                    <div className="w-px h-6 bg-gray-300"></div>
+
+                                    {/* Selector de orden */}
+                                    <div className="flex items-center">
+                                        <Select
+                                            value={options.find(option => option.value === orden)}
+                                            onChange={(selectedOption) => setOrden(selectedOption.value)}
+                                            options={options}
+                                            classNames={{
+                                                control: () => "border z-80 border-gray-300 rounded-md bg-transparent hover:border-gray-400 cursor-pointer",
+                                                option: ({ isFocused, isSelected }) =>
+                                                    `px-3 py-1.5 cursor-pointer ${
+                                                        isSelected
+                                                            ? "bg-gray-900 text-white"
+                                                            : isFocused
+                                                            ? "bg-gray-100"
+                                                            : "text-gray-900"
+                                                    }`,
+                                                menu: () => "mt-0 bg-white border border-gray-200 rounded-md shadow-lg relative ", // Añadido z-50
+                                                menuList: () => "max-h-60 overflow-auto text-sm", // Añadido para scroll si hay muchas opciones
+                                                singleValue: () => "text-sm font-medium text-gray-900",
+                                                placeholder: () => "text-sm font-medium text-gray-500",
+                                                input: () => "text-xs font-medium text-gray-900",
+                                                valueContainer: () => "p-2",
+                                                indicatorsContainer: () => "px-1",
+                                                indicatorSeparator: () => "bg-gray-300",
+                                                dropdownIndicator: () => "text-gray-500 hover:text-gray-800"
+                                            }}
+                                            unstyled
+                                            isSearchable={false}
+                                            components={{
+                                                IndicatorSeparator: () => null,
+                                                DropdownIndicator: () => (
+                                                    <svg 
+                                                        className="w-5 h-5 text-gray-500" 
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path 
+                                                            strokeLinecap="round" 
+                                                            strokeLinejoin="round" 
+                                                            strokeWidth={2} 
+                                                            d="M19 9l-7 7-7-7"
+                                                        />
+                                                    </svg>
+                                                )
+                                            }}
+                                        />
                                     </div>
                                 </div>
-
-                                {/* Separador vertical */}
-                                <div className="w-px h-6 bg-gray-300"></div>
-
-                                {/* Selector de columnas */}
-                                <div className="flex items-center border border-gray-300 rounded-md">
-                                    <button
-                                        onClick={() => handleColumnasChange(2)}
-                                        className={`px-2 py-1.5 ${columnas === 2 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'} border-r border-gray-300`}
-                                        title="2 Columnas"
-                                    >
-                                        <TfiLayoutGrid2 size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleColumnasChange(3)}
-                                        className={`px-2 py-1.5 ${columnas === 3 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'} border-r border-gray-300`}
-                                        title="3 Columnas"
-                                    >
-                                        <TfiLayoutGrid3 size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleColumnasChange(4)}
-                                        className={`px-2 py-1.5 ${columnas === 4 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'}`}
-                                        title="4 Columnas"
-                                    >
-                                        <TfiLayoutGrid4 size={16} />
-                                    </button>
-                                </div>
-
-                                {/* Separador vertical */}
-                                <div className="w-px h-6 bg-gray-300"></div>
-
-                                {/* Selector de orden */}
-                                <div className="flex items-center">
-                                    <select
-                                        value={orden}
-                                        onChange={(e) => setOrden(e.target.value)}
-                                        className="appearance-none px-3 py-1.5 pr-7 text-sm font-medium text-gray-900 bg-transparent border border-gray-300 rounded-md hover:border-gray-400 focus:outline-none cursor-pointer relative min-w-[180px]"
-                                        style={{
-                                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                                            backgroundRepeat: 'no-repeat',
-                                            backgroundPosition: '95% center',
-                                            backgroundSize: '16px'
-                                        }}
-                                    >
-                                        <option value="predeterminado">Orden Predeterminado</option>
-                                        <option value="precioAsc">Precio: Menor a Mayor</option>
-                                        <option value="precioDesc">Precio: Mayor a Menor</option>
-                                        <option value="popularidad">Por popularidad</option>
-                                        <option value="nuevos">Más recientes</option>
-                                    </select>
-                                </div>
                             </div>
+
+                            {/* Filtros activos */}
+                            {(categoriasSeleccionadas.length > 0 || marcasSeleccionadas.length > 0 || precio.min > 0 || precio.max < maxPrecio) && (
+                                <div className="flex flex-wrap gap-2 mt-4">
+                                    {categoriasSeleccionadas.length > 0 && (
+                                        <button
+                                            onClick={() => {
+                                                setCategoriasSeleccionadas([]);
+                                                setCurrentPage(1);
+                                            }}
+                                            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800 hover:bg-gray-200"
+                                        >
+                                            <span className="mr-1">Categoría: {categorias.find(cat => categoriasSeleccionadas.includes(cat.id))?.name}</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    )}
+
+                                    {marcasSeleccionadas.map(marcaId => (
+                                        <button
+                                            key={marcaId}
+                                            onClick={() => {
+                                                setMarcasSeleccionadas(prev => prev.filter(id => id !== marcaId));
+                                                setCurrentPage(1);
+                                            }}
+                                            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800 hover:bg-gray-200"
+                                        >
+                                            <span className="mr-1">Marca: {marcas.find(marca => marca.id === marcaId)?.name}</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    ))}
+
+                                    {(precio.min > 0 || precio.max < maxPrecio) && (
+                                        <button
+                                            onClick={() => {
+                                                setPrecio({ min: 0, max: maxPrecio });
+                                                setCurrentPage(1);
+                                            }}
+                                            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800 hover:bg-gray-200"
+                                        >
+                                            <span className="mr-1">Precio: S/{precio.min} - S/{precio.max}</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    )}
+
+                                    <button
+                                        onClick={() => {
+                                            setCategoriasSeleccionadas([]);
+                                            setMarcasSeleccionadas([]);
+                                            setPrecio({ min: 0, max: maxPrecio });
+                                            setCurrentPage(1);
+                                        }}
+                                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-100 text-red-800 hover:bg-red-200"
+                                    >
+                                        <span className="mr-1">Eliminar todos los filtros</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         {/* Grid de productos */}
