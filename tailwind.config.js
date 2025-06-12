@@ -21,6 +21,7 @@ export default {
             fontFamily: {
                 // Usamos el método profesional para extender la fuente por defecto
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],
+                'satoshi': ['Satoshi', 'sans-serif'],
             },
             
             screens: {

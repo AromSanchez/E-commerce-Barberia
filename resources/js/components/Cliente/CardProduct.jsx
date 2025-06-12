@@ -17,9 +17,9 @@ export default function CardProduct({
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const regularPriceValue = typeof regularPrice === 'number' ? regularPrice : parseFloat(regularPrice) || 0;
-  const salePriceValue = salePrice ? (typeof salePrice === 'number' ? salePrice : parseFloat(salePrice)) : null;
+  const salePriceValue = salePrice && salePrice > 0 ? (typeof salePrice === 'number' ? salePrice : parseFloat(salePrice)) : null;
 
-  const discountPercentage = salePriceValue
+  const discountPercentage = salePriceValue && salePriceValue > 0
     ? Math.round(((regularPriceValue - salePriceValue) / regularPriceValue) * 100)
     : 0;
 
@@ -45,22 +45,17 @@ export default function CardProduct({
   };
 
   return (
-    <div className="relative group w-full sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg">
+    <div className="relative after:hover:bg-white group w-full sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg">
 
       {/* Tarjeta del producto */}
-      <div className="">
+      <div className={`${!inStock ? 'opacity-60 grayscale' : ''}`}>
 
         {/* Imagen */}
-        <div className="relative overflow-hidden bg-transparent">
-          <div className="absolute top-3 left-3 z-20 flex flex-col gap-2">
+        <div className="relative overflow-hidden bg-white rounded-lg shadow-md">
+          <div className="absolute top-3 left-3 flex flex-col gap-2">
             {isNew && (
-              <span className="px-3 py-1 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-full shadow-lg">
+              <span className="px-3 py-1 text-xs font-bold text-white bg-black rounded-full shadow-lg">
                 NUEVO
-              </span>
-            )}
-            {salePriceValue && (
-              <span className="px-3 py-1 text-xs font-bold text-white bg-gradient-to-r from-red-600 to-red-700 rounded-full shadow-lg">
-                -{discountPercentage}%
               </span>
             )}
             {!inStock && (
@@ -70,7 +65,7 @@ export default function CardProduct({
             )}
           </div>
 
-          <div className="relative aspect-[4/3] overflow-hidden bg-white">
+          <div className="relative aspect-[4/3] overflow-hidden">
             {!isImageLoaded && (
               <div className="absolute inset-0 bg-gray-600 animate-pulse flex items-center justify-center">
                 <div className="w-16 h-16 bg-gray-500 rounded-lg"></div>
@@ -88,7 +83,7 @@ export default function CardProduct({
             />
 
             {/* Botones en la parte inferior con animación más pegada */}
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 translate-y-1 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 translate-y-1 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
               <div className="flex gap-3 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg">
                 <button
                   onClick={handleViewProduct}
@@ -119,37 +114,39 @@ export default function CardProduct({
         </div>
 
         {/* Contenido */}
-        <div className="p-4 bg-transparent">
+        <div className="p-3 bg-transparent">
 
           {/* Marca */}
           {brand && (
-            <p className="text-xs font-bold text-black uppercase tracking-wide mb-2 text-center">
+            <p className="text-xs font-bold text-black uppercase tracking-wide mb-2 text-left">
               {brand}
             </p>
           )}
 
           {/* Nombre del producto */}
-          <h3 className="text-sm text-center font-bold text-gray-700 mb-1.5 leading-normal">
+          <h3 className="text-sm text-left font-black text-gray-700 mb-1.5 leading-normal">
             {name}
           </h3>
 
           {/* Precio */}
-          <div className="flex flex-col items-center">
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold text-gray-700">
-                S/{finalPrice.toFixed(2)}
-              </span>
+          <div className="flex flex-col items-start">
+            <div className="flex items-center gap-2">
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl font-extrabold text-black">
+                  S/{finalPrice.toFixed(2)}
+                </span>
+                {salePriceValue && (
+                  <span className="text-xs text-gray-500 line-through">
+                    S/{regularPriceValue.toFixed(2)}
+                  </span>
+                )}
+              </div>
               {salePriceValue && (
-                <span className="text-xs text-gray-500 line-through">
-                  S/{regularPriceValue.toFixed(2)}
+                <span className="px-2 py-0.5 mt-1 text-xs font-bold text-red-600 bg-red-100 rounded-full">
+                  -{discountPercentage}%
                 </span>
               )}
             </div>
-            {salePriceValue && (
-              <span className="text-xs text-red-500 font-medium">
-                Ahorras S/{(regularPriceValue - salePriceValue).toFixed(2)}
-              </span>
-            )}
           </div>
         </div>
       </div>
