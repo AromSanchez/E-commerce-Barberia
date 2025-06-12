@@ -45,11 +45,12 @@ export default function CardProduct({
   };
 
   return (
-    <div className="relative after:hover:bg-white group w-full sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg">
+    <div className="relative group w-full mb-3 sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg transform transition-all duration-300 ease-in-out hover:translate-y-[-8px] hover:shadow-xl hover:z-10">
 
       {/* Tarjeta del producto */}
-      <div className={`${!inStock ? 'opacity-60 grayscale' : ''}`}>
+      <div className='absolute inset-[-15px_-15px_-50px_-15px] invisible border border-transparent rounded-md bg-white shadow-[0_0_15px_rgba(0,0,0,0.2)] opacity-0 group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out'></div>
 
+      <div className={`${!inStock ? 'opacity-60 grayscale' : ''} transform transition-transform duration-300`}>
         {/* Imagen */}
         <div className="relative overflow-hidden bg-white rounded-lg shadow-md">
           <div className="absolute top-3 left-3 flex flex-col gap-2">
@@ -82,39 +83,12 @@ export default function CardProduct({
               }}
             />
 
-            {/* Botones en la parte inferior con animación más pegada */}
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 translate-y-1 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-              <div className="flex gap-3 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg">
-                <button
-                  onClick={handleViewProduct}
-                  className="p-2 rounded-full bg-white hover:bg-gray-100 transition-colors text-gray-700 shadow-md"
-                  title="Ver producto"
-                >
-                  <HiEye className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={handleAddToCart}
-                  disabled={!inStock}
-                  className={`p-2 rounded-full transition-colors shadow-md ${inStock ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-                  title={inStock ? 'Añadir al carrito' : 'Producto agotado'}
-                >
-                  <HiShoppingCart className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={handleToggleWishlist}
-                  className={`p-2 rounded-full transition-colors shadow-md ${isWishlisted ? 'bg-red-100 text-red-600' : 'bg-white hover:bg-gray-100 text-gray-700'}`}
-                  title={isWishlisted ? 'Quitar de favoritos' : 'Añadir a favoritos'}
-                >
-                  {isWishlisted ? <HiHeart className="w-5 h-5" /> : <HiOutlineHeart className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
 
           </div>
         </div>
 
         {/* Contenido */}
-        <div className="p-3 bg-transparent">
+        <div className="p-3 relative group-hover transition-shadow duration-300">
 
           {/* Marca */}
           {brand && (
@@ -148,7 +122,37 @@ export default function CardProduct({
               )}
             </div>
           </div>
+
+          {/* Botones en la parte inferior */}
+          <div className="absolute -bottom-11 left-1/2 -translate-x-1/2 translate-y-1 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
+            <div className="flex gap-3 backdrop-blur-sm p-2">
+              <button
+                onClick={handleViewProduct}
+                className="p-2 rounded-full bg-white hover:bg-gray-100 transition-colors text-gray-700 shadow-md"
+                title="Ver producto"
+              >
+                <HiEye className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleAddToCart}
+                disabled={!inStock}
+                className={`p-2 rounded-full transition-colors shadow-md ${inStock ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                title={inStock ? 'Añadir al carrito' : 'Producto agotado'}
+            >
+                <HiShoppingCart className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleToggleWishlist}
+                className={`p-2 rounded-full transition-colors shadow-md ${isWishlisted ? 'bg-red-100 text-red-600' : 'bg-white hover:bg-gray-100 text-gray-700'}`}
+                title={isWishlisted ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+              >
+              {isWishlisted ? <HiHeart className="w-5 h-5" /> : <HiOutlineHeart className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
         </div>
+
       </div>
     </div>
   );

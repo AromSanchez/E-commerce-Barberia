@@ -6,6 +6,7 @@
         <link rel="icon" href="{{ asset('images/logo-ventana.png') }}" type="image/png">
         <link rel="apple-touch-icon" href="{{ asset('images/logo-ventana.png') }}">
         <title inertia>{{ config('app.name', 'BarberShop') }}</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css" />
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
