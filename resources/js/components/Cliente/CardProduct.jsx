@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { HiHeart, HiOutlineHeart, HiShoppingCart, HiEye } from 'react-icons/hi';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useCart } from '@/contexts/CartContext';
 
 export default function CardProduct({
+  id,
   name,
   regularPrice,
   salePrice,
@@ -9,12 +13,12 @@ export default function CardProduct({
   brand,
   inStock,
   isNew,
-  onAddToCart,
-  onAddToWishlist,
   onViewProduct
 }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const { openCart } = useCart();
 
   const regularPriceValue = typeof regularPrice === 'number' ? regularPrice : parseFloat(regularPrice) || 0;
   const salePriceValue = salePrice && salePrice > 0 ? (typeof salePrice === 'number' ? salePrice : parseFloat(salePrice)) : null;
@@ -25,22 +29,46 @@ export default function CardProduct({
 
   const finalPrice = salePriceValue || regularPriceValue;
 
-  const handleAddToCart = () => {
-    if (onAddToCart) {
-      onAddToCart({ name, price: finalPrice, image, regularPrice: regularPriceValue, salePrice: salePriceValue });
+  const handleAddToCart = async () => {
+    if (!inStock || isAddingToCart) return;
+
+    setIsAddingToCart(true);
+    try {
+      await axios.post(route('cart.add'), {
+        product_id: id,
+        quantity: 1
+      });
+      toast.success('¡Producto agregado al carrito!', {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      openCart(); // Abrimos el carrito automáticamente
+    } catch (error) {
+      console.error('Error al agregar al carrito:', error);
+      toast.error('No se pudo agregar el producto al carrito', {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
   const handleToggleWishlist = () => {
     setIsWishlisted(!isWishlisted);
-    if (onAddToWishlist) {
-      onAddToWishlist({ name, price: finalPrice, image, isWishlisted: !isWishlisted });
-    }
   };
 
   const handleViewProduct = () => {
     if (onViewProduct) {
-      onViewProduct({ name, price: finalPrice, image });
+      onViewProduct({ id, name, price: finalPrice, image });
     }
   };
 
@@ -52,15 +80,15 @@ export default function CardProduct({
 
       <div className={`${!inStock ? 'opacity-60 grayscale' : ''} transform transition-transform duration-300`}>
         {/* Imagen */}
-        <div className="relative overflow-hidden bg-white rounded-lg shadow-md">
+        <div className="relative overflow-hidden bg-white rounded-lg items-start shadow-md">
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {isNew && (
-              <span className="px-3 py-1 text-xs font-bold text-white bg-black rounded-full shadow-lg">
+              <span className="px-3 py-1 text-xs font-bold text-white bg-black rounded-full shadow-lg z-10">
                 NUEVO
               </span>
             )}
             {!inStock && (
-              <span className="px-3 py-1 text-xs font-bold text-white bg-gray-500 rounded-full shadow-lg">
+              <span className="px-3 py-1 text-xs font-bold text-white bg-gray-500 rounded-full shadow-lg z-10">
                 AGOTADO
               </span>
             )}
