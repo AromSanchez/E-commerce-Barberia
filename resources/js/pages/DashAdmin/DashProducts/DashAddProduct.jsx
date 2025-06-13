@@ -2,17 +2,18 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage, router } from '@inertiajs/react';
 import HeadAdmin from '@/Layouts/head_admin/HeadAdmin';
 import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
-import { useState} from 'react';
+import { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
 
 export default function DashAddProduct() {
     const { categories, brands } = usePage().props;
+
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         regular_price: '',
         sale_price: '',
-        category_id: '',                                    
+        category_id: '',
         brand_id: '',
         is_featured: 'no',
         is_new: 'yes',
@@ -21,6 +22,7 @@ export default function DashAddProduct() {
         short_description: '',
         long_description: ''
     });
+
     const [mainImage, setMainImage] = useState(null);
     const [mainImagePreview, setMainImagePreview] = useState(null);
     const [galleryImages, setGalleryImages] = useState([]);
@@ -28,7 +30,9 @@ export default function DashAddProduct() {
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
 
-    
+    const isValidImage = (file) => {
+        return file.type.startsWith("image/") && file.size <= 2 * 1024 * 1024; // 2MB
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -47,7 +51,9 @@ export default function DashAddProduct() {
         }
     };
 
-    
+    const handleDragOver = (e) => {
+        e.preventDefault();
+    };
 
     const handleMainImageDrop = (e) => {
         e.preventDefault();
@@ -65,11 +71,12 @@ export default function DashAddProduct() {
     const handleGalleryImagesDrop = (e) => {
         e.preventDefault();
         const files = Array.from(e.dataTransfer.files);
-        if (files.length > 0) {
-            setGalleryImages(prev => [...prev, ...files]);
-            
-            // Crear previsualizaciones para las imágenes de la galería
-            const readers = files.map(file => {
+        const validFiles = files.filter(isValidImage); // ⬅️ aplica filtro
+
+        if (validFiles.length > 0) {
+            setGalleryImages(prev => [...prev, ...validFiles]);
+
+            const readers = validFiles.map(file => {
                 return new Promise(resolve => {
                     const reader = new FileReader();
                     reader.onloadend = () => {
@@ -85,34 +92,56 @@ export default function DashAddProduct() {
         }
     };
 
-    const handleDragOver = (e) => {
-        e.preventDefault();
+    const handleGalleryImagesChange = (e) => {
+        const files = Array.from(e.target.files);
+        const validFiles = files.filter(isValidImage); // ⬅️ aplica filtro
+
+        if (validFiles.length > 0) {
+            setGalleryImages(prev => [...prev, ...validFiles]);
+
+            const readers = validFiles.map(file => {
+                return new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        resolve(reader.result);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            Promise.all(readers).then(results => {
+                setGalleryImagePreviews(prev => [...prev, ...results]);
+            });
+        }
+    };
+
+    const handleRemoveGalleryImage = (indexToRemove) => {
+        setGalleryImages(prev => prev.filter((_, index) => index !== indexToRemove));
+        setGalleryImagePreviews(prev => prev.filter((_, index) => index !== indexToRemove));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Enviando datos...', formData);
-      
         setProcessing(true);
-      
+
         const productData = new FormData();
         Object.keys(formData).forEach(key => productData.append(key, formData[key]));
         if (mainImage) productData.append('image', mainImage);
-      
-        console.log('Ruta submit:', route('dashboard.addproduct.store'));
-      
-        router.post(route('dashboard.addproduct.store'), productData, {
-          onSuccess: () => {
-            setProcessing(false);
-            router.visit(route('dashboard.product'));
-          },
-          onError: (errors) => {
-            setProcessing(false);
-            setErrors(errors);
-            console.log('Errores:', errors);
-          },
+        galleryImages.forEach(file => {
+            productData.append('gallery_images[]', file);
         });
-      };
+
+        router.post(route('dashboard.addproduct.store'), productData, {
+            onSuccess: () => {
+                setProcessing(false);
+                router.visit(route('dashboard.product'));
+            },
+            onError: (errors) => {
+                setProcessing(false);
+                setErrors(errors);
+            },
+        });
+    };
 
     return (
         <AuthenticatedLayout>
@@ -261,7 +290,7 @@ export default function DashAddProduct() {
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                                     Subir imágenes <span className="text-red-500">*</span>
                                                 </label>
-                                                <div 
+                                                <div
                                                     className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center cursor-pointer"
                                                     onDrop={handleMainImageDrop}
                                                     onDragOver={handleDragOver}
@@ -269,10 +298,10 @@ export default function DashAddProduct() {
                                                 >
                                                     {mainImagePreview ? (
                                                         <div className="flex flex-col items-center">
-                                                            <img 
-                                                                src={mainImagePreview} 
-                                                                alt="Vista previa" 
-                                                                className="max-h-40 mb-2 object-contain" 
+                                                            <img
+                                                                src={mainImagePreview}
+                                                                alt="Vista previa"
+                                                                className="max-h-40 mb-2 object-contain"
                                                             />
                                                             <p className="text-sm text-gray-500">Haz clic para cambiar la imagen</p>
                                                         </div>
@@ -299,7 +328,81 @@ export default function DashAddProduct() {
                                                 )}
                                             </div>
 
-                                           
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Subir imágenes de galería
+                                                </label>
+
+                                                <div
+                                                    className="border-2 border-dashed border-blue-300 rounded-lg p-6 cursor-pointer bg-white hover:bg-blue-50 transition"
+                                                    onDrop={handleGalleryImagesDrop}
+                                                    onDragOver={handleDragOver}
+                                                    onClick={() => document.getElementById('gallery-images-upload').click()}
+                                                >
+                                                    {galleryImagePreviews.length > 0 ? (
+                                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                                            {galleryImagePreviews.map((preview, index) => (
+                                                                <div key={index} className="relative group w-full aspect-square">
+                                                                    <img
+                                                                        src={preview}
+                                                                        alt={`Galería ${index + 1}`}
+                                                                        className="w-full h-full object-cover rounded-lg border shadow-sm"
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleRemoveGalleryImage(index);
+                                                                        }}
+                                                                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                                                                        title="Eliminar"
+                                                                    >
+                                                                        ×
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                            <div className="flex items-center justify-center text-center border-2 border-dashed border-gray-300 rounded-lg h-full min-h-[96px] p-4 text-sm text-gray-500 col-span-full">
+                                                                Haz clic para añadir más imágenes
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex flex-col items-center justify-center h-32">
+                                                            <svg
+                                                                className="mx-auto h-10 w-10 text-blue-400"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                stroke="currentColor"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={2}
+                                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                                                />
+                                                            </svg>
+                                                            <p className="mt-2 text-sm text-gray-600">
+                                                                Arrastra tus imágenes aquí o <span className="text-blue-500">haz clic para buscar</span>
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                    <input
+                                                        id="gallery-images-upload"
+                                                        type="file"
+                                                        accept="image/*"
+                                                        multiple
+                                                        onChange={handleGalleryImagesChange}
+                                                        className="hidden"
+                                                    />
+                                                </div>
+
+                                                {errors.gallery && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.gallery}</p>
+                                                )}
+                                            </div>
+
+
+
                                             {/* Precio regular */}
                                             <div>
                                                 <label htmlFor="regular_price" className="block text-sm font-medium text-gray-700 mb-1">

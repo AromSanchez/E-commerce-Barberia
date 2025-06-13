@@ -35,6 +35,12 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    // Relación con ProductImage
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order', 'asc');
+    }
+
     protected static function boot()
     {
         parent::boot();

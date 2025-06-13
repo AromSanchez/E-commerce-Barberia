@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Brand;
@@ -19,6 +20,16 @@ class PublicProductController extends Controller
             'productos' => $productos,
             'categorias' => $categorias,
             'marcas' => $marcas,
+        ]);
+    }
+    public function show($slug)
+    {
+        $product = Product::with(['brand', 'category', 'images']) // Asegúrate de tener la relación images en el modelo
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        return Inertia::render('Producto', [
+            'product' => $product,
         ]);
     }
 }

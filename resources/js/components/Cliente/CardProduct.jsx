@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { HiHeart, HiOutlineHeart, HiShoppingCart, HiEye } from 'react-icons/hi';
+import { router } from '@inertiajs/react';
+
 
 export default function CardProduct({
   name,
+  slug,
   regularPrice,
   salePrice,
   image,
@@ -39,9 +42,7 @@ export default function CardProduct({
   };
 
   const handleViewProduct = () => {
-    if (onViewProduct) {
-      onViewProduct({ name, price: finalPrice, image });
-    }
+    router.visit(`/producto/${slug}`);
   };
 
   return (

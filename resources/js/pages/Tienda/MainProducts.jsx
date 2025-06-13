@@ -342,6 +342,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                         <div key={producto.id}>
                                             <CardProduct
                                                 name={producto.name}
+                                                slug={producto.slug}
                                                 regularPrice={producto.regular_price}
                                                 salePrice={producto.sale_price}
                                                 image={producto.image ? `/storage/${producto.image}` : '/images/no-image.png'}

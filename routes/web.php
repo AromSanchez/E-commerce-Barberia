@@ -20,6 +20,7 @@ Route::get('/', function () {
 });
 
 Route::get('/productos', [PublicProductController::class, 'index'])->name('products.index');
+Route::get('/producto/{slug}', [PublicProductController::class, 'show'])->name('products.show');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
