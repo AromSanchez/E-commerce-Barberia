@@ -2,11 +2,13 @@ import { useState, useEffect, useMemo } from 'react';
 import TopInfoBar from './TopInfoBar';
 import MainHeader from './MainHeader';
 import MobileMenu from './MobileMenu';
+import MenuCart from './MenuCart';
 import { FaShippingFast, FaClock } from 'react-icons/fa';
 import { HiOutlineLocationMarker, HiOutlinePhone } from 'react-icons/hi';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   
@@ -94,6 +96,8 @@ export default function Header() {
         <MainHeader
           isMenuOpen={isMenuOpen}
           setIsMenuOpen={setIsMenuOpen}
+          isCartOpen={isCartOpen}
+          setIsCartOpen={setIsCartOpen}
           navLinks={navLinks}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -106,6 +110,12 @@ export default function Header() {
         isOpen={isMenuOpen} 
         onClose={() => setIsMenuOpen(false)}
         navLinks={navLinks}
+      />
+
+      {/* Carrito */}
+      <MenuCart 
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
       />
     </>
   );

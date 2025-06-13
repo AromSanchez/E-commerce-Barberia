@@ -2,7 +2,16 @@ import { FiSearch, FiMenu, FiX } from 'react-icons/fi';
 import { AiOutlineHeart, AiOutlineShoppingCart, AiOutlineUser } from 'react-icons/ai';
 import { Link } from '@inertiajs/react';
 
-const MainHeader = ({ isMenuOpen, setIsMenuOpen, navLinks, searchQuery, setSearchQuery, handleSearch }) => (
+const MainHeader = ({ 
+  isMenuOpen, 
+  setIsMenuOpen, 
+  isCartOpen,
+  setIsCartOpen,
+  navLinks, 
+  searchQuery, 
+  setSearchQuery, 
+  handleSearch 
+}) => (
   <div className="max-w-6xl mx-auto px-4">
     <div className="flex items-center justify-between h-12 lg:h-16 gap-4 lg:gap-6">
       {/* Mobile menu button */}
@@ -75,7 +84,11 @@ const MainHeader = ({ isMenuOpen, setIsMenuOpen, navLinks, searchQuery, setSearc
           </Link>
         </div>
         {/* Carrito siempre visible */}
-        <Link href="/cart" className="flex items-center text-gray-600 hover:text-black transition-colors">
+        <button 
+          onClick={() => setIsCartOpen(true)}
+          className="flex items-center text-gray-600 hover:text-black transition-colors focus:outline-none"
+          aria-label="Abrir carrito"
+        >
           <div className="relative p-1">
             <AiOutlineShoppingCart size={20} />
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-gray-800 text-white text-[10px] rounded-full flex items-center justify-center">
@@ -83,7 +96,7 @@ const MainHeader = ({ isMenuOpen, setIsMenuOpen, navLinks, searchQuery, setSearc
             </span>
           </div>
           <span className="hidden lg:inline text-sm ml-1 font-medium">S/45.00</span>
-        </Link>
+        </button>
       </div>
     </div>
   </div>
