@@ -1,10 +1,13 @@
 import '../css/app.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 import NProgress from 'nprogress'
 import { router } from '@inertiajs/react'
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
+import { ToastContainer } from 'react-toastify';
+import { CartProvider } from '@/contexts/CartContext';
 
 // Configuración de NProgress
 NProgress.configure({
@@ -48,8 +51,12 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
-
-        root.render(<App {...props} />);
+        root.render(
+            <CartProvider>
+                <App {...props} />
+                <ToastContainer />
+            </CartProvider>
+        );
     },
     progress: false,
     

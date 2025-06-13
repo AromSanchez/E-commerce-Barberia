@@ -9,6 +9,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
 use Inertia\Inertia;
+use App\Http\Controllers\CartController;
 
 Route::get('/', function () {
     return Inertia::render('Home', [
@@ -72,6 +73,16 @@ Route::patch('/dashboard/products/{product}/edit/', [ProductController::class, '
 Route::get('/dashboard/orders', function(){
     return Inertia::render('DashAdmin/DashOrders/DashOrder');
 })->middleware(['auth','verified', 'admin'])->name('dashboard.orders');
+
+// Rutas del carrito
+Route::middleware('auth')->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/cart/get', [CartController::class, 'getCart'])->name('cart.get');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

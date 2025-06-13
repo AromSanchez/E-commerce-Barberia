@@ -5,10 +5,11 @@ import MobileMenu from './MobileMenu';
 import MenuCart from './MenuCart';
 import { FaShippingFast, FaClock } from 'react-icons/fa';
 import { HiOutlineLocationMarker, HiOutlinePhone } from 'react-icons/hi';
+import { useCart } from '@/contexts/CartContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { isCartOpen, closeCart } = useCart();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   
@@ -76,7 +77,7 @@ export default function Header() {
   };
 
   return (
-    <>
+    <div className="relative z-50">
       {/* TopInfoBar - solo visible cuando estamos en el top */}
       <header className={`bg-white relative z-40 transition-all duration-300 ${isAtTop ? 'block' : 'hidden'}`}>
         <TopInfoBar 
@@ -97,7 +98,7 @@ export default function Header() {
           isMenuOpen={isMenuOpen}
           setIsMenuOpen={setIsMenuOpen}
           isCartOpen={isCartOpen}
-          setIsCartOpen={setIsCartOpen}
+          setIsCartOpen={closeCart}
           navLinks={navLinks}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -115,8 +116,8 @@ export default function Header() {
       {/* Carrito */}
       <MenuCart 
         isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
+        onClose={closeCart}
       />
-    </>
+    </div>
   );
 }
