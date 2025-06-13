@@ -24,8 +24,47 @@ export default function DashEditProduct({ product, categories, brands }) {
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [galleryImages, setGalleryImages] = useState([]); // Nuevas imágenes seleccionadas (File[])
+    const [galleryImagePreviews, setGalleryImagePreviews] = useState([]); // Nuevas previews (base64)
+    const [existingGalleryImages, setExistingGalleryImages] = useState(product.images || []); // Imágenes existentes desde la DB
+    const [deletedImageIds, setDeletedImageIds] = useState([]); // IDs de imágenes eliminadas
 
 
+
+    const handleGalleryImagesChange = (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            setGalleryImages(prev => [...prev, ...files]);
+
+            const readers = files.map(file => {
+                return new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            Promise.all(readers).then(results => {
+                setGalleryImagePreviews(prev => [...prev, ...results]);
+            });
+        }
+    };
+
+    const handleGalleryImagesDrop = (e) => {
+        e.preventDefault();
+        const files = Array.from(e.dataTransfer.files);
+        handleGalleryImagesChange({ target: { files } });
+    };
+
+    const handleRemoveGalleryImage = (index) => {
+        setGalleryImages(prev => prev.filter((_, i) => i !== index));
+        setGalleryImagePreviews(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleDeleteExistingImage = (id) => {
+        setDeletedImageIds(prev => [...prev, id]);
+        setExistingGalleryImages(prev => prev.filter(img => img.id !== id));
+    };
     function handleChange(e) {
         const { name, value, files } = e.target;
 
@@ -56,6 +95,13 @@ export default function DashEditProduct({ product, categories, brands }) {
             setImagePreview(URL.createObjectURL(file));
         }
     }
+    function handleRemoveExistingGalleryImage(imageId) {
+        // Elimina visualmente la imagen
+        setExistingGalleryImages((prev) => prev.filter(img => img.id !== imageId));
+
+        // Guarda el ID para eliminarlo en el backend
+        setDeletedImageIds((prev) => [...prev, imageId]);
+    }
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -63,19 +109,26 @@ export default function DashEditProduct({ product, categories, brands }) {
 
         const data = new FormData();
 
-    for (const key in formData) {
-        // Asegurarse de que se envíen todos los campos del formulario, incluso si son 'no'
-        if (formData[key] !== null) {
-            data.append(key, formData[key]);
+        for (const key in formData) {
+            if (formData[key] !== null) {
+                data.append(key, formData[key]);
+            }
         }
-    }
 
-        data.append('_method', 'PATCH'); // Asegúrate de que sea PATCH
+        galleryImages.forEach((file, index) => {
+            data.append(`gallery_images[]`, file);
+        });
+
+        deletedImageIds.forEach((id) => {
+            data.append('deleted_gallery_image_ids[]', id);
+        });
+
+        data.append('_method', 'PATCH');
 
         router.post(route('dashboard.products.update', product.id), data, {
             onSuccess: () => {
                 setProcessing(false);
-                router.visit(route('dashboard.product')); // Redirección después del éxito
+                router.visit(route('dashboard.product'));
             },
             onError: (errors) => {
                 setErrors(errors);
@@ -269,6 +322,103 @@ export default function DashEditProduct({ product, categories, brands }) {
 
                                                 {errors.image && (
                                                     <p className="mt-1 text-sm text-red-600">{errors.image}</p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Subir imágenes de galería
+                                                </label>
+
+                                                <div
+                                                    className="border-2 border-dashed border-blue-300 rounded-lg p-6 cursor-pointer bg-white hover:bg-blue-50 transition"
+                                                    onDrop={handleGalleryImagesDrop}
+                                                    onDragOver={handleDragOver}
+                                                    onClick={() => document.getElementById('gallery-images-upload').click()}
+                                                >
+                                                    {(galleryImagePreviews.length > 0 || existingGalleryImages.length > 0) ? (
+                                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                                            {/* Imágenes ya existentes (desde la base de datos) */}
+                                                            {existingGalleryImages.map((img, index) => (
+                                                                <div key={`existing-${img.id}`} className="relative group w-full aspect-square">
+                                                                    <img
+                                                                        src={`/storage/${img.image_path}`}
+                                                                        alt={`Imagen actual ${index + 1}`}
+                                                                        className="w-full h-full object-cover rounded-lg border shadow-sm"
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleRemoveExistingGalleryImage(img.id);
+                                                                        }}
+                                                                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                                                                        title="Eliminar"
+                                                                    >
+                                                                        ×
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+
+                                                            {/* Imágenes nuevas seleccionadas */}
+                                                            {galleryImagePreviews.map((preview, index) => (
+                                                                <div key={`new-${index}`} className="relative group w-full aspect-square">
+                                                                    <img
+                                                                        src={preview}
+                                                                        alt={`Nueva galería ${index + 1}`}
+                                                                        className="w-full h-full object-cover rounded-lg border shadow-sm"
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleRemoveGalleryImage(index);
+                                                                        }}
+                                                                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                                                                        title="Eliminar"
+                                                                    >
+                                                                        ×
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+
+                                                            <div className="flex items-center justify-center text-center border-2 border-dashed border-gray-300 rounded-lg h-full min-h-[96px] p-4 text-sm text-gray-500 col-span-full">
+                                                                Haz clic para añadir más imágenes
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex flex-col items-center justify-center h-32">
+                                                            <svg
+                                                                className="mx-auto h-10 w-10 text-blue-400"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                stroke="currentColor"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={2}
+                                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                                                />
+                                                            </svg>
+                                                            <p className="mt-2 text-sm text-gray-600">
+                                                                Arrastra tus imágenes aquí o <span className="text-blue-500">haz clic para buscar</span>
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                    <input
+                                                        id="gallery-images-upload"
+                                                        type="file"
+                                                        accept="image/*"
+                                                        multiple
+                                                        onChange={handleGalleryImagesChange}
+                                                        className="hidden"
+                                                    />
+                                                </div>
+
+                                                {errors.gallery && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.gallery}</p>
                                                 )}
                                             </div>
 

@@ -54,9 +54,8 @@ export default function DashProduct() {
     // Filtrar productos según el término de búsqueda
     const filteredProducts = productList.filter(product =>
         product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.brand?.toLowerCase().includes(searchTerm.toLowerCase())
+        product.category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        || product.brand?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
