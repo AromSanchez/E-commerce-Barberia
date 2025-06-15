@@ -341,6 +341,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                     .map(producto => (
                                         <div key={producto.id}>
                                             <CardProduct
+                                                id={producto.id}
                                                 name={producto.name}
                                                 slug={producto.slug}
                                                 regularPrice={producto.regular_price}
