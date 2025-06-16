@@ -21,9 +21,8 @@ export default function Header() {
   const navLinks = useMemo(() => [
     { href: "/", label: "Inicio" },
     { href: "/productos", label: "Tienda" },
-    { href: "/categories", label: "Categorías" },
     { href: "/offers", label: "Ofertas" },
-    { href: "/about", label: "Nosotros" },
+    { href: "/nosotros", label: "Nosotros" },
   ], []);
 
   const promoMessages = useMemo(() => [
@@ -77,19 +76,20 @@ export default function Header() {
   };
 
   return (
-    <div className="relative z-50">
+    <header className="relative z-50">
+      
       {/* TopInfoBar - solo visible cuando estamos en el top */}
-      <header className={`bg-white relative z-40 transition-all duration-300 ${isAtTop ? 'block' : 'hidden'}`}>
+      <div className={`bg-white relative z-40 transition-all duration-300 ${isAtTop ? 'block' : 'hidden'}`}>
         <TopInfoBar 
           promoMessages={promoMessages} 
           currentMessageIndex={currentMessageIndex} 
         />
-      </header>
+      </div>
 
       {/* MainHeader - visible cuando estamos en el top o al scrollear hacia arriba */}
       <div 
         className={`
-          ${isAtTop ? 'relative bg-white z-40' : 'fixed top-0 left-0 right-0 z-50 bg-white shadow-lg'} 
+          ${isAtTop ? 'relative bg-white z-40' : 'fixed top-0 left-0 right-0 z-50 bg-white'} 
           transition-all duration-300 ease-in-out
           ${showMainHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}
         `}
@@ -118,6 +118,6 @@ export default function Header() {
         isOpen={isCartOpen}
         onClose={closeCart}
       />
-    </div>
+    </header>
   );
 }

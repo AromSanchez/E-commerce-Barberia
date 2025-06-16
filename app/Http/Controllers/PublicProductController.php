@@ -21,4 +21,48 @@ class PublicProductController extends Controller
             'marcas' => $marcas,
         ]);
     }
+
+    public function byCategory($slug)
+    {
+        $category = Category::where('slug', $slug)->firstOrFail();
+        $productos = Product::with(['brand', 'category'])
+            ->where('category_id', $category->id)
+            ->get();
+        
+        $categorias = Category::withCount('products')->get();
+        $marcas = Brand::withCount('products')->get();
+
+        return Inertia::render('Tienda', [
+            'productos' => $productos,
+            'categorias' => $categorias,
+            'marcas' => $marcas,
+            'currentFilter' => [
+                'type' => 'category',
+                'value' => $category->id,
+                'name' => $category->name
+            ]
+        ]);
+    }
+
+    public function byBrand($slug)
+    {
+        $brand = Brand::where('slug', $slug)->firstOrFail();
+        $productos = Product::with(['brand', 'category'])
+            ->where('brand_id', $brand->id)
+            ->get();
+        
+        $categorias = Category::withCount('products')->get();
+        $marcas = Brand::withCount('products')->get();
+
+        return Inertia::render('Tienda', [
+            'productos' => $productos,
+            'categorias' => $categorias,
+            'marcas' => $marcas,
+            'currentFilter' => [
+                'type' => 'brand',
+                'value' => $brand->id,
+                'name' => $brand->name
+            ]
+        ]);
+    }
 }
