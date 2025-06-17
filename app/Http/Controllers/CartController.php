@@ -13,7 +13,8 @@ class CartController extends Controller
     {
         $cartItems = Session::get('cart', []);
         return Inertia::render('Cart/Index', [
-            'cartItems' => $cartItems
+            'cartItems' => $cartItems,
+            'isAuthenticated' => auth()->check()
         ]);
     }
 
@@ -32,12 +33,27 @@ class CartController extends Controller
             'name' => $product->name,
             'price' => $product->sale_price ?? $product->regular_price,
             'quantity' => $validated['quantity'],
-            'image' => $product->image ? '/storage/' . $product->image : '/images/no-image.png'
+            'image' => $product->image ? '/storage/' . $product->image : '/images/no-image.png',
+            'stock' => $product->stock
         ];
 
         if (isset($cart[$product->id])) {
-            $cart[$product->id]['quantity'] += $validated['quantity'];
+            // Validar que no exceda el stock disponible
+            $newQuantity = $cart[$product->id]['quantity'] + $validated['quantity'];
+            if ($newQuantity > $product->stock) {
+                return response()->json([
+                    'message' => 'No hay suficiente stock disponible',
+                    'available_stock' => $product->stock
+                ], 422);
+            }
+            $cart[$product->id]['quantity'] = $newQuantity;
         } else {
+            if ($validated['quantity'] > $product->stock) {
+                return response()->json([
+                    'message' => 'No hay suficiente stock disponible',
+                    'available_stock' => $product->stock
+                ], 422);
+            }
             $cart[$product->id] = $cartItem;
         }
 
@@ -57,8 +73,16 @@ class CartController extends Controller
         ]);
 
         $cart = Session::get('cart', []);
+        $product = Product::findOrFail($validated['product_id']);
 
         if (isset($cart[$validated['product_id']])) {
+            // Validar que no exceda el stock disponible
+            if ($validated['quantity'] > $product->stock) {
+                return response()->json([
+                    'message' => 'No hay suficiente stock disponible',
+                    'available_stock' => $product->stock
+                ], 422);
+            }
             $cart[$validated['product_id']]['quantity'] = $validated['quantity'];
             Session::put('cart', $cart);
         }

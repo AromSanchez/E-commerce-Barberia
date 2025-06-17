@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiX, FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const MenuCart = ({ isOpen, onClose }) => {
     const [cartItems, setCartItems] = useState([]);
@@ -10,7 +11,6 @@ const MenuCart = ({ isOpen, onClose }) => {
     const fetchCart = async () => {
         try {
             const response = await axios.get(route('cart.get'));
-            // Asegurarse de que los precios sean números
             const itemsWithNumericPrices = Object.values(response.data.items).map(item => ({
                 ...item,
                 price: parseFloat(item.price) || 0
@@ -19,6 +19,11 @@ const MenuCart = ({ isOpen, onClose }) => {
             setLoading(false);
         } catch (error) {
             console.error('Error al cargar el carrito:', error);
+            toast.error('Error al cargar el carrito', {
+                position: "bottom-right",
+                autoClose: 1500,
+                hideProgressBar: true
+            });
             setLoading(false);
         }
     };
@@ -39,7 +44,21 @@ const MenuCart = ({ isOpen, onClose }) => {
             });
             fetchCart();
         } catch (error) {
+            if (error.response?.status === 422) {
+                toast.error(error.response.data.message, {
+                    position: "bottom-right",
+                    autoClose: 1500,
+                    hideProgressBar: true
+                });
+            } else {
+                toast.error('Error al actualizar la cantidad', {
+                    position: "bottom-right",
+                    autoClose: 1500,
+                    hideProgressBar: true
+                });
+            }
             console.error('Error al actualizar cantidad:', error);
+            fetchCart();
         }
     };
 
@@ -48,9 +67,19 @@ const MenuCart = ({ isOpen, onClose }) => {
             await axios.post(route('cart.remove'), {
                 product_id: productId
             });
+            toast.success('Producto eliminado', {
+                position: "bottom-right",
+                autoClose: 1500,
+                hideProgressBar: true
+            });
             fetchCart();
         } catch (error) {
             console.error('Error al eliminar producto:', error);
+            toast.error('Error al eliminar el producto', {
+                position: "bottom-right",
+                autoClose: 1500,
+                hideProgressBar: true
+            });
         }
     };
 

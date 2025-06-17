@@ -36,29 +36,33 @@ export default function CardProduct({
 
     setIsAddingToCart(true);
     try {
-      await axios.post(route('cart.add'), {
+      const response = await axios.post(route('cart.add'), {
         product_id: id,
         quantity: 1
       });
+      
       toast.success('¡Producto agregado al carrito!', {
         position: "bottom-right",
-        autoClose: 2000,
-        hideProgressBar: false,
+        autoClose: 1500,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
       });
-      openCart(); // Abrimos el carrito automáticamente
+      openCart();
     } catch (error) {
+      if (error.response?.status === 422) {
+        toast.error(error.response.data.message, {
+          position: "bottom-right",
+          autoClose: 1500,
+        });
+      } else {
+        toast.error('No se pudo agregar el producto al carrito', {
+          position: "bottom-right",
+          autoClose: 1500,
+        });
+      }
       console.error('Error al agregar al carrito:', error);
-      toast.error('No se pudo agregar el producto al carrito', {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
     } finally {
       setIsAddingToCart(false);
     }
