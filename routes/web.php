@@ -27,6 +27,10 @@ Route::prefix('productos')->group(function () {
     Route::get('/marca/{slug}', [PublicProductController::class, 'byBrand'])->name('products.brand');
 });
 
+// Ruta individual para mostrar un producto
+Route::get('/producto/{slug}', [PublicProductController::class, 'show'])->name('products.show');
+
+// Página "Nosotros"
 Route::get('/nosotros', function () {
     return Inertia::render('Nosotros');
 })->name('nosotros');
