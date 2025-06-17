@@ -1,5 +1,8 @@
-import { FiSearch, FiMenu, FiX } from 'react-icons/fi';
-import { AiOutlineHeart, AiOutlineShoppingCart, AiOutlineUser } from 'react-icons/ai';
+import { FiSearch, FiMenu, FiX, FiLogIn, FiLogOut, FiUserPlus, FiTag } from 'react-icons/fi';
+import { AiOutlineHeart, AiOutlineShoppingCart, AiOutlineUser, AiOutlineDashboard } from 'react-icons/ai';
+import { CgProfile } from 'react-icons/cg';
+import { BiCategory } from 'react-icons/bi';
+import { MdOutlineLocalOffer } from 'react-icons/md';
 import { Link, usePage } from '@inertiajs/react';
 import { useCart } from '@/contexts/CartContext';
 import { useEffect, useState, useRef } from 'react';
@@ -18,7 +21,7 @@ const MainHeader = ({
   const [cartTotal, setCartTotal] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const { categories, brands } = usePage().props;
+  const { categories, brands, auth } = usePage().props;
   const dropdownRef = useRef(null);
   const userDropdownRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -70,46 +73,72 @@ const MainHeader = ({
   const renderDropdownContent = () => (
     <div 
       ref={dropdownRef}
-      className={`absolute top-full left-1/2 transform -translate-x-1/2 w-[480px] bg-white shadow-lg rounded-lg 
-                  transition-all duration-300 ease-out
+      className={`absolute top-full left-1/2 transform -translate-x-1/2 w-[520px] bg-white shadow-xl rounded-lg 
+                  transition-all duration-300 ease-out border border-gray-100
                   ${showDropdown ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}
                   z-50 mt-2`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="p-6 grid grid-cols-2 gap-8">
-        {/* Categorías */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-4 border-b pb-2">Categorías</h3>
-          <ul className="space-y-2">
-            {categories?.map((category) => (
-              <li key={category.id}>
-                <Link
-                  href={route('products.category', category.slug)}
-                  className="text-sm text-gray-600 hover:text-black transition-colors block py-1 hover:bg-gray-50 px-2 rounded"
-                >
-                  {category.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+      <div className="p-4">
+        {/* Header */}
+        <div className="text-center pb-3 mb-4 border-b border-gray-100">
+          <h3 className="text-lg font-medium text-gray-900">Nuestros Productos</h3>
+          <p className="text-sm text-gray-500">Explora por categorías y marcas</p>
         </div>
-        
-        {/* Marcas */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-4 border-b pb-2">Marcas</h3>
-          <ul className="space-y-2">
-            {brands?.map((brand) => (
-              <li key={brand.id}>
-                <Link
-                  href={route('products.brand', brand.slug)}
-                  className="text-sm text-gray-600 hover:text-black transition-colors block py-1 hover:bg-gray-50 px-2 rounded"
-                >
-                  {brand.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+
+        <div className="grid grid-cols-2 gap-6">
+          {/* Categorías */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 px-2">
+              <BiCategory className="w-5 h-5 text-gray-400" />
+              <h3 className="text-sm font-semibold text-gray-900">Categorías</h3>
+            </div>
+            <ul className="space-y-1">
+              {categories?.map((category) => (
+                <li key={category.id}>
+                  <Link
+                    href={route('products.category', category.slug)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+                  >
+                    <FiTag className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+                    <span className="group-hover:text-gray-900">{category.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Marcas */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 px-2">
+              <MdOutlineLocalOffer className="w-5 h-5 text-gray-400" />
+              <h3 className="text-sm font-semibold text-gray-900">Marcas</h3>
+            </div>
+            <ul className="space-y-1">
+              {brands?.map((brand) => (
+                <li key={brand.id}>
+                  <Link
+                    href={route('products.brand', brand.slug)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+                  >
+                    <FiTag className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+                    <span className="group-hover:text-gray-900">{brand.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-4 pt-3 border-t border-gray-100 text-center">
+          <Link
+            href={route('products.index')}
+            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            Ver todos los productos →
+          </Link>
         </div>
       </div>
     </div>
@@ -118,27 +147,66 @@ const MainHeader = ({
   const renderUserDropdownContent = () => (
     <div 
       ref={userDropdownRef}
-      className={`absolute top-full left-1/2 transform -translate-x-1/2 w-44 bg-white shadow-lg rounded-lg 
-                  transition-all duration-300 ease-out
+      className={`absolute top-full left-1/2 -translate-x-1/2 w-64 bg-white shadow-xl rounded-lg 
+                  transition-all duration-300 ease-out border border-gray-100
                   ${showUserDropdown ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}
                   z-50 mt-2`}
       onMouseEnter={handleUserMouseEnter}
       onMouseLeave={handleUserMouseLeave}
     >
-      <div className="py-2">
-        <Link
-          href={route('login')}
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          Iniciar sesión
-        </Link>
-        <Link
-          href={route('register')}
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          Registrarse
-        </Link>
-      </div>
+      {auth?.user ? (
+        <div className="p-3">
+          <div className="px-3 py-2 border-b border-gray-100 mb-2">
+            <p className="text-sm font-medium text-gray-900">{auth.user.name}</p>
+            <p className="text-xs text-gray-500">{auth.user.email}</p>
+          </div>
+          {auth.user.role === 'admin' ? (
+            <Link
+              href={route('dashboard')}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+            >
+              <AiOutlineDashboard className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+              <span>Dashboard</span>
+            </Link>
+          ) : (
+            <Link
+              href={route('profile.edit')}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+            >
+              <CgProfile className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+              <span>Mi Perfil</span>
+            </Link>
+          )}
+          <div className="border-t border-gray-100 mt-2 pt-2">
+            <Link
+              href={route('logout')}
+              method="post"
+              as="button"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 group"
+            >
+              <FiLogOut className="w-5 h-5 text-red-400 group-hover:text-red-600" />
+              <span>Cerrar Sesión</span>
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="p-3 space-y-1">
+          <Link
+            href={route('login')}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+          >
+            <FiLogIn className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+            <span>Iniciar Sesión</span>
+          </Link>
+          <Link
+            href={route('register')}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+          >
+            <FiUserPlus className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+            <span>Registrarse</span>
+          </Link>
+        </div>
+      )}
     </div>
   );
 

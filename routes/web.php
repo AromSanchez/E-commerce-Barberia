@@ -31,6 +31,10 @@ Route::get('/nosotros', function () {
     return Inertia::render('Nosotros');
 })->name('nosotros');
 
+Route::get('/ofertas', function () {
+    return Inertia::render('Ofertas');
+})->name('ofertas');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified', 'admin'])->name('dashboard');
