@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { HiHeart, HiOutlineHeart, HiShoppingCart, HiEye } from 'react-icons/hi';
+import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useCart } from '@/contexts/CartContext';
@@ -7,6 +8,7 @@ import { useCart } from '@/contexts/CartContext';
 export default function CardProduct({
   id,
   name,
+  slug,
   regularPrice,
   salePrice,
   image,
@@ -66,11 +68,9 @@ export default function CardProduct({
     setIsWishlisted(!isWishlisted);
   };
 
-  const handleViewProduct = () => {
-    if (onViewProduct) {
-      onViewProduct({ id, name, price: finalPrice, image });
-    }
-  };
+const handleViewProduct = () => {
+    router.visit(`/producto/${slug}`);
+};
 
   return (
     <div className="relative group w-full mb-3 sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg transform transition-all duration-300 ease-in-out hover:translate-y-[-8px] hover:shadow-xl hover:z-10">
