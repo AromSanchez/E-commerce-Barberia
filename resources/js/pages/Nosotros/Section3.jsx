@@ -9,14 +9,14 @@ export default function Section3() {
             image: "https://i0.wp.com/masterbarbersupply.pe/wp-content/uploads/2021/10/about-us-3-team-member-3.jpg?fit=400%2C643&ssl=1",
             description: "Especialista en cortes clásicos y modernos con más de 8 años de experiencia.",
             socials: {
-                instagram: "@carlos_barber_pe",
-                tiktok: "@carlosbarber",
-                whatsapp: "+51987654321"
+                instagram: "@frankcastro754",
+                tiktok: "@brahim18_e",
+                whatsapp: "+51968899167"
             }
         },
         {
             id: 2,
-            name: "Arom Sanchez",
+            name: "Alicia Yachi",
             role: "Senior Stylist",
             image: "https://i0.wp.com/masterbarbersupply.pe/wp-content/uploads/2021/10/about-us-3-team-member-2.jpg?fit=400%2C643&ssl=1",
             description: "Experto en degradados y estilos urbanos, creando looks únicos para cada cliente.",
@@ -28,7 +28,7 @@ export default function Section3() {
         },
         {
             id: 3,
-            name: "Alicia Yachi",
+            name: "Arom Sanchez",
             role: "Creative Director",
             image: "https://i0.wp.com/masterbarbersupply.pe/wp-content/uploads/2021/10/about-us-3-team-member-1.jpg?fit=400%2C643&ssl=1",
             description: "Director creativo con pasión por las tendencias internacionales y técnicas innovadoras.",
@@ -41,7 +41,7 @@ export default function Section3() {
     ];
 
     return (
-        <section className="relative py-20 md:py-28 overflow-hidden">
+        <section className="relative py-20 md:py-20 overflow-hidden">
             <div className="container mx-auto px-6 md:px-12 relative z-10">
                 {/* Header Section */}
                 <div className="text-center mb-16 md:mb-20">

@@ -1,12 +1,14 @@
 import MainLayout from "@/layouts/MainLayout";
+import ProductsOfertas from "./Ofertas/ProductsOfertas";
+import { usePage } from "@inertiajs/react";
+import CarruBanner from "./Ofertas/CarruBanner";
 
 export default function Ofertas() {
+    const { productos } = usePage().props;
     return (
         <MainLayout title="Ofertas">
-            <div className="flex flex-col items-center justify-center h-screen">
-                <h1 className="text-4xl font-bold mb-4">Ofertas</h1>
-                <p className="text-lg">¡Pronto estarán disponibles las ofertas!</p>
-            </div>
+            <CarruBanner />
+            <ProductsOfertas productos={productos} />
         </MainLayout>
     );
 }

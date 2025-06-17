@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 
 export default function Section1() {
     return (
-        <section className="relative w-full py-16 md:py-24 lg:py-32 overflow-hidden">
+        <section className="relative w-full py-16 md:py-24 lg:py-20 overflow-hidden">
             <div className="container mx-auto px-6 md:px-8 lg:px-12 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-stretch">
                     

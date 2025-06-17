@@ -41,8 +41,11 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
 
     // Funciones de manejo
     const productosFiltrados = productos.filter(producto => {
+        // Considerar sin oferta si sale_price es null, undefined, vacío o igual a 0
+        const sinOferta = producto.sale_price === null || producto.sale_price === undefined || producto.sale_price === '' || producto.sale_price === 0;
         const precioProducto = producto.sale_price ?? producto.regular_price;
         return (
+            sinOferta &&
             (categoriasSeleccionadas.length === 0 || categoriasSeleccionadas.includes(producto.category_id)) &&
             (marcasSeleccionadas.length === 0 || marcasSeleccionadas.includes(producto.brand_id)) &&
             precioProducto >= precio.min && precioProducto <= precio.max

@@ -134,8 +134,9 @@ class ProductController extends Controller
             'deleted_gallery_image_ids.*' => 'integer|exists:product_images,id',
         ]);
 
-        // Normalizar el campo sale_price
-        $validated['sale_price'] = $request->input('sale_price') !== '' ? $request->input('sale_price') : null;
+        // Normalizar el campo sale_price: null si es vacío, 0 o "0"
+        $salePriceInput = $request->input('sale_price');
+        $validated['sale_price'] = ($salePriceInput === '' || $salePriceInput === 0 || $salePriceInput === '0') ? null : $salePriceInput;
 
         // Reemplazo de la imagen principal si llega una nueva
         if ($request->hasFile('image')) {

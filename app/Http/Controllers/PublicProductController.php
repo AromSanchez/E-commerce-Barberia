@@ -77,6 +77,18 @@ class PublicProductController extends Controller
             'product' => $product,
         ]);
     }
+
+    public function ofertas()
+    {
+        $productos = Product::with(['brand', 'category'])
+            ->whereNotNull('sale_price')
+            ->where('sale_price', '>', 0)
+            ->get();
+
+        return Inertia::render('Ofertas', [
+            'productos' => $productos,
+        ]);
+    }
 }
 
 

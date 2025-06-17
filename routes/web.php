@@ -35,9 +35,8 @@ Route::get('/nosotros', function () {
     return Inertia::render('Nosotros');
 })->name('nosotros');
 
-Route::get('/ofertas', function () {
-    return Inertia::render('Ofertas');
-})->name('ofertas');
+    
+Route::get('/ofertas', [\App\Http\Controllers\PublicProductController::class, 'ofertas'])->name('ofertas');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

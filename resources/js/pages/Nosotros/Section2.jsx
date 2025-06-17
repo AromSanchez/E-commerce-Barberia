@@ -20,7 +20,7 @@ export default function Section2() {
     }, []);
 
     return (
-        <section className="relative py-20 md:py-28 overflow-hidden">
+        <section className="relative  overflow-hidden">
         
             <div className="container mx-auto px-6 md:px-12 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -109,7 +109,7 @@ export default function Section2() {
                             
                             <div className="space-y-5 text-gray-700 text-lg leading-relaxed">
                                 <p className="relative pl-6 border-l-2 border-gray-300">
-                                    <strong className="text-black font-semibold">Perú 51 Barbershop</strong> nació con un sueño: transformar el cuidado masculino en una experiencia única. Comenzamos en un pequeño local alquilado, con herramientas básicas, muchas gansas y pasión por lo que hacíamos.
+                                    <strong className="text-black font-semibold">Barbershop</strong> nació con un sueño: transformar el cuidado masculino en una experiencia única. Comenzamos en un pequeño local alquilado, con herramientas básicas, muchas gansas y pasión por lo que hacíamos.
                                 </p>
                                 
                                 <p className="text-gray-600">
