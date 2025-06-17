@@ -20,8 +20,20 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/productos', [PublicProductController::class, 'index'])->name('products.index');
+// Rutas públicas de productos
+Route::prefix('productos')->group(function () {
+    Route::get('/', [PublicProductController::class, 'index'])->name('products.index');
+    Route::get('/categoria/{slug}', [PublicProductController::class, 'byCategory'])->name('products.category');
+    Route::get('/marca/{slug}', [PublicProductController::class, 'byBrand'])->name('products.brand');
+});
+
+// Ruta individual para mostrar un producto
 Route::get('/producto/{slug}', [PublicProductController::class, 'show'])->name('products.show');
+
+// Página "Nosotros"
+Route::get('/nosotros', function () {
+    return Inertia::render('Nosotros');
+})->name('nosotros');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

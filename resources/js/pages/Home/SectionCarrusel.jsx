@@ -54,7 +54,7 @@ export default function SectionCarrusel() {
       {...handlers}
       className="w-full relative group bg-gradient-to-b from-gray-100 to-white overflow-hidden"
     >
-      <div className="relative w-full h-[650px] md:h-[600px] lg:h-[620px]">
+      <div className="relative w-full h-[650px] md:h-[650px] lg:h-[620px]">
         {slides.map((slide, index) => (
           <div
             key={slide.id}
@@ -65,7 +65,7 @@ export default function SectionCarrusel() {
             <div className="container mx-auto h-full px-6 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-10">
               {/* Text Content */}
               <div className="text-center lg:text-left lg:max-w-lg">
-                <h2 className="text-3xl md:text-3xl lg:text-5xl font-extrabold uppercase text-gray-800 whitespace-pre-line">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold uppercase text-gray-800 whitespace-pre-line">
                   {slide.title}
                 </h2>
                 <p className="mt-3 text-sm md:text-base lg:text-lg text-gray-600 whitespace-pre-line max-w-md mx-auto lg:mx-0">

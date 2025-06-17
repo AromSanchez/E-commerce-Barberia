@@ -19,8 +19,8 @@ export default function Footer() {
   return (
     <footer className="bg-black text-white py-12 px-4 border-t border-gray-800">
       <div className="container mx-auto max-w-6xl">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 justify-items-center">
-          
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
+
           {/* Logo y descripción */}
           <div className="col-span-1 flex flex-col items-center sm:items-start">
             <Link href="/" className="group transition duration-300">
@@ -33,8 +33,8 @@ export default function Footer() {
             <p className="text-sm text-gray-400 text-center sm:text-left max-w-xs leading-relaxed">
               Productos profesionales para barbería y cuidado masculino.
             </p>
-            <div className="mt-6 flex space-x-5">
-              {[
+            <div className="mt-6 flex space-x-5 justify-center sm:justify-start">
+              {[ 
                 { icon: FaTwitter, label: "Twitter" },
                 { icon: FaFacebook, label: "Facebook" },
                 { icon: FaTiktok, label: "TikTok" },
@@ -59,7 +59,7 @@ export default function Footer() {
               Información
             </h3>
             <ul className="space-y-3">
-              {[
+              {[ 
                 { icon: FaInfoCircle, text: "Acerca de Nosotros", href: "/acerca-de" },
                 { icon: FaShieldAlt, text: "Política & Privacidad", href: "/politica-privacidad" },
                 { icon: FaFileContract, text: "Términos & Condiciones", href: "/terminos-condiciones" }
@@ -84,7 +84,7 @@ export default function Footer() {
               Servicio al Cliente
             </h3>
             <ul className="space-y-3">
-              {[
+              {[ 
                 { icon: FaCreditCard, text: "Formas de pago", href: "/formas-pago" },
                 { icon: FaExchangeAlt, text: "Cambios y Devoluciones", href: "/cambios-devoluciones" },
                 { icon: FaQuestionCircle, text: "Preguntas Frecuentes", href: "/preguntas-frecuentes" }
@@ -109,7 +109,7 @@ export default function Footer() {
               Delivery
             </h3>
             <ul className="space-y-3">
-              {[
+              {[ 
                 { icon: FaTruck, text: "Tiempos y Costos", href: "/tiempos-costos" },
                 { icon: FaMapMarkedAlt, text: "Zona de Reparto", href: "/zona-reparto" }
               ].map(({ icon: Icon, text, href }, idx) => (

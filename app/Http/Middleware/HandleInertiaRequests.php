@@ -4,6 +4,8 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\Category;
+use App\Models\Brand;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -29,11 +31,12 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
+        return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
             ],
-        ];
+            'categories' => \App\Models\Category::select('id', 'name', 'slug')->get(),
+            'brands' => \App\Models\Brand::select('id', 'name', 'slug')->get(),
+        ]);
     }
 }

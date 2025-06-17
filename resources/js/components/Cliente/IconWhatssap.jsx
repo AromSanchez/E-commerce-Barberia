@@ -16,7 +16,7 @@ const FloatingWhatsAppIcon = () => {
     };
 
     return (
-        <div className="fixed bottom-3 right-3 z-50 p-3 bg-green-500 text-white rounded-full shadow-xl flex items-center justify-center space-x-2 hover:bg-green-600 transition-all cursor-pointer sm:bottom-6 sm:right-6">
+        <div className="z-10 fixed bottom-3 right-3 p-3 bg-green-500 text-white rounded-full shadow-xl flex items-center justify-center space-x-2 hover:bg-green-600 transition-all cursor-pointer sm:bottom-6 sm:right-6">
             <FaWhatsapp className="w-10 h-10 sm:w-10 sm:h-10" onClick={() => setIsOpen(!isOpen)} />
 
             {/* Popup chat window */}
