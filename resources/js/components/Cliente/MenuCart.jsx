@@ -13,7 +13,8 @@ const MenuCart = ({ isOpen, onClose }) => {
             const response = await axios.get(route('cart.get'));
             const itemsWithNumericPrices = Object.values(response.data.items).map(item => ({
                 ...item,
-                price: parseFloat(item.price) || 0
+                price: parseFloat(item.price) || 0,
+                localQuantity: item.quantity // ← agrega esto
             }));
             setCartItems(itemsWithNumericPrices);
             setLoading(false);
@@ -34,9 +35,34 @@ const MenuCart = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
+    const handleLocalQuantityChange = (productId, newQuantity) => {
+        if (newQuantity < 1) return;
+
+        setCartItems(prevItems =>
+            prevItems.map(item =>
+                item.id === productId
+                    ? { ...item, localQuantity: newQuantity }
+                    : item
+            )
+        );
+
+        // Luego sincronizas con el backend (no bloqueas la UI)
+        axios.post(route('cart.update'), {
+            product_id: productId,
+            quantity: newQuantity
+        }).catch(error => {
+            toast.error('Error al actualizar cantidad', {
+                position: "bottom-right",
+                autoClose: 1500,
+                hideProgressBar: true
+            });
+            console.error('Error:', error);
+        });
+    };
+
     const handleUpdateQuantity = async (productId, newQuantity) => {
         if (newQuantity < 1) return;
-        
+
         try {
             await axios.post(route('cart.update'), {
                 product_id: productId,
@@ -83,7 +109,7 @@ const MenuCart = ({ isOpen, onClose }) => {
         }
     };
 
-    const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const subtotal = cartItems.reduce((acc, item) => acc + (item.price * (item.localQuantity || item.quantity)), 0);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -102,8 +128,8 @@ const MenuCart = ({ isOpen, onClose }) => {
             <div id="cart-content" className={`fixed right-0 top-0 h-full w-[90%] sm:w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                 <div className="flex justify-between items-center p-4 border-b border-gray-200">
                     <h2 className="text-xl font-medium text-gray-800">Carrito</h2>
-                    <button 
-                        onClick={onClose} 
+                    <button
+                        onClick={onClose}
                         className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                     >
                         <FiX size={14} />
@@ -119,8 +145,8 @@ const MenuCart = ({ isOpen, onClose }) => {
                         cartItems.map((item) => (
                             <div key={item.id} className="flex gap-4 mb-4 border-b pb-4 border-gray-200">
                                 <div className="w-20 h-20">
-                                    <img 
-                                        src={item.image || '/images/no-image.png'} 
+                                    <img
+                                        src={item.image || '/images/no-image.png'}
                                         alt={item.name}
                                         className="w-full h-full object-cover rounded-lg shadow-sm"
                                         onError={(e) => {
@@ -132,22 +158,26 @@ const MenuCart = ({ isOpen, onClose }) => {
                                     <h3 className="text-sm font-medium text-gray-800">{item.name}</h3>
                                     <div className="flex items-center justify-between mt-2">
                                         <div className="flex items-center gap-2">
-                                            <button 
-                                                onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                            <button
+                                                onClick={() => handleLocalQuantityChange(item.id, item.localQuantity - 1)}
+                                                disabled={item.localQuantity <= 1}
                                                 className="p-1 hover:bg-gray-200 rounded-full transition-colors"
                                             >
                                                 <FiMinus size={12} />
                                             </button>
+
                                             <span className="text-sm text-gray-600">
-                                                {item.quantity}
+                                                {item.localQuantity}
                                             </span>
-                                            <button 
-                                                onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+
+                                            <button
+                                                onClick={() => handleLocalQuantityChange(item.id, item.localQuantity + 1)}
+                                                disabled={item.localQuantity >= item.stock}
                                                 className="p-1 hover:bg-gray-200 rounded-full transition-colors"
                                             >
                                                 <FiPlus size={12} />
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => handleRemoveItem(item.id)}
                                                 className="p-1 hover:bg-red-100 text-red-600 rounded-full transition-colors ml-2"
                                             >

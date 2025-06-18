@@ -8,13 +8,13 @@ import { useCart } from '@/contexts/CartContext';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 
-const MainHeader = ({ 
-  isMenuOpen, 
+const MainHeader = ({
+  isMenuOpen,
   setIsMenuOpen,
-  navLinks, 
-  searchQuery, 
-  setSearchQuery, 
-  handleSearch 
+  navLinks,
+  searchQuery,
+  setSearchQuery,
+  handleSearch
 }) => {
   const { openCart } = useCart();
   const [cartCount, setCartCount] = useState(0);
@@ -28,14 +28,10 @@ const MainHeader = ({
   const userTimeoutRef = useRef(null);
 
   const fetchCartInfo = async () => {
-    try {
-      const response = await axios.get(route('cart.get'));
-      const items = Object.values(response.data.items || {});
-      setCartCount(items.reduce((sum, item) => sum + item.quantity, 0));
-      setCartTotal(items.reduce((sum, item) => sum + (item.price * item.quantity), 0));
-    } catch (error) {
-      console.error('Error al obtener información del carrito:', error);
-    }
+    const response = await axios.get(route('cart.get'));
+    const items = Object.values(response.data.items || {});
+    setCartCount(items.reduce((sum, item) => sum + item.quantity, 0));
+    setCartTotal(items.reduce((sum, item) => sum + (item.price * item.quantity), 0));
   };
 
   useEffect(() => {
@@ -71,7 +67,7 @@ const MainHeader = ({
   };
 
   const renderDropdownContent = () => (
-    <div 
+    <div
       ref={dropdownRef}
       className={`absolute top-full left-1/2 transform -translate-x-1/2 w-[520px] bg-white shadow-xl rounded-lg 
                   transition-all duration-300 ease-out border border-gray-100
@@ -108,7 +104,7 @@ const MainHeader = ({
               ))}
             </ul>
           </div>
-          
+
           {/* Marcas */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 px-2">
@@ -145,7 +141,7 @@ const MainHeader = ({
   );
 
   const renderUserDropdownContent = () => (
-    <div 
+    <div
       ref={userDropdownRef}
       className={`absolute top-full left-1/2 -translate-x-1/2 w-64 bg-white shadow-xl rounded-lg 
                   transition-all duration-300 ease-out border border-gray-100
@@ -240,7 +236,7 @@ const MainHeader = ({
             {navLinks.map((link, index) => {
               const isActive = typeof window !== 'undefined' && window.location.pathname === link.href;
               const isTienda = link.label.toLowerCase() === 'tienda';
-              
+
               return (
                 <li key={index} className="relative">
                   <Link
@@ -312,7 +308,7 @@ const MainHeader = ({
             </Link>
           </div>
           {/* Carrito siempre visible */}
-          <button 
+          <button
             onClick={openCart}
             className="flex items-center text-gray-600 hover:text-black transition-colors focus:outline-none"
             aria-label="Abrir carrito"

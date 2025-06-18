@@ -29,7 +29,7 @@ class PublicProductController extends Controller
         $productos = Product::with(['brand', 'category'])
             ->where('category_id', $category->id)
             ->get();
-        
+
         $categorias = Category::withCount('products')->get();
         $marcas = Brand::withCount('products')->get();
 
@@ -51,7 +51,7 @@ class PublicProductController extends Controller
         $productos = Product::with(['brand', 'category'])
             ->where('brand_id', $brand->id)
             ->get();
-        
+
         $categorias = Category::withCount('products')->get();
         $marcas = Brand::withCount('products')->get();
 
@@ -69,15 +69,23 @@ class PublicProductController extends Controller
 
     public function show($slug)
     {
-        $product = Product::with(['brand', 'category', 'images']) // Asegúrate de tener la relación images en el modelo
+        $product = Product::with(['brand', 'category', 'images'])
             ->where('slug', $slug)
             ->firstOrFail();
 
+        // Buscar productos relacionados (misma categoría, excepto el actual)
+        $relatedProducts = Product::with('brand')
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->take(4)
+            ->get();
+
         return Inertia::render('Producto', [
             'product' => $product,
+            'relatedProducts' => $relatedProducts,
         ]);
     }
-
+    
     public function ofertas()
     {
         $productos = Product::with(['brand', 'category'])
@@ -90,5 +98,3 @@ class PublicProductController extends Controller
         ]);
     }
 }
-
-
