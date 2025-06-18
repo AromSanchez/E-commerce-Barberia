@@ -39,6 +39,9 @@ Route::get('/nosotros', function () {
     return Inertia::render('Nosotros');
 })->name('nosotros');
 
+Route::get('/carrito', function () {
+    return Inertia::render('VerCarrito');
+})->name('carrito');
     
 Route::get('/ofertas', [\App\Http\Controllers\PublicProductController::class, 'ofertas'])->name('ofertas');
 

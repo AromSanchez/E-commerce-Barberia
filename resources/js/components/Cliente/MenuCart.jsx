@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiX, FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { HiShoppingCart } from 'react-icons/hi';
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -20,7 +21,7 @@ const MenuCart = ({ isOpen, onClose }) => {
         } catch (error) {
             console.error('Error al cargar el carrito:', error);
             toast.error('Error al cargar el carrito', {
-                position: "bottom-right",
+                position: "top-right",
                 autoClose: 1500,
                 hideProgressBar: true
             });
@@ -46,13 +47,13 @@ const MenuCart = ({ isOpen, onClose }) => {
         } catch (error) {
             if (error.response?.status === 422) {
                 toast.error(error.response.data.message, {
-                    position: "bottom-right",
+                    position: "top-right",
                     autoClose: 1500,
                     hideProgressBar: true
                 });
             } else {
                 toast.error('Error al actualizar la cantidad', {
-                    position: "bottom-right",
+                    position: "top-right",
                     autoClose: 1500,
                     hideProgressBar: true
                 });
@@ -68,7 +69,7 @@ const MenuCart = ({ isOpen, onClose }) => {
                 product_id: productId
             });
             toast.success('Producto eliminado', {
-                position: "bottom-right",
+                position: "top-right",
                 autoClose: 1500,
                 hideProgressBar: true
             });
@@ -76,7 +77,7 @@ const MenuCart = ({ isOpen, onClose }) => {
         } catch (error) {
             console.error('Error al eliminar producto:', error);
             toast.error('Error al eliminar el producto', {
-                position: "bottom-right",
+                position: "top-right",
                 autoClose: 1500,
                 hideProgressBar: true
             });
@@ -162,30 +163,46 @@ const MenuCart = ({ isOpen, onClose }) => {
                             </div>
                         ))
                     ) : (
-                        <div className="text-center py-8">
-                            <p className="text-gray-500">Tu carrito está vacío</p>
+                        <div className="h-full flex flex-col items-center justify-center py-8 px-4">
+                            <div className="flex flex-col items-center justify-center flex-1">
+                                <div className="mb-6 text-gray-400 relative">
+                                    <HiShoppingCart className="h-32 w-32" />
+                                    <div className="absolute -top-2 -right-2 h-8 w-8 bg-gray-400 rounded-full flex items-center justify-center text-white after:content-['×'] after:text-2xl"></div>
+                                </div>
+                                <p className="text-xl text-center font-medium text-gray-800 mb-4">No hay productos en el carrito.</p>
+                                <Link
+                                    href={route('products.index')}
+                                    onClick={onClose}
+                                    className="bg-black text-white text-sm px-6 py-2 rounded-md hover:bg-gray-900 transition-colors"
+                                >
+                                    RETORNAR A LA TIENDA
+                                </Link>
+                            </div>
                         </div>
                     )}
                 </div>
 
-                <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-                    <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm font-medium text-gray-800">Subtotal:</span>
-                        <span className="text-sm text-gray-800">S/ {subtotal.toFixed(2)}</span>
+                {cartItems.length > 0 && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+                        <div className="flex justify-between items-center mb-3">
+                            <span className="text-sm font-medium text-gray-800">Subtotal:</span>
+                            <span className="text-sm text-gray-800">S/ {subtotal.toFixed(2)}</span>
+                        </div>
+                        <Link
+                            href={route('carrito')}
+                            onClick={onClose}
+                            className="block w-full bg-gray-200 text-gray-800 py-2 rounded-md hover:bg-gray-300 text-center transition-colors"
+                        >
+                            VER CARRITO
+                        </Link>
+                        <Link
+                            href="/checkout"
+                            className="block w-full bg-black text-white py-2 rounded-md hover:bg-gray-900 text-center transition-colors mt-2"
+                        >
+                            FINALIZAR COMPRA
+                        </Link>
                     </div>
-                    <Link
-                        href={route('cart.index')}
-                        className="block w-full bg-gray-200 text-gray-800 py-2 rounded-md hover:bg-gray-300 text-center transition-colors"
-                    >
-                        VER CARRITO
-                    </Link>
-                    <Link
-                        href="/checkout"
-                        className="block w-full bg-black text-white py-2 rounded-md hover:bg-gray-900 text-center transition-colors mt-2"
-                    >
-                        FINALIZAR COMPRA
-                    </Link>
-                </div>
+                )}
             </div>
         </div>
     );

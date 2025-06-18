@@ -42,7 +42,7 @@ export default function CardProduct({
       });
       
       toast.success('¡Producto agregado al carrito!', {
-        position: "bottom-right",
+        position: "top-right",
         autoClose: 1500,
         hideProgressBar: true,
         closeOnClick: true,
@@ -53,13 +53,15 @@ export default function CardProduct({
     } catch (error) {
       if (error.response?.status === 422) {
         toast.error(error.response.data.message, {
-          position: "bottom-right",
+          position: "top-right",
           autoClose: 1500,
+          hideProgressBar: true
         });
       } else {
         toast.error('No se pudo agregar el producto al carrito', {
-          position: "bottom-right",
+          position: "top-right",
           autoClose: 1500,
+          hideProgressBar: true
         });
       }
       console.error('Error al agregar al carrito:', error);
