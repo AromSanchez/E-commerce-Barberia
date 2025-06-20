@@ -1,4 +1,4 @@
-import { FiSearch, FiMenu, FiX, FiLogIn, FiLogOut, FiUserPlus, FiTag } from 'react-icons/fi';
+import { FiSearch, FiMenu, FiX, FiLogIn, FiLogOut, FiUserPlus, FiTag, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { AiOutlineHeart, AiOutlineShoppingCart, AiOutlineUser, AiOutlineDashboard } from 'react-icons/ai';
 import { CgProfile } from 'react-icons/cg';
 import { BiCategory } from 'react-icons/bi';
@@ -11,19 +11,20 @@ import axios from 'axios';
 const MainHeader = ({
   isMenuOpen,
   setIsMenuOpen,
-  navLinks,
-  searchQuery,
-  setSearchQuery,
-  handleSearch
+  navLinks
 }) => {
   const { openCart } = useCart();
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState({ productos: [], marcas: [] });
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const { categories, brands, auth } = usePage().props;
   const dropdownRef = useRef(null);
   const userDropdownRef = useRef(null);
+  const suggestionsRef = useRef(null);
   const timeoutRef = useRef(null);
   const userTimeoutRef = useRef(null);
 
@@ -64,6 +65,50 @@ const MainHeader = ({
     userTimeoutRef.current = setTimeout(() => {
       setShowUserDropdown(false);
     }, 200);
+  };
+
+  // Buscador en vivo
+  useEffect(() => {
+    if (searchQuery.trim().length === 0) {
+      setSuggestions({ productos: [], marcas: [] });
+      setShowSuggestions(false);
+      return;
+    }
+    const fetchSuggestions = async () => {
+      try {
+        const { data } = await axios.get(route('products.live_search'), {
+          params: { q: searchQuery }
+        });
+        setSuggestions(data);
+        setShowSuggestions(true);
+      } catch (e) {
+        setSuggestions({ productos: [], marcas: [] });
+      }
+    };
+    const timeout = setTimeout(fetchSuggestions, 250);
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
+
+  // Cerrar sugerencias al hacer click fuera
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    if (showSuggestions) {
+      document.addEventListener('mousedown', handleClick);
+    }
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showSuggestions]);
+
+  const handleInputChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSuggestionClick = (href) => {
+    setShowSuggestions(false);
+    window.location.href = href;
   };
 
   const renderDropdownContent = () => (
@@ -268,14 +313,16 @@ const MainHeader = ({
         </nav>
 
         {/* Barra de búsqueda en desktop */}
-        <div className="hidden lg:flex flex-1 max-w-md mx-4">
-          <form onSubmit={handleSearch} className="flex w-full">
+        <div className="hidden lg:flex flex-1 max-w-3xl mx-4 relative">
+          <form onSubmit={e => { e.preventDefault(); window.location.href = route('products.index') + '?q=' + encodeURIComponent(searchQuery); }} className="flex w-full">
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               placeholder="Buscar producto"
               className="w-full px-4 py-2 text-sm border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-gray-400"
+              onFocus={() => searchQuery && setShowSuggestions(true)}
+              autoComplete="off"
             />
             <button
               type="submit"
@@ -284,6 +331,118 @@ const MainHeader = ({
               <FiSearch size={18} className="text-gray-600" />
             </button>
           </form>
+          {showSuggestions && (searchQuery.trim().length > 0) && (
+            <div ref={suggestionsRef} className="absolute left-1/2 top-full -translate-x-1/2 w-[600px] bg-white shadow-xl rounded-b-lg border border-gray-100 z-50 mt-1 p-6">
+              {/* Sugerencias de búsqueda y marcas */}
+              <div className="flex gap-8 mb-4">
+                <div className="flex-1">
+                  <ul className="mb-2">
+                    {suggestions.productos.length > 0 ? suggestions.productos.map(p => (
+                      <li key={p.id}>
+                        <button
+                          type="button"
+                          className="block w-full text-left py-1.5 px-2 hover:bg-gray-100 text-base"
+                          onClick={() => window.location.href = route('products.index') + '?q=' + encodeURIComponent(p.name)}
+                        >
+                          {p.name.split(' ').slice(0, 3).join(' ')}
+                        </button>
+                      </li>
+                    )) : <span className="text-gray-400 text-base">Sin resultados</span>}
+                  </ul>
+                </div>
+                <div className="w-40">
+                  <div className="font-bold text-gray-800 mb-2">Marcas</div>
+                  <ul className="grid grid-cols-1 gap-x-4">
+                    {suggestions.marcas.length > 0 ? suggestions.marcas.map(m => (
+                      <li key={m.id}>
+                        <button type="button" className="block w-full text-left py-1.5 px-2 hover:bg-gray-100 text-base" onClick={() => window.location.href = route('products.brand', m.slug)}>
+                          {m.name}
+                        </button>
+                      </li>
+                    )) : <span className="text-gray-400 text-base">-</span>}
+                  </ul>
+                </div>
+              </div>
+              {/* Carrusel de productos relacionados */}
+              <div className="mt-2">
+                <div className="font-bold text-gray-800 mb-2">TE PODRÍA INTERESAR</div>
+                <div className="relative">
+                  <button type="button" onClick={() => {
+                    const el = document.getElementById('carousel-sugerencias');
+                    if (el) {
+                      const distance = 180;
+                      const duration = 400; // ms
+                      const start = el.scrollLeft;
+                      const end = start - distance;
+                      let startTime = null;
+                      function animateScroll(timestamp) {
+                        if (!startTime) startTime = timestamp;
+                        const elapsed = timestamp - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        // easeInOutQuad
+                        const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+                        el.scrollLeft = start + (end - start) * ease;
+                        if (progress < 1) {
+                          requestAnimationFrame(animateScroll);
+                        }
+                      }
+                      requestAnimationFrame(animateScroll);
+                    }
+                  }} className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 border border-gray-300 rounded-full shadow p-1 hover:bg-gray-200 transition-colors flex items-center justify-center w-6 h-6">
+                    <FiChevronLeft className="w-4 h-4 text-gray-700" />
+                  </button>
+                  <div
+                    id="carousel-sugerencias"
+                    className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide scroll-smooth px-4"
+                    style={{scrollbarWidth:'none'}} 
+                    onWheel={e => {
+                      const el = e.currentTarget;
+                      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                        el.scrollLeft += e.deltaY;
+                        e.preventDefault();
+                      }
+                    }}
+                  >
+                    {suggestions.productos.length > 0 ? suggestions.productos.map(p => (
+                      <div key={p.id} className="w-[150px] h-[200px] bg-white border rounded shadow-sm flex-shrink-0 flex flex-col">
+                        <button type="button" onClick={() => window.location.href = route('products.show', p.slug)} className="w-full text-left h-full flex flex-col">
+                          <img src={p.image || '/images/logo.png'} alt={p.name} className="w-full h-[140px] object-contain rounded-t" />
+                          <div className="p-2 flex-1 flex flex-col justify-between">
+                            <div className="font-bold text-gray-800 text-xs uppercase truncate">{p.brand}</div>
+                            <div className="text-xs text-gray-700 truncate mb-2">{p.name}</div>
+                          </div>
+                        </button>
+                      </div>
+                    )) : <span className="text-gray-400 text-base">Sin productos</span>}
+                  </div>
+                  <button type="button" onClick={() => {
+                    const el = document.getElementById('carousel-sugerencias');
+                    if (el) {
+                      const distance = 180;
+                      const duration = 400; // ms
+                      const start = el.scrollLeft;
+                      const end = start + distance;
+                      let startTime = null;
+                      function animateScroll(timestamp) {
+                        if (!startTime) startTime = timestamp;
+                        const elapsed = timestamp - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        // easeInOutQuad
+                        const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+                        el.scrollLeft = start + (end - start) * ease;
+                        if (progress < 1) {
+                          requestAnimationFrame(animateScroll);
+                        }
+                      }
+                      requestAnimationFrame(animateScroll);
+                    }
+                  }} className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 border border-gray-300 rounded-full shadow p-1 hover:bg-gray-200 transition-colors flex items-center justify-center w-6 h-6">
+                    <FiChevronRight className="w-4 h-4 text-gray-700" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Iconos de usuario */}

@@ -27,6 +27,7 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name
 // Rutas públicas de productos
 Route::prefix('productos')->group(function () {
     Route::get('/', [PublicProductController::class, 'index'])->name('products.index');
+    Route::get('/buscar-sugerencias', [PublicProductController::class, 'liveSearch'])->name('products.live_search');
     Route::get('/categoria/{slug}', [PublicProductController::class, 'byCategory'])->name('products.category');
     Route::get('/marca/{slug}', [PublicProductController::class, 'byBrand'])->name('products.brand');
 });

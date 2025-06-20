@@ -97,4 +97,70 @@ class PublicProductController extends Controller
             'productos' => $productos,
         ]);
     }
+
+    public function liveSearch(Request $request)
+    {
+        $query = trim($request->input('q'));
+        if (strlen($query) === 0) {
+            return response()->json([
+                'productos' => [],
+                'marcas' => [],
+                'categorias' => []
+            ]);
+        }
+
+        // Buscar productos por coincidencia exacta, al inicio, y por palabra
+        $productos = Product::with(['brand', 'images'])
+            ->where(function($q) use ($query) {
+                $q->where('name', 'like', $query . '%') // empieza con
+                  ->orWhere('name', 'like', '% ' . $query . '%') // palabra intermedia
+                  ->orWhere('name', 'like', '%' . $query . '%'); // en cualquier parte
+            })
+            ->limit(7)
+            ->get();
+
+        // Si no hay productos, sugerir marcas y categorías relevantes
+        $marcas = collect();
+        $categorias = collect();
+        if ($productos->isEmpty()) {
+            $marcas = Brand::where('name', 'like', '%' . $query . '%')
+                ->limit(5)
+                ->get(['id', 'name', 'slug']);
+            $categorias = Category::where('name', 'like', '%' . $query . '%')
+                ->limit(5)
+                ->get(['id', 'name', 'slug']);
+        } else {
+            // Sugerir marcas de los productos encontrados
+            $marcas = $productos->pluck('brand')->filter()->unique('id')->values()->map(function($brand) {
+                return [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                    'slug' => $brand->slug
+                ];
+            });
+        }
+
+        $productosArr = $productos->map(function($p) {
+            $img = null;
+            if ($p->images && $p->images->count() > 0) {
+                $img = asset('storage/' . $p->images->first()->image_path);
+            } elseif ($p->image) {
+                $img = asset('storage/' . $p->image);
+            }
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'brand' => $p->brand ? $p->brand->name : null,
+                'brand_slug' => $p->brand ? $p->brand->slug : null,
+                'image' => $img
+            ];
+        });
+
+        return response()->json([
+            'productos' => $productosArr,
+            'marcas' => $marcas,
+            'categorias' => $categorias
+        ]);
+    }
 }

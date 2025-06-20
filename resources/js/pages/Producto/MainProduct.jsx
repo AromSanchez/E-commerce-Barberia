@@ -15,11 +15,6 @@ export default function MainProduct({ product, relatedProducts }) {
     const [quantity, setQuantity] = useState(1);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-
-
-
-
-
     // Crear array de imágenes (imagen principal + imágenes adicionales)
     const allImages = [
         ...(product.image ? [product.image] : []),
