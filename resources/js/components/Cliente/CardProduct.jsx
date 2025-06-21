@@ -15,9 +15,9 @@ export default function CardProduct({
   brand,
   inStock,
   isNew,
-  onViewProduct
+  isFavorite,     
 }) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(isFavorite || false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { openCart } = useCart();
@@ -40,7 +40,7 @@ export default function CardProduct({
         product_id: id,
         quantity: 1
       });
-      
+
       toast.success('¡Producto agregado al carrito!', {
         position: "top-right",
         autoClose: 1500,
@@ -70,13 +70,32 @@ export default function CardProduct({
     }
   };
 
-  const handleToggleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
+  const handleToggleWishlist = async () => {
+    try {
+      await axios.post(`/favorites/${id}/toggle`);
+      setIsWishlisted(!isWishlisted);
+
+      toast.success(
+        isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos',
+        {
+          position: "top-right",
+          autoClose: 1500,
+          hideProgressBar: true,
+        }
+      );
+    } catch (error) {
+      toast.error('Error al actualizar favoritos', {
+        position: "top-right",
+        autoClose: 1500,
+        hideProgressBar: true,
+      });
+      console.error(error);
+    }
   };
 
-const handleViewProduct = () => {
+  const handleViewProduct = () => {
     router.visit(`/producto/${slug}`);
-};
+  };
 
   return (
     <div className="relative group w-full mb-3 sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg transform transition-all duration-300 ease-in-out hover:translate-y-[-8px] hover:shadow-xl hover:z-10">
@@ -107,7 +126,7 @@ const handleViewProduct = () => {
               </div>
             )}
             <img
-              src={image}
+              src={`/storage/${image}`}
               alt={name}
               className={`w-full h-full object-contain transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
               onLoad={() => setIsImageLoaded(true)}
@@ -127,7 +146,7 @@ const handleViewProduct = () => {
           {/* Marca */}
           {brand && (
             <p className="text-xs font-bold text-black uppercase tracking-wide mb-2 text-left">
-              {brand}
+              {brand?.name}
             </p>
           )}
 
@@ -172,15 +191,16 @@ const handleViewProduct = () => {
                 disabled={!inStock}
                 className={`p-2 transition-colors ${inStock ? 'hover:text-opacity-30 text-black' : 'text-gray-800 cursor-not-allowed'}`}
                 title={inStock ? 'Añadir al carrito' : 'Producto agotado'}
-            >
+              >
                 <HiShoppingCart className="w-5 h-5" />
               </button>
               <button
                 onClick={handleToggleWishlist}
-                className={`p-2 transition-colors ${isWishlisted ? 'text-red-600' : 'hover:text-opacity-30 text-gray-700'}`}
+                className={`p-2 transition-colors ${isWishlisted ? 'text-red-600' : 'hover:text-opacity-30 text-gray-700'
+                  }`}
                 title={isWishlisted ? 'Quitar de favoritos' : 'Añadir a favoritos'}
               >
-              {isWishlisted ? <HiHeart className="w-5 h-5" /> : <HiOutlineHeart className="w-5 h-5" />}
+                {isWishlisted ? <HiHeart className="w-5 h-5" /> : <HiOutlineHeart className="w-5 h-5" />}
               </button>
             </div>
           </div>

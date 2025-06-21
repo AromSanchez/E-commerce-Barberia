@@ -27,6 +27,8 @@ const MainHeader = ({
   const suggestionsRef = useRef(null);
   const timeoutRef = useRef(null);
   const userTimeoutRef = useRef(null);
+  const { favoriteCount } = usePage().props; // ¡Aquí está la magia!
+
 
   const fetchCartInfo = async () => {
     const response = await axios.get(route('cart.get'));
@@ -459,11 +461,13 @@ const MainHeader = ({
               </button>
               {renderUserDropdownContent()}
             </div>
-            <Link href="/wishlist" className="p-1 text-gray-600 hover:text-black transition-colors relative">
+            <Link href="/favoritos" className="p-1 text-gray-600 hover:text-black transition-colors relative">
               <AiOutlineHeart size={20} />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-gray-800 text-white text-[10px] rounded-full flex items-center justify-center">
-                0
-              </span>
+              {favoriteCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[10px] rounded-full flex items-center justify-center shadow">
+                  {favoriteCount}
+                </span>
+              )}
             </Link>
           </div>
           {/* Carrito siempre visible */}

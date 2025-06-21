@@ -6,6 +6,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicProductController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\FavoriteController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
@@ -20,6 +21,13 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+
+Route::middleware('auth')->get('/favoritos', [FavoriteController::class, 'index']);
+Route::middleware('auth')->post('/favorites/{productId}/toggle', [FavoriteController::class, 'toggleFavorite']);
+
+
+
 
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');

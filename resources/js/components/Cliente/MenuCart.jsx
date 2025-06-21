@@ -233,7 +233,7 @@ const MenuCart = ({ isOpen, onClose }) => {
                         </Link>
                     </div>
                 )}
-            </div>
+                </div>
         </div>
     );
 };
