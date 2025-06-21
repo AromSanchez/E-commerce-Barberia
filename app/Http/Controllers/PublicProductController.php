@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Brand;
 use App\Models\User; // Asegúrate de importar esto arriba
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 class PublicProductController extends Controller
 {
