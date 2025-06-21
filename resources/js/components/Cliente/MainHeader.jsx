@@ -260,7 +260,7 @@ const MainHeader = ({
           className="lg:hidden p-1 text-gray-600 focus:outline-none"
           aria-label="Abrir menú"
         >
-          {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+          <FiMenu size={24} />
         </button>
 
         {/* Logo */}
