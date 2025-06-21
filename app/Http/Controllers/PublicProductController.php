@@ -4,15 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Brand;
-use Illuminate\Http\Request;
+use App\Models\User; // Asegúrate de importar esto arriba
 use Inertia\Inertia;
 
 class PublicProductController extends Controller
 {
     public function index()
     {
-        $productos = Product::with(['brand', 'category'])->get(); // Cargar las relaciones
+        // Obtener el usuario autenticado
+        $user = Auth::user();
+
+        /** @var \App\Models\User $user */  // 👈 Esta línea soluciona el error en VS Code
+
+        $productos = Product::with(['brand', 'category'])->get();
+
+        if ($user) {
+            $user->load('favorites');
+
+            $productos->each(function ($producto) use ($user) {
+                $producto->is_favorite = $user->favorites->contains($producto->id);
+            });
+        } else {
+            $productos->each(function ($producto) {
+                $producto->is_favorite = false;
+            });
+        }
+
         $categorias = Category::withCount('products')->get();
         $marcas = Brand::withCount('products')->get();
 
@@ -85,7 +104,7 @@ class PublicProductController extends Controller
             'relatedProducts' => $relatedProducts,
         ]);
     }
-    
+
     public function ofertas()
     {
         $productos = Product::with(['brand', 'category'])

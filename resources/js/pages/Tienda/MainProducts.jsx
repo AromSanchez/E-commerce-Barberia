@@ -41,13 +41,13 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
 
     // Funciones de manejo
     const productosFiltrados = productos.filter(producto => {
-    const precioProducto = producto.sale_price ?? producto.regular_price;
-    return (
-        (categoriasSeleccionadas.length === 0 || categoriasSeleccionadas.includes(producto.category_id)) &&
-        (marcasSeleccionadas.length === 0 || marcasSeleccionadas.includes(producto.brand_id)) &&
-        precioProducto >= precio.min && precioProducto <= precio.max
-    );
-});
+        const precioProducto = producto.sale_price ?? producto.regular_price;
+        return (
+            (categoriasSeleccionadas.length === 0 || categoriasSeleccionadas.includes(producto.category_id)) &&
+            (marcasSeleccionadas.length === 0 || marcasSeleccionadas.includes(producto.brand_id)) &&
+            precioProducto >= precio.min && precioProducto <= precio.max
+        );
+    });
 
 
     const handleColumnasChange = (numColumnas) => {
@@ -172,8 +172,8 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                                     key={num}
                                                     onClick={() => handleProductosPorPaginaChange(num)}
                                                     className={`px-2 py-1 text-sm border transition-colors ${productosPorPagina === num
-                                                            ? 'border-gray-900 bg-gray-900 text-white'
-                                                            : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                                                        ? 'border-gray-900 bg-gray-900 text-white'
+                                                        : 'border-gray-300 text-gray-600 hover:border-gray-400'
                                                         } rounded`}
                                                 >
                                                     {num}
@@ -222,10 +222,9 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                             classNames={{
                                                 control: () => "border z-80 border-gray-300 rounded-md bg-transparent hover:border-gray-400 cursor-pointer",
                                                 option: ({ isFocused, isSelected }) =>
-                                                    `px-3 py-1.5 cursor-pointer ${
-                                                        isSelected
-                                                            ? "bg-gray-900 text-white"
-                                                            : isFocused
+                                                    `px-3 py-1.5 cursor-pointer ${isSelected
+                                                        ? "bg-gray-900 text-white"
+                                                        : isFocused
                                                             ? "bg-gray-100"
                                                             : "text-gray-900"
                                                     }`,
@@ -244,16 +243,16 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                             components={{
                                                 IndicatorSeparator: () => null,
                                                 DropdownIndicator: () => (
-                                                    <svg 
-                                                        className="w-5 h-5 text-gray-500" 
+                                                    <svg
+                                                        className="w-5 h-5 text-gray-500"
                                                         viewBox="0 0 24 24"
                                                         fill="none"
                                                         stroke="currentColor"
                                                     >
-                                                        <path 
-                                                            strokeLinecap="round" 
-                                                            strokeLinejoin="round" 
-                                                            strokeWidth={2} 
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
                                                             d="M19 9l-7 7-7-7"
                                                         />
                                                     </svg>
@@ -333,8 +332,8 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
 
                         {/* Grid de productos */}
                         <div className={`grid gap-4 ${columnas === 2 ? 'grid-cols-2 md:grid-cols-2' :
-                                columnas === 3 ? 'grid-cols-2 md:grid-cols-3' :
-                                    'grid-cols-2 md:grid-cols-4'
+                            columnas === 3 ? 'grid-cols-2 md:grid-cols-3' :
+                                'grid-cols-2 md:grid-cols-4'
                             } grid-flow-row-dense`}>
                             {productosFiltrados.length > 0 ? (
                                 ordenarProductos(productosFiltrados)
@@ -347,10 +346,12 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                                 slug={producto.slug}
                                                 regularPrice={producto.regular_price}
                                                 salePrice={producto.sale_price}
-                                                image={producto.image ? `/storage/${producto.image}` : '/images/no-image.png'}
-                                                brand={producto.brand ? producto.brand.name : null}
+                                                image={producto.image}
+                                                brand={producto.brand}
                                                 inStock={producto.stock > 0}
-                                                isNew={producto.is_new === 'yes' ? true : false}
+                                                isNew={producto.is_new === 'yes'}
+                                                isFavorite={producto.is_favorite}
+                                                onViewProduct={() => route.visit(`/producto/${producto.slug}`)}
                                             />
                                         </div>
                                     ))

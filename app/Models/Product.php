@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -39,6 +40,11 @@ class Product extends Model
     public function images()
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order', 'asc');
+    }
+    
+    public function favoredByUsers()
+    {
+        return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
     }
 
     protected static function boot()
