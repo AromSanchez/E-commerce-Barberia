@@ -25,7 +25,7 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
                     }
                 }}
             >
-                <h2 className="font-bold text-xl">{titulo}</h2>
+                <h2 className="font-bold text-xl ">{titulo}</h2>
                 {abierto ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
             </div>
 

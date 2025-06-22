@@ -15,7 +15,8 @@ export default function CardProduct({
   brand,
   inStock,
   isNew,
-  isFavorite,     
+  isFavorite,
+  showOfferBadge, // <-- Agregado para recibir el prop correctamente
 }) {
   const [isWishlisted, setIsWishlisted] = useState(isFavorite || false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -98,10 +99,10 @@ export default function CardProduct({
   };
 
   return (
-    <div className="relative group w-full mb-3 sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg transform transition-all duration-300 ease-in-out hover:translate-y-[-8px] hover:shadow-xl hover:z-10">
+    <div className="relative group w-full mb-3 sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg transform transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-2 hover:shadow-xl hover:z-10">
 
       {/* Tarjeta del producto */}
-      <div className='absolute inset-[-15px_-15px_-50px_-15px] invisible border border-transparent rounded-md bg-white shadow-[0_0_15px_rgba(0,0,0,0.2)] opacity-0 group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out'></div>
+      <div className='absolute inset-[-12px_-12px_-50px_-12px] invisible border border-transparent rounded-md bg-white shadow-[0_0_15px_rgba(0,0,0,0.2)] opacity-0 group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out'></div>
 
       <div className={`${!inStock ? 'opacity-60 grayscale' : ''} transform transition-transform duration-300`}>
         {/* Imagen */}
@@ -115,6 +116,11 @@ export default function CardProduct({
             {!inStock && (
               <span className="px-3 py-1 text-xs font-bold text-white bg-gray-500 rounded-full shadow-lg z-10">
                 AGOTADO
+              </span>
+            )}
+            {showOfferBadge && (
+              <span className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full z-10 shadow-lg animate-pulse">
+                OFERTA
               </span>
             )}
           </div>

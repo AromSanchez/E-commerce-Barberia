@@ -40,8 +40,9 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
             pageNumbers.push(totalPages);
         }
         return pageNumbers;
-    };    return (
-        <div className="flex justify-center items-center space-x-1 mt-16 mb-5">
+    };    
+    return (
+        <div className="flex justify-center items-center space-x-1 mt-5 mb-2">
             {/* Botón Anterior */}
             <button
                 onClick={() => onPageChange(currentPage - 1)}

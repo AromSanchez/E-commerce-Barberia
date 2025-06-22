@@ -8,7 +8,7 @@ import { TfiLayoutGrid2, TfiLayoutGrid3, TfiLayoutGrid4 } from 'react-icons/tfi'
 export default function ProductsOfertas({ productos = [] }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [columnas, setColumnas] = useState(4);
-    const [productsPerPage, setProductsPerPage] = useState(8); // Cambia a estado para control dinámico
+    const [productsPerPage, setProductsPerPage] = useState(8);
     const [orden, setOrden] = useState('predeterminado');
 
     const options = [
@@ -56,38 +56,44 @@ export default function ProductsOfertas({ productos = [] }) {
     };
 
     return (
-        <div className="flex overflow-y-hidden min-h-screen bg-gradient-to-t to-gray-50 from-white py-6">
-            <div className="w-[75%] mx-auto">
-                <Breadcrumb 
-                    baseItems={['Inicio', 'Ofertas']}
-                    separator=">"
-                    onHomeClick={() => {
-                        window.location.href = '/';
-                    }}
-                />
-                <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">
-                    Ofertas Especiales
-                </h1>
+        <div className="flex overflow-y-hidden min-h-screen bg-gradient-to-t to-gray-50 from-white py-3 md:py-6">
+            <div className="w-full max-w-7xl mt-4 mx-auto px-3 sm:px-4 md:px-6 lg:px-8"> 
 
-                {/* Controles superiores */}
-                <div className="flex flex-col mb-8">
-                    <div className="flex justify-between items-center">
-                        {/* Mostrando X–Y de Z resultados */}
-                        <div className="text-sm text-gray-600 min-w-[200px]">
+                 {/* Controles */}              
+                <div className="flex flex-col gap-4 px-1 mb-6">
+                    {/* Contenedor superior con breadcrumb e información */}
+                    <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
+                        <div className="flex-shrink-0">
+                            <Breadcrumb 
+                                baseItems={['Inicio', 'Ofertas']}
+                                separator=">"
+                                onHomeClick={() => {
+                                    window.location.href = '/';
+                                }}
+                            />
+                        </div>
+                        
+                        {/* Información de resultados responsive */}
+                        <div className="text-sm text-gray-600">
                             {productosEnOferta.length > 0 && (
                                 <span>
-                                    Mostrando {((currentPage - 1) * productsPerPage) + 1}
-                                    –
-                                    {Math.min(currentPage * productsPerPage, productosEnOferta.length)}
-                                    {' '}de {productosEnOferta.length} resultados
+                                   Mostrando: {((currentPage - 1) * productsPerPage) + 1}—{Math.min(currentPage * productsPerPage, productosEnOferta.length)} de {productosEnOferta.length} resultados
                                 </span>
                             )}
                         </div>
-                        <div className="flex items-center space-x-4">
-                            {/* Control de productos por página */}
-                            <div className="flex items-center gap-3">
-                                <span className="text-sm text-gray-500">Mostrar:</span>
-                                <div className="flex gap-1 items-center">
+                    </div>                   
+
+                    {/* Contenedor de título y selector de orden */}
+                    <div className="flex flex-wrap justify-between items-center gap-4">
+                        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 lg:text-left mb-0">
+                            Ofertas Especiales
+                        </h1>
+
+                        <div className="flex flex-wrap items-center gap-4">
+                            {/* Mostrar Productos */}                     
+                            <div className="hidden lg:flex items-center gap-3">
+                                <span className="text-sm text-gray-500 whitespace-nowrap">Mostrar:</span>
+                                <div className="flex gap-2 items-center">
                                     {[9, 12, 18, 24].map((num) => (
                                         <button
                                             key={num}
@@ -102,55 +108,57 @@ export default function ProductsOfertas({ productos = [] }) {
                                     ))}
                                 </div>
                             </div>
-                            <div className="w-px h-6 bg-gray-300"></div>
+            
                             {/* Selector de columnas */}
-                            <div className="flex items-center border border-gray-300 rounded-md">
-                                <button
-                                    onClick={() => setColumnas(2)}
-                                    className={`px-2 py-1.5 ${columnas === 2 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'} border-r border-gray-300`}
-                                    title="2 Columnas"
-                                >
-                                    <TfiLayoutGrid2 size={16} />
-                                </button>
-                                <button
-                                    onClick={() => setColumnas(3)}
-                                    className={`px-2 py-1.5 ${columnas === 3 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'} border-r border-gray-300`}
-                                    title="3 Columnas"
-                                >
-                                    <TfiLayoutGrid3 size={16} />
-                                </button>
-                                <button
-                                    onClick={() => setColumnas(4)}
-                                    className={`px-2 py-1.5 ${columnas === 4 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'}`}
-                                    title="4 Columnas"
-                                >
-                                    <TfiLayoutGrid4 size={16} />
-                                </button>
+                            <div className="hidden lg:flex items-center gap-2">
+                                <div className="flex items-center border border-gray-300 rounded-md">
+                                    <button
+                                        onClick={() => setColumnas(2)}
+                                        className={`px-2 sm:px-3 py-1.5 ${columnas === 2 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'} border-r border-gray-300`}
+                                        title="2 Columnas"
+                                    >
+                                        <TfiLayoutGrid2 size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => setColumnas(3)}
+                                        className={`px-2 sm:px-3 py-1.5 ${columnas === 3 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'} border-r border-gray-300`}
+                                        title="3 Columnas"
+                                    >
+                                        <TfiLayoutGrid3 size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => setColumnas(4)}
+                                        className={`px-2 sm:px-3 py-1.5 ${columnas === 4 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'}`}
+                                        title="4 Columnas"
+                                    >
+                                        <TfiLayoutGrid4 size={16} />
+                                    </button>
+                                </div>
                             </div>
-                            <div className="w-px h-6 bg-gray-300"></div>
-                            {/* Selector de orden */}
-                            <div className="flex items-center">
+                            
+                            {/* Selector de orden en móvil/tablet */}
+                            <div className="mt-0">
                                 <Select
                                     value={options.find(option => option.value === orden)}
                                     onChange={(selectedOption) => setOrden(selectedOption.value)}
                                     options={options}
                                     classNames={{
-                                        control: () => "border z-80 border-gray-300 rounded-md bg-transparent hover:border-gray-400 cursor-pointer",
+                                        control: () => "border border-gray-300 rounded-md hover:border-gray-400 cursor-pointer shadow-sm",
                                         option: ({ isFocused, isSelected }) =>
-                                            `px-3 py-1.5 cursor-pointer ${
+                                            `px-3 py-2 cursor-pointer ${
                                                 isSelected
                                                     ? "bg-gray-900 text-white"
                                                     : isFocused
                                                         ? "bg-gray-100"
                                                         : "text-gray-900"
                                             }`,
-                                        menu: () => "mt-0 bg-white border border-gray-200 rounded-md shadow-lg relative ",
-                                        menuList: () => "max-h-60 overflow-auto text-sm",
+                                        menu: () => "mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50",
+                                        menuList: () => "max-h-60 overflow-auto text-sm z-10",
                                         singleValue: () => "text-sm font-medium text-gray-900",
                                         placeholder: () => "text-sm font-medium text-gray-500",
-                                        input: () => "text-xs font-medium text-gray-900",
-                                        valueContainer: () => "p-2",
-                                        indicatorsContainer: () => "px-1",
+                                        input: () => "text-sm font-medium text-gray-900",
+                                        valueContainer: () => "px-3 py-2",
+                                        indicatorsContainer: () => "px-2",
                                         indicatorSeparator: () => "bg-gray-300",
                                         dropdownIndicator: () => "text-gray-500 hover:text-gray-800"
                                     }}
@@ -160,7 +168,7 @@ export default function ProductsOfertas({ productos = [] }) {
                                         IndicatorSeparator: () => null,
                                         DropdownIndicator: () => (
                                             <svg
-                                                className="w-5 h-5 text-gray-500"
+                                                className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500"
                                                 viewBox="0 0 24 24"
                                                 fill="none"
                                                 stroke="currentColor"
@@ -178,31 +186,51 @@ export default function ProductsOfertas({ productos = [] }) {
                             </div>
                         </div>
                     </div>
+
                 </div>
 
-                {/* Grid de productos */}
-                <div className={`grid gap-6 ${columnas === 2 ? 'grid-cols-2 md:grid-cols-2' : columnas === 3 ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-4'} grid-flow-row-dense justify-items-center`}>
+                {/* Grid de productos con responsividad fija por dispositivo */}
+                <div className={`grid gap-4 md:gap-6 mb-6 md:mb-8 grid-cols-2 md:grid-cols-3 ${
+                    columnas === 2 
+                        ? 'lg:grid-cols-2' 
+                        : columnas === 3 
+                            ? 'lg:grid-cols-3' 
+                            : 'lg:grid-cols-4'
+                } justify-items-center px-4 sm:px-3 lg:px-0`}>
                     {currentProducts.map(producto => (
-                        <CardProduct
-                            key={producto.id}
-                            id={producto.id}
-                            slug={producto.slug}
-                            name={producto.name}
-                            salePrice={producto.sale_price}
-                            regularPrice={producto.regular_price}
-                            brand={producto.brand ? producto.brand.name : null}
-                            image={producto.image ? `/storage/${producto.image}` : '/images/no-image.png'}
-                            isNew={producto.is_new === 'yes'}
-                            inStock={producto.stock > 0}
-                        />
+                        <div key={producto.id} className="w-full max-w-sm">
+                            <CardProduct
+                                id={producto.id}
+                                slug={producto.slug}
+                                name={producto.name}
+                                salePrice={producto.sale_price}
+                                regularPrice={producto.regular_price}
+                                brand={producto.brand ? producto.brand.name : null}
+                                image={producto.image}
+                                inStock={producto.stock > 0}
+                                showOfferBadge={!!producto.sale_price && producto.sale_price > 0}
+                            />
+                        </div>
                     ))}
                 </div>
+
+                {/* Paginación */}
                 {productosEnOferta.length > 0 && (
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                    />
+                    <div className="mt-8">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
+                )}
+
+                {/* Mensaje cuando no hay productos */}
+                {productosEnOferta.length === 0 && (
+                    <div className="text-center py-12">
+                        <div className="text-gray-500 text-lg mb-2">No hay ofertas disponibles</div>
+                        <div className="text-gray-400 text-sm">Vuelve pronto para ver nuestras ofertas especiales</div>
+                    </div>
                 )}
             </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MessageCircle, X, Send } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 
 const FloatingWhatsAppIcon = () => {
@@ -15,44 +16,92 @@ const FloatingWhatsAppIcon = () => {
         }
     };
 
-    return (
-        <div className="z-10 fixed bottom-3 right-3 p-3 bg-green-500 text-white rounded-full shadow-xl flex items-center justify-center space-x-2 hover:bg-green-600 transition-all cursor-pointer sm:bottom-6 sm:right-6">
-            <FaWhatsapp className="w-10 h-10 sm:w-10 sm:h-10" onClick={() => setIsOpen(!isOpen)} />
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    };
 
-            {/* Popup chat window */}
+    return (
+        <div className="fixed bottom-4 right-4 z-10 sm:bottom-6 sm:right-6">
+            {/* Main WhatsApp Button */}
+            <div 
+                className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <FaWhatsapp className="w-6 h-6 sm:w-7 sm:h-7" />
+            </div>
+
+            {/* Chat Popup Window */}
             {isOpen && (
-                <div
-                    className="absolute bg-white text-gray-800 px-6 py-5 rounded-lg shadow-xl w-72 sm:w-64 mt-4 transform transition-all duration-300 ease-in-out"
-                    style={{
-                        bottom: '80px',
-                        right: '0px',
-                    }}
-                >
-                    <div className="flex justify-between items-center">
-                        <p className="font-medium text-lg text-green-500">Hola 👋</p>
-                        <button
-                            onClick={() => setIsOpen(false)}
-                            className="text-gray-500 hover:text-gray-800 focus:outline-none"
-                        >
-                            ✖
-                        </button>
-                    </div>
-                    <p className="mt-1 text-sm text-gray-600">¿En qué podemos ayudarte?</p>
-                    <textarea
-                        className="mt-4 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                        placeholder="Escribe tu mensaje..."
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        rows="4"
+                <>
+                    {/* Backdrop for mobile */}
+                    <div 
+                        className="fixed inset-0 bg-black bg-opacity-20 sm:hidden -z-10"
+                        onClick={() => setIsOpen(false)}
                     />
-                    <button
-                        onClick={handleSendMessage}
-                        className="mt-3 w-full p-3 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none transition-all"
-                    >
-                        Enviar
-                    </button>
-                    <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white transform rotate-45 shadow-md"></div>
-                </div>
+                    
+                    {/* Chat Window */}
+                    <div className="absolute bottom-16 right-0 bg-white rounded-2xl shadow-2xl border border-gray-200 w-80 sm:w-72 max-w-[90vw] transform transition-all duration-300 ease-out animate-in slide-in-from-bottom-4">
+                        {/* Header */}
+                        <div className="bg-green-500 text-white p-4 rounded-t-2xl flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                    <FaWhatsapp className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-lg">WhatsApp</h3>
+                                    <p className="text-xs text-green-100">En línea</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="text-white hover:bg-white hover:bg-opacity-20 p-1 rounded-full transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Chat Content */}
+                        <div className="p-4">
+                            {/* Welcome Message */}
+                            <div className="bg-gray-50 p-3 rounded-lg mb-4">
+                                <p className="text-sm text-gray-700">
+                                    <span className="text-lg">👋</span> ¡Hola! 
+                                </p>
+                                <p className="text-sm text-gray-600 mt-1">
+                                    ¿En qué podemos ayudarte hoy?
+                                </p>
+                            </div>
+
+                            {/* Message Input */}
+                            <div className="space-y-3">
+                                <textarea
+                                    className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-sm"
+                                    placeholder="Escribe tu mensaje aquí..."
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                    rows="3"
+                                />
+                                
+                                {/* Send Button */}
+                                <button
+                                    onClick={handleSendMessage}
+                                    disabled={!message.trim()}
+                                    className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 font-medium"
+                                >
+                                    <Send className="w-4 h-4" />
+                                    <span>Enviar mensaje</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Chat Tail */}
+                        <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white border-r border-b border-gray-200 transform rotate-45"></div>
+                    </div>
+                </>
             )}
         </div>
     );

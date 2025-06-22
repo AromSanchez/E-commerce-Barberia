@@ -52,7 +52,7 @@ Route::get('/carrito', function () {
     return Inertia::render('VerCarrito');
 })->name('carrito');
     
-Route::get('/ofertas', [\App\Http\Controllers\PublicProductController::class, 'ofertas'])->name('ofertas');
+Route::get('/ofertas', [PublicProductController::class, 'ofertas'])->name('ofertas');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -122,6 +122,40 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Rutas de pago con Stripe
+Route::middleware('auth')->group(function () {
+    Route::post('/create-payment-intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent'])
+        ->name('payment.create-intent');
+});
+
+use Illuminate\Support\Facades\Config;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout', function () {
+        $cart = session('cart', []);
+        
+        if (empty($cart)) {
+            return redirect()->route('carrito');
+        }
+
+        $total = array_reduce($cart, function($carry, $item) {
+            return $carry + ($item['price'] * $item['quantity']);
+        }, 0);
+
+        return \Inertia\Inertia::render('Checkout/Index', [
+            'total' => $total,
+            'stripeKey' => \Illuminate\Support\Facades\Config::get('services.stripe.key'),
+        ]);
+    })->name('checkout');
+});
+
+// Ruta para crear preferencia de MercadoPago
+use App\Http\Controllers\PaymentController;
+
+Route::post('/mercadopago/preference', [PaymentController::class, 'createMercadoPagoPayment'])->name('mercadopago.preference');
+
 require __DIR__.'/auth.php';
+
+
 
 

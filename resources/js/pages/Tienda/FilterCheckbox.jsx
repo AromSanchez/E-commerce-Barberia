@@ -34,19 +34,32 @@ export default function FiltroCheckbox({ titulo = 'XXXXX', opciones = [], selecc
                     {opciones.map((opcion) => (
                         <label
                             key={opcion.valor}
-                            className={`w-full flex items-center justify-between py-1.5 group transition-colors cursor-pointer ${
-                                seleccionados.includes(opcion.valor)
-                                    ? 'text-gray-900'
-                                    : 'text-gray-600 hover:text-gray-900'
-                            }`}
+                            className="group flex items-center justify-between py-2 px-0 rounded-lg cursor-pointer transition-colors"
                         >
                             <div className="flex items-center gap-2 flex-1">
-                                <input
-                                    type="checkbox"
-                                    checked={seleccionados.includes(opcion.valor)}
-                                    onChange={() => toggleOpcion(opcion.valor)}
-                                    className="accent-gray-900 w-4 h-4 rounded-full"
-                                />
+                                {/* Custom Checkbox */}
+                                <span className="relative flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={seleccionados.includes(opcion.valor)}
+                                        onChange={() => toggleOpcion(opcion.valor)}
+                                        className="peer absolute -left-0 top-0 w-5 h-5 opacity-0 z-10 cursor-pointer outline-none focus:outline-none"
+                                        tabIndex={-1}
+                                    />
+                                    <span className={`
+                                        w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all
+                                        ${seleccionados.includes(opcion.valor)
+                                            ? 'border-gray-900 bg-gray-900 shadow-md'
+                                            : 'border-gray-300 bg-white'}
+                                    `}>
+                                        {seleccionados.includes(opcion.valor) && (
+                                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        )}
+                                    </span>
+                                </span>
+                                {/* Logo y Nombre */}
                                 {opcion.logo && (
                                     <div className="flex items-center gap-2 flex-1">
                                         <img
