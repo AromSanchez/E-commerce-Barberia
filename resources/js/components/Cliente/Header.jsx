@@ -4,6 +4,7 @@ import MainHeader from './MainHeader';
 import MobileMenu from './MobileMenu';
 import MenuCart from './MenuCart';
 import { FaShippingFast, FaClock } from 'react-icons/fa';
+import { usePage } from '@inertiajs/react';
 import { HiOutlineLocationMarker, HiOutlinePhone } from 'react-icons/hi';
 import { useCart } from '@/contexts/CartContext';
 
@@ -114,9 +115,10 @@ export default function Header() {
       />
 
       {/* Carrito */}
-      <MenuCart 
+      <MenuCart
         isOpen={isCartOpen}
         onClose={closeCart}
+        auth={usePage().props.auth}
       />
     </header>
   );

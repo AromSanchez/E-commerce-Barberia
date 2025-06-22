@@ -5,6 +5,7 @@ import TablaProductos from "./Carrito/TablaProductos";
 import PanelTotales from "./Carrito/PanelTotales";
 import axios from 'axios';
 import Breadcrumb from "@/components/Cliente/Breadcrumb";
+import PaymentForm from '@/components/PaymentForm';
 
 export default function VerCarrito() {
   const [cart, setCart] = useState([]);
@@ -15,6 +16,7 @@ export default function VerCarrito() {
   const [undoTimeout, setUndoTimeout] = useState(null);
   const [couponCode, setCouponCode] = useState('');
   const [shippingOption, setShippingOption] = useState('pickup');
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   // Función para obtener el carrito con manejo de errores mejorado
   const fetchCart = useCallback(async () => {
@@ -234,13 +236,7 @@ export default function VerCarrito() {
       return;
     }
 
-    // Redirigir a checkout o mostrar modal de checkout
-    // window.location.href = route('checkout');
-    toast.info('Redirigiendo al checkout...', {
-      position: "top-right",
-      autoClose: 1000,
-      hideProgressBar: true
-    });
+    window.location.href = route('checkout');
   };
 
   return (
@@ -293,6 +289,7 @@ export default function VerCarrito() {
               updating={updating}
               handleCheckout={handleCheckout}
             />
+            {/* Eliminado el formulario de pago embebido */}
           </div>
         </div>
       </div>
