@@ -12,12 +12,16 @@ import { toast } from 'react-toastify';
 // Inicializar stripe después de obtener la clave pública del servidor
 let stripePromise = null;
 
-const CheckoutForm = ({ total, onSuccess }) => {
+const CheckoutForm = ({ total = 0, amount = 0, onSuccess }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [amountInUSD, setAmountInUSD] = useState(null);
+  
+  // Usar amount si está disponible, si no usar total
+  const paymentAmount = amount || total;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -29,18 +33,22 @@ const CheckoutForm = ({ total, onSuccess }) => {
       return;
     }
 
-    try {
-      // Usar el total del carrito
-      const amount = total || 10.00;
+    if (!paymentAmount || paymentAmount <= 0) {
+      setError('El monto a pagar no es válido');
+      setProcessing(false);
+      return;
+    }
 
-      // Crear PaymentIntent en backend usando la ruta correcta
+    try {
       const { data } = await axios.post(route('payment.create-intent'), { 
-        amount: amount
+        amount: paymentAmount
       });
 
       if (!data.clientSecret) {
         throw new Error('No se recibió el client secret del servidor');
       }
+
+      setAmountInUSD(data.amountInUSD);
 
       const cardElement = elements.getElement(CardElement);
 
@@ -71,9 +79,23 @@ const CheckoutForm = ({ total, onSuccess }) => {
     }
   };
 
+  if (!paymentAmount || paymentAmount <= 0) {
+    return (
+      <div className="mt-4 p-4 border rounded-lg shadow-sm">
+        <p className="text-red-600">No hay un monto válido para procesar el pago</p>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4 p-4 border rounded-lg shadow-sm">
       <h3 className="text-lg font-semibold mb-4">Pagar con tarjeta</h3>
+      <div className="mb-4">
+        <p className="text-sm text-gray-600">Monto en Soles: S/ {Number(paymentAmount).toFixed(2)}</p>
+        {amountInUSD && (
+          <p className="text-sm text-gray-600">Monto aproximado en USD: $ {Number(amountInUSD).toFixed(2)}</p>
+        )}
+      </div>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <CardElement className="p-3 border rounded" options={{
@@ -93,10 +115,10 @@ const CheckoutForm = ({ total, onSuccess }) => {
         </div>
         <button
           type="submit"
-          disabled={!stripe || processing}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50"
+          disabled={!stripe || processing || !paymentAmount}
+          className="w-full bg-black text-white py-3 rounded-2xl hover:bg-gray-900 disabled:opacity-50"
         >
-          {processing ? 'Procesando...' : `Pagar S/ ${total ? total.toFixed(2) : ''}`}
+          {processing ? 'Procesando...' : `Pagar S/ ${Number(paymentAmount).toFixed(2)}`}
         </button>
         {error && <div className="mt-2 text-red-600">{error}</div>}
         {success && <div className="mt-2 text-green-600">¡Pago realizado con éxito!</div>}
@@ -105,11 +127,11 @@ const CheckoutForm = ({ total, onSuccess }) => {
   );
 };
 
-const PaymentForm = ({ total, stripeKey }) => {
+const PaymentForm = ({ total = 0, amount = 0, stripeKey }) => {
   const [stripeLoaded, setStripeLoaded] = useState(false);
+  const paymentAmount = amount || total;
 
   useEffect(() => {
-    // Inicializar Stripe con la clave pública recibida como prop
     if (!stripePromise && stripeKey) {
       stripePromise = loadStripe(stripeKey);
       setStripeLoaded(true);
@@ -120,9 +142,13 @@ const PaymentForm = ({ total, stripeKey }) => {
     return <div>Cargando...</div>;
   }
 
+  if (!paymentAmount || paymentAmount <= 0) {
+    return <div>No hay un monto válido para procesar</div>;
+  }
+
   return (
     <Elements stripe={stripePromise}>
-      <CheckoutForm total={total} />
+      <CheckoutForm total={total} amount={amount} />
     </Elements>
   );
 };

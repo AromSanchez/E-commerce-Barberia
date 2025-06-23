@@ -32,19 +32,27 @@ class PaymentController extends Controller
             // Configurar Stripe con la clave secreta
             Stripe::setApiKey($stripeSecret);
 
+            // Convertir el monto de PEN a USD (usando una tasa aproximada de 1 PEN = 0.27 USD)
+            // Nota: Deberías usar un servicio de tipos de cambio en tiempo real en producción
+            $amountInPEN = $request->amount;
+            $exchangeRate = 0.27; // Tasa de cambio PEN a USD (actualizar según sea necesario)
+            $amountInUSD = $amountInPEN * $exchangeRate;
+
             // Log para debugging
             Log::info('Creando PaymentIntent', [
-                'amount' => $request->amount,
-                'currency' => 'usd'
+                'amount_pen' => $amountInPEN,
+                'amount_usd' => $amountInUSD,
+                'exchange_rate' => $exchangeRate
             ]);
 
             $paymentIntent = PaymentIntent::create([
-                'amount' => intval($request->amount * 100), // convertir a centavos
-                'currency' => 'pen', // Moneda peruana (PEN)
+                'amount' => intval($amountInUSD * 100), // convertir a centavos
+                'currency' => 'usd', // Usar USD ya que PEN no está soportado
                 'payment_method_types' => ['card'],
                 'metadata' => [
                     'order_id' => uniqid('order_'),
-                    'customer_ip' => $request->ip()
+                    'customer_ip' => $request->ip(),
+                    'original_amount_pen' => $amountInPEN
                 ]
             ]);
 
@@ -54,7 +62,8 @@ class PaymentController extends Controller
 
             return response()->json([
                 'clientSecret' => $paymentIntent->client_secret,
-                'publicKey' => $stripeKey
+                'publicKey' => $stripeKey,
+                'amountInUSD' => $amountInUSD
             ]);
 
         } catch (\Stripe\Exception\ApiErrorException $e) {
