@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('quantity');
 
             // Precio unitario en ese momento (en PEN)
-            $table->decimal('price_pen', 10, 2);
+            $table->decimal('price', 10, 2);
 
             $table->timestamps();
         });

@@ -101,7 +101,7 @@ export default function Checkout({ total, stripeKey, cart }) {
               onChange={(e) => setPaymentMethod(e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="stripe">Tarjeta de crédito</option>
+              <option value="stripe">Tarjeta de Débito o Crédito</option>
             </select>
           </div>
         </div>

@@ -131,9 +131,9 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::middleware('auth')->group(function () {
-    Route::post('/orden/guardar', [OrderController::class, 'store'])->name('order.store');
-});
+Route::post('/orden/guardar', [OrderController::class, 'store'])->name('order.store');
+
+
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', function () {

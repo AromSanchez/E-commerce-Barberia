@@ -8,6 +8,7 @@ import {
 } from '@stripe/react-stripe-js';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { route } from 'ziggy-js';
 
 // Inicializar stripe después de obtener la clave pública del servidor
 let stripePromise = null;
@@ -70,6 +71,7 @@ const CheckoutForm = ({ total = 0, amount = 0, onSuccess, customerData = {}, pro
         toast.error('Error en el pago: ' + paymentResult.error.message);
       } else {
         if (paymentResult.paymentIntent.status === 'succeeded') {
+          console.log('Ruta del backend:', route('order.store'));
           await axios.post(route('order.store'), {
             amount: paymentAmount,
             customer_name: customerData.customer_name,

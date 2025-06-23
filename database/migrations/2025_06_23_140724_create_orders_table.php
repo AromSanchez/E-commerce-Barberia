@@ -18,8 +18,11 @@ return new class extends Migration
             $table->string('customer_phone');
             $table->text('shipping_address');
             $table->decimal('total_amount', 10, 2);
-            $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
-            $table->enum('order_status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])->default('pending');
+
+            // 👇 Columnas en inglés, pero valores en español
+            $table->enum('payment_status', ['pendiente', 'pagado', 'fallido'])->default('pendiente');
+            $table->enum('order_status', ['pendiente', 'procesando', 'enviado', 'entregado', 'cancelado'])->default('pendiente');
+
             $table->timestamps();
         });
     }
