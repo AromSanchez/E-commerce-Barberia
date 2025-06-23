@@ -12,14 +12,14 @@ import { toast } from 'react-toastify';
 // Inicializar stripe después de obtener la clave pública del servidor
 let stripePromise = null;
 
-const CheckoutForm = ({ total = 0, amount = 0, onSuccess }) => {
+const CheckoutForm = ({ total = 0, amount = 0, onSuccess, customerData = {}, products = [] }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [amountInUSD, setAmountInUSD] = useState(null);
-  
+
   // Usar amount si está disponible, si no usar total
   const paymentAmount = amount || total;
 
@@ -40,8 +40,15 @@ const CheckoutForm = ({ total = 0, amount = 0, onSuccess }) => {
     }
 
     try {
-      const { data } = await axios.post(route('payment.create-intent'), { 
-        amount: paymentAmount
+      const { data } = await axios.post(route('payment.create-intent'), {
+        amount: paymentAmount,
+        customer_name: customerData.customer_name,
+        customer_phone: customerData.customer_phone,
+        shipping_address: customerData.shipping_address,
+        products: products.map(p => ({
+          id: p.id,
+          quantity: p.quantity
+        }))
       });
 
       if (!data.clientSecret) {
@@ -63,13 +70,23 @@ const CheckoutForm = ({ total = 0, amount = 0, onSuccess }) => {
         toast.error('Error en el pago: ' + paymentResult.error.message);
       } else {
         if (paymentResult.paymentIntent.status === 'succeeded') {
+          await axios.post(route('order.store'), {
+            amount: paymentAmount,
+            customer_name: customerData.customer_name,
+            customer_phone: customerData.customer_phone,
+            shipping_address: customerData.shipping_address,
+            products: products.map(p => ({
+              id: p.id,
+              quantity: p.quantity
+            }))
+          });
+
           setSuccess(true);
-          toast.success('¡Pago realizado con éxito!');
-          if (onSuccess) {
-            onSuccess();
-          }
+          toast.success('¡Pago realizado y orden guardada!');
+          if (onSuccess) onSuccess();
         }
       }
+
     } catch (err) {
       console.error('Error en el pago:', err);
       setError(err.response?.data?.error || 'Error al procesar el pago');
@@ -111,11 +128,18 @@ const CheckoutForm = ({ total = 0, amount = 0, onSuccess }) => {
                 color: '#9e2146',
               },
             },
-          }}/>
+          }} />
         </div>
         <button
           type="submit"
-          disabled={!stripe || processing || !paymentAmount}
+          disabled={
+            !stripe ||
+            processing ||
+            !paymentAmount ||
+            !customerData.customer_name?.trim() ||
+            !customerData.customer_phone?.trim() ||
+            !customerData.shipping_address?.trim()
+          }
           className="w-full bg-black text-white py-3 rounded-2xl hover:bg-gray-900 disabled:opacity-50"
         >
           {processing ? 'Procesando...' : `Pagar S/ ${Number(paymentAmount).toFixed(2)}`}
@@ -127,7 +151,7 @@ const CheckoutForm = ({ total = 0, amount = 0, onSuccess }) => {
   );
 };
 
-const PaymentForm = ({ total = 0, amount = 0, stripeKey }) => {
+const PaymentForm = ({ total = 0, amount = 0, stripeKey, customerData = {}, products = [], onSuccess }) => {
   const [stripeLoaded, setStripeLoaded] = useState(false);
   const paymentAmount = amount || total;
 
@@ -148,7 +172,12 @@ const PaymentForm = ({ total = 0, amount = 0, stripeKey }) => {
 
   return (
     <Elements stripe={stripePromise}>
-      <CheckoutForm total={total} amount={amount} />
+      <CheckoutForm total={total}
+        amount={amount}
+        onSuccess={onSuccess}
+        customerData={customerData}
+        products={products}
+      />
     </Elements>
   );
 };

@@ -4,9 +4,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ProductController;
+use Illuminate\Support\Facades\Config;
 use App\Http\Controllers\PublicProductController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
@@ -51,7 +53,7 @@ Route::get('/nosotros', function () {
 Route::get('/carrito', function () {
     return Inertia::render('VerCarrito');
 })->name('carrito');
-    
+
 Route::get('/ofertas', [PublicProductController::class, 'ofertas'])->name('ofertas');
 
 Route::get('/dashboard', function () {
@@ -73,7 +75,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
 // Brands Routes
 
-Route::middleware(['auth','verified', 'admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/dashboard/brand', [BrandController::class, 'index'])
         ->name('dashboard.brand');
     Route::post('/dashboard/brand', [BrandController::class, 'store'])
@@ -86,12 +88,12 @@ Route::middleware(['auth','verified', 'admin'])->group(function () {
 
 
 
-Route::get('/dashboard/coupon', function(){
+Route::get('/dashboard/coupon', function () {
     return Inertia::render('DashAdmin/DashCoupon');
 })->middleware(['auth', 'verified', 'admin'])->name('dashboard.coupon');
 
-Route::get('/dashboard/users', [UsersController::class, 'index'])->middleware(['auth','verified', 'admin'])->name('dashboard.users');
-Route::put('/dashboard/users/{id}', [UsersController::class, 'updateRole'])->middleware(['auth','verified', 'admin'])->name('dashboard.users.update-role');
+Route::get('/dashboard/users', [UsersController::class, 'index'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.users');
+Route::put('/dashboard/users/{id}', [UsersController::class, 'updateRole'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.users.update-role');
 
 Route::get('/dashboard/products', [ProductController::class, 'index'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.product');
 Route::delete('/dashboard/products/{id}', [ProductController::class, 'destroy'])->name('dashboard.products.destroy');
@@ -102,9 +104,9 @@ Route::post('/dashboard/addproducts', [ProductController::class, 'store'])->midd
 Route::get('/dashboard/products/{product}/edit/', [ProductController::class, 'edit'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.products.edit');
 Route::patch('/dashboard/products/{product}/edit/', [ProductController::class, 'update'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.products.update');
 
-Route::get('/dashboard/orders', function(){
+Route::get('/dashboard/orders', function () {
     return Inertia::render('DashAdmin/DashOrders/DashOrder');
-})->middleware(['auth','verified', 'admin'])->name('dashboard.orders');
+})->middleware(['auth', 'verified', 'admin'])->name('dashboard.orders');
 
 // Rutas del carrito
 Route::group(['prefix' => 'cart'], function () {
@@ -128,34 +130,30 @@ Route::middleware('auth')->group(function () {
         ->name('payment.create-intent');
 });
 
-use Illuminate\Support\Facades\Config;
+
+Route::middleware('auth')->group(function () {
+    Route::post('/orden/guardar', [OrderController::class, 'store'])->name('order.store');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', function () {
         $cart = session('cart', []);
-        
+
         if (empty($cart)) {
             return redirect()->route('carrito');
         }
 
-        $total = array_reduce($cart, function($carry, $item) {
+        $total = array_reduce($cart, function ($carry, $item) {
             return $carry + ($item['price'] * $item['quantity']);
         }, 0);
 
         return \Inertia\Inertia::render('Checkout/Index', [
             'total' => $total,
-            'stripeKey' => \Illuminate\Support\Facades\Config::get('services.stripe.key'),
+            'stripeKey' => Config::get('services.stripe.key'),
+            'cart' => $cart,
         ]);
     })->name('checkout');
 });
 
-// Ruta para crear preferencia de MercadoPago
-use App\Http\Controllers\PaymentController;
 
-Route::post('/mercadopago/preference', [PaymentController::class, 'createMercadoPagoPayment'])->name('mercadopago.preference');
-
-require __DIR__.'/auth.php';
-
-
-
-
+require __DIR__ . '/auth.php';
