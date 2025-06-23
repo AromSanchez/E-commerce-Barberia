@@ -3,33 +3,48 @@ import CardProduct from "@/components/Cliente/CardProduct";
 import Pagination from "@/components/Cliente/Pagination";
 import { useState, useMemo } from "react";
 import Select from 'react-select';
-import { TfiLayoutGrid2, TfiLayoutGrid3, TfiLayoutGrid4 } from 'react-icons/tfi';
 
 export default function ProductsOfertas({ productos = [] }) {
     const [currentPage, setCurrentPage] = useState(1);
-    const [columnas, setColumnas] = useState(4);
-    const [productsPerPage, setProductsPerPage] = useState(8);
-    const [orden, setOrden] = useState('predeterminado');
+    const [productsPerPage, setProductsPerPage] = useState(
+        () => parseInt(localStorage.getItem('productsPerPage')) || 9
+    );
+    const [orden, setOrden] = useState(
+        () => localStorage.getItem('ordenProductos') || 'predeterminado'
+    );
+
+    // Actualizar el localStorage cuando cambian las preferencias
+    const handleProductsPerPageChange = (num) => {
+        setProductsPerPage(num);
+        setCurrentPage(1);
+        localStorage.setItem('productsPerPage', num);
+    };
+
+    const handleOrdenChange = (selectedOption) => {
+        setOrden(selectedOption.value);
+        localStorage.setItem('ordenProductos', selectedOption.value);
+    };
 
     const options = [
         { value: 'predeterminado', label: 'Orden Predeterminado' },
+        { value: 'descuentoDesc', label: 'Mayor descuento' },
         { value: 'precioAsc', label: 'Precio: Menor a Mayor' },
-        { value: 'precioDesc', label: 'Precio: Mayor a Menor' },
-        { value: 'popularidad', label: 'Por popularidad' },
-        { value: 'nuevos', label: 'Más recientes' }
+        { value: 'precioDesc', label: 'Precio: Mayor a Menor' }
     ];
 
     // Ordenar productos según selección
     const ordenarProductos = (productos) => {
         switch (orden) {
+            case 'descuentoDesc':
+                return productos.slice().sort((a, b) => {
+                    const descuentoA = ((a.regular_price - a.sale_price) / a.regular_price) * 100;
+                    const descuentoB = ((b.regular_price - b.sale_price) / b.regular_price) * 100;
+                    return descuentoB - descuentoA;
+                });
             case 'precioAsc':
                 return productos.slice().sort((a, b) => (a.sale_price ?? a.regular_price) - (b.sale_price ?? b.regular_price));
             case 'precioDesc':
                 return productos.slice().sort((a, b) => (b.sale_price ?? b.regular_price) - (a.sale_price ?? a.regular_price));
-            case 'popularidad':
-                return productos.slice().sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
-            case 'nuevos':
-                return productos.slice().reverse();
             default:
                 return productos;
         }
@@ -60,7 +75,7 @@ export default function ProductsOfertas({ productos = [] }) {
             <div className="w-full max-w-7xl mt-4 mx-auto px-3 sm:px-4 md:px-6 lg:px-8"> 
 
                  {/* Controles */}              
-                <div className="flex flex-col gap-4 px-1 mb-6">
+                <div className="flex flex-col gap-4 px-1 mb-9">
                     {/* Contenedor superior con breadcrumb e información */}
                     <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
                         <div className="flex-shrink-0">
@@ -92,15 +107,16 @@ export default function ProductsOfertas({ productos = [] }) {
                         <div className="flex flex-wrap items-center gap-4">
                             {/* Mostrar Productos */}                     
                             <div className="hidden lg:flex items-center gap-3">
-                                <span className="text-sm text-gray-500 whitespace-nowrap">Mostrar:</span>
-                                <div className="flex gap-2 items-center">
+                                <span className="text-sm text-gray-500 font-medium whitespace-nowrap">Mostrar:</span>
+                                <div className="flex gap-1.5 items-center">
                                     {[9, 12, 18, 24].map((num) => (
                                         <button
                                             key={num}
-                                            onClick={() => { setProductsPerPage(num); setCurrentPage(1); }}
-                                            className={`px-2 py-1 text-sm border transition-colors ${productsPerPage === num
-                                                ? 'border-gray-900 bg-gray-900 text-white'
-                                                : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                                            onClick={() => handleProductsPerPageChange(num)}
+                                            className={`px-2 py-1 text-sm border transition-colors ${
+                                                productsPerPage === num
+                                                    ? 'border-gray-900 bg-gray-900 text-white font-bold'
+                                                    : 'border-gray-300 text-gray-600 hover:border-gray-400'
                                             } rounded`}
                                         >
                                             {num}
@@ -108,46 +124,19 @@ export default function ProductsOfertas({ productos = [] }) {
                                     ))}
                                 </div>
                             </div>
-            
-                            {/* Selector de columnas */}
-                            <div className="hidden lg:flex items-center gap-2">
-                                <div className="flex items-center border border-gray-300 rounded-md">
-                                    <button
-                                        onClick={() => setColumnas(2)}
-                                        className={`px-2 sm:px-3 py-1.5 ${columnas === 2 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'} border-r border-gray-300`}
-                                        title="2 Columnas"
-                                    >
-                                        <TfiLayoutGrid2 size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => setColumnas(3)}
-                                        className={`px-2 sm:px-3 py-1.5 ${columnas === 3 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'} border-r border-gray-300`}
-                                        title="3 Columnas"
-                                    >
-                                        <TfiLayoutGrid3 size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => setColumnas(4)}
-                                        className={`px-2 sm:px-3 py-1.5 ${columnas === 4 ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'}`}
-                                        title="4 Columnas"
-                                    >
-                                        <TfiLayoutGrid4 size={16} />
-                                    </button>
-                                </div>
-                            </div>
                             
                             {/* Selector de orden en móvil/tablet */}
                             <div className="mt-0">
                                 <Select
                                     value={options.find(option => option.value === orden)}
-                                    onChange={(selectedOption) => setOrden(selectedOption.value)}
+                                    onChange={handleOrdenChange}
                                     options={options}
                                     classNames={{
                                         control: () => "border border-gray-300 rounded-md hover:border-gray-400 cursor-pointer shadow-sm",
                                         option: ({ isFocused, isSelected }) =>
                                             `px-3 py-2 cursor-pointer ${
                                                 isSelected
-                                                    ? "bg-gray-900 text-white"
+                                                    ? "bg-gray-900 text-white font-bold"
                                                     : isFocused
                                                         ? "bg-gray-100"
                                                         : "text-gray-900"
@@ -186,17 +175,10 @@ export default function ProductsOfertas({ productos = [] }) {
                             </div>
                         </div>
                     </div>
-
                 </div>
 
-                {/* Grid de productos con responsividad fija por dispositivo */}
-                <div className={`grid gap-4 md:gap-6 mb-6 md:mb-8 grid-cols-2 md:grid-cols-3 ${
-                    columnas === 2 
-                        ? 'lg:grid-cols-2' 
-                        : columnas === 3 
-                            ? 'lg:grid-cols-3' 
-                            : 'lg:grid-cols-4'
-                } justify-items-center px-4 sm:px-3 lg:px-0`}>
+                {/* Grid de productos con responsividad fija */}
+                <div className="grid gap-4 md:gap-6 mb-6 md:mb-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center px-4 sm:px-3 lg:px-0">
                     {currentProducts.map(producto => (
                         <div key={producto.id} className="w-full max-w-sm">
                             <CardProduct
