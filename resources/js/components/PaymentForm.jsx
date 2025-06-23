@@ -83,6 +83,9 @@ const CheckoutForm = ({ total = 0, amount = 0, onSuccess, customerData = {}, pro
             }))
           });
 
+          // Vaciar el carrito después de una compra exitosa
+          await axios.post(route('cart.clear'));
+
           setSuccess(true);
           toast.success('¡Pago realizado y orden guardada!');
           if (onSuccess) onSuccess();
