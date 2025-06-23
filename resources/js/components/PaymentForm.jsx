@@ -89,6 +89,11 @@ const CheckoutForm = ({ total = 0, amount = 0, onSuccess, customerData = {}, pro
           setSuccess(true);
           toast.success('¡Pago realizado y orden guardada!');
           if (onSuccess) onSuccess();
+
+          // Redirigir a la tienda después de 2 segundos
+          setTimeout(() => {
+            window.location.href = route('products.index');
+          }, 2000);
         }
       }
 
