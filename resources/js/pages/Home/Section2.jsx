@@ -1,23 +1,84 @@
 export default function Section2() {
+    const categories = [
+        {
+            id: 1,
+            name: 'Equipamientos',
+            slug: 'equipamientos',
+            image: '/images/lavaCate.jpg',
+            alt: 'Equipamientos de barbería'
+        },
+        {
+            id: 2,
+            name: 'Accesorios',
+            slug: 'accesorios',
+            image: '/images/papa.jpg',
+            alt: 'Accesorios de barbería'
+        },
+        {
+            id: 3,
+            name: 'Tijeras y Navajas',
+            slug: 'tijeras-navajas',
+            image: '/images/lakme.jpg',
+            alt: 'Tijeras y Navajas'
+        },
+        {
+            id: 4,
+            name: 'Máquinas y Partes',
+            slug: 'maquinas-partes',
+            image: '/images/lakmeRes.jpg',
+            alt: 'Máquinas y Partes'
+        },
+        {
+            id: 5,
+            name: 'Herramientas',
+            slug: 'herramientas',
+            image: '/images/des.png',
+            alt: 'Herramientas de barbería'
+        },
+        {
+            id: 6,
+            name: 'Productos',
+            slug: 'productos',
+            image: '/images/CeraPrin.png',
+            alt: 'Productos de barbería'
+        }    ];
+
     return (
-        <section className="bg-white dark:bg-gray-900">
-        <div className="container px-6 py-10 mx-auto">
-            <div className="flex flex-col items-center justify-between lg:flex-row">
-            <div className="max-w-lg">
-                <h1 className="text-3xl font-semibold text-gray-800 capitalize lg:text-4xl dark:text-white">
-                We are here to help you
-                </h1>
-                <p className="mt-4 text-gray-500 dark:text-gray-300">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.
-                </p>
+        <section className="py-12 bg-gray-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 className="text-3xl font-bold text-center mb-8">Nuestras Categorías</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {categories.reduce((acc, category, index) => {
+                        const columnIndex = Math.floor(index / 2);
+                        if (!acc[columnIndex]) {
+                            acc[columnIndex] = [];
+                        }
+                        acc[columnIndex].push(
+                            <a 
+                                key={category.id}
+                                href={`/categorias/${category.slug}`} 
+                                className="relative overflow-hidden rounded-lg shadow-lg group"
+                            >
+                                <div className="aspect-w-1 aspect-h-1">
+                                    <img 
+                                        src={category.image}
+                                        alt={category.alt}
+                                        className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
+                                    />
+                                </div>
+                                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                    <h3 className="text-white text-2xl font-bold">{category.name}</h3>
+                                </div>
+                            </a>
+                        );
+                        return acc;
+                    }, []).map((column, index) => (
+                        <div key={index} className="grid gap-6">
+                            {column}
+                        </div>
+                    ))}
+                </div>
             </div>
-            <img
-                src="/images/section2-image.png"
-                alt="Section 2 Image"
-                className="w-full max-w-md mt-8 lg:mt-0"
-            />
-            </div>
-        </div>
         </section>
     );
 }

@@ -7,6 +7,7 @@ export default function Home({ auth, laravelVersion, phpVersion }) {
     return (
         <MainLayout title="Inicio">
             <SectionCarrusel />
+            <Section2 />
             <FloatingWhatsAppIcon />
         </MainLayout>
     );

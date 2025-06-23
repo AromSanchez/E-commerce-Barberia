@@ -9,8 +9,14 @@ const FloatingWhatsAppIcon = () => {
 
     const handleSendMessage = () => {
         if (message.trim()) {
-            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
+            const url = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+            // Verificamos si es un dispositivo móvil para usar la app nativa en lugar de WhatsApp Web
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+                window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`, '_blank');
+            } else {
+                window.open(url, '_blank'); // Abrir en nueva pestaña para WhatsApp Web
+            }
             setMessage(''); // Reset message input after sending
             setIsOpen(false); // Close the chat window after sending
         }

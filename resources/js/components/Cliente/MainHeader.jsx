@@ -1,4 +1,4 @@
-import { FiSearch, FiMenu, FiX, FiLogIn, FiLogOut, FiUserPlus, FiTag, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiSearch, FiMenu, FiX, FiLogIn, FiLogOut, FiUserPlus, FiTag, FiChevronLeft, FiChevronRight, FiClock } from 'react-icons/fi';
 import { AiOutlineHeart, AiOutlineShoppingCart, AiOutlineUser, AiOutlineDashboard } from 'react-icons/ai';
 import { CgProfile } from 'react-icons/cg';
 import { BiCategory } from 'react-icons/bi';
@@ -204,21 +204,39 @@ const MainHeader = ({
             <p className="text-xs text-gray-500">{auth.user.email}</p>
           </div>
           {auth.user.role === 'admin' ? (
-            <Link
-              href={route('dashboard')}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
-            >
-              <AiOutlineDashboard className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
-              <span>Dashboard</span>
-            </Link>
+            <>
+              <Link
+                href={route('dashboard')}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+              >
+                <AiOutlineDashboard className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+                <span>Dashboard</span>
+              </Link>
+              <Link
+                href={route('dashboard')}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+              >
+                <FiClock className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+                <span>Ver Pedidos</span>
+              </Link>
+            </>
           ) : (
-            <Link
-              href={route('profile.edit')}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
-            >
-              <CgProfile className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
-              <span>Mi Perfil</span>
-            </Link>
+            <>
+              <Link
+                href={route('profile.edit')}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+              >
+                <CgProfile className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+                <span>Mi Perfil</span>
+              </Link>
+              <Link
+                href={route('profile.edit')}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+              >
+                <FiClock className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+                <span>Ver Pedidos</span>
+              </Link>
+            </>
           )}
           <div className="border-t border-gray-100 mt-2 pt-2">
             <Link

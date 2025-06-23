@@ -184,7 +184,7 @@ export default function CardProduct({
 
           {/* Botones en la parte inferior */}
           <div className="absolute -bottom-11 left-1/2 -translate-x-1/2 translate-y-1 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
-            <div className="flex gap-7 backdrop-blur-sm p-2">
+            <div className="flex gap-3 lg:gap-7 backdrop-blur-sm p-2">
               <button
                 onClick={handleViewProduct}
                 className="p-2 hover:text-opacity-30 transition-colors text-black"
