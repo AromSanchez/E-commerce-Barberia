@@ -6,9 +6,10 @@ import { useState } from "react"
 import { Search, Truck, Eye, FileText } from "lucide-react"
 import { usePage, router } from '@inertiajs/react';
 
-const statusOptions = ["procesando", "enviado", "entregado", "cancelado"];
+const statusOptions = ["pendiente", "procesando", "enviado", "entregado", "cancelado"];
 
 const statusLabels = {
+  pendiente: "Pendiente",
   procesando: "Procesando",
   enviado: "Enviado",
   entregado: "Entregado",
