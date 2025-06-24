@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 
@@ -6,6 +6,23 @@ const FloatingWhatsAppIcon = () => {
     const [message, setMessage] = useState('');
     const [isOpen, setIsOpen] = useState(false);
     const phoneNumber = '968899167'; // Replace with your phone number
+    const popupRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
 
     const handleSendMessage = () => {
         if (message.trim()) {
@@ -33,10 +50,10 @@ const FloatingWhatsAppIcon = () => {
         <div className="fixed bottom-4 right-4 z-10 sm:bottom-6 sm:right-6">
             {/* Main WhatsApp Button */}
             <div 
-                className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95"
+                className="bg-green-500 hover:bg-green-600 text-white p-3 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <FaWhatsapp className="w-6 h-6 sm:w-7 sm:h-7" />
+                <FaWhatsapp className="w-6 h-6 sm:w-10 sm:h-10" />
             </div>
 
             {/* Chat Popup Window */}
@@ -49,7 +66,7 @@ const FloatingWhatsAppIcon = () => {
                     />
                     
                     {/* Chat Window */}
-                    <div className="absolute bottom-16 right-0 bg-white rounded-2xl shadow-2xl border border-gray-200 w-80 sm:w-72 max-w-[90vw] transform transition-all duration-300 ease-out animate-in slide-in-from-bottom-4">
+                    <div ref={popupRef} className="absolute bottom-16 right-0 bg-white rounded-2xl shadow-2xl border border-gray-200 w-80 sm:w-72 max-w-[90vw] transform transition-all duration-300 ease-out animate-in slide-in-from-bottom-4">
                         {/* Header */}
                         <div className="bg-green-500 text-white p-4 rounded-t-2xl flex items-center justify-between">
                             <div className="flex items-center space-x-3">
