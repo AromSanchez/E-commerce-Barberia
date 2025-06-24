@@ -50,6 +50,10 @@ Route::get('/nosotros', function () {
     return Inertia::render('Nosotros');
 })->name('nosotros');
 
+Route::get('/historial', function () {
+    return Inertia::render('Historial');
+})->name('historial');
+
 Route::get('/carrito', function () {
     return Inertia::render('VerCarrito');
 })->name('carrito');

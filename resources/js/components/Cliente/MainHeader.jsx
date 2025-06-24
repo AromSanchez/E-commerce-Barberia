@@ -213,7 +213,7 @@ const MainHeader = ({
                 <span>Dashboard</span>
               </Link>
               <Link
-                href={route('dashboard')}
+                href="/historial"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
               >
                 <FiClock className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
@@ -230,7 +230,7 @@ const MainHeader = ({
                 <span>Mi Perfil</span>
               </Link>
               <Link
-                href={route('profile.edit')}
+                href="/historial"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200 group"
               >
                 <FiClock className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
