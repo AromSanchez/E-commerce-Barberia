@@ -163,4 +163,38 @@ class OrderController extends Controller
             'orders' => $orders,
         ]);
     }
+    public function indexSeguimiento()
+    {
+        $orders = Order::with(['user', 'items.product'])
+            ->latest()
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'customer_name' => $order->customer_name,
+                    'customer_phone' => $order->customer_phone,
+                    'shipping_address' => $order->shipping_address,
+                    'total_amount' => (float) $order->total_amount,
+                    'order_status' => $order->order_status,
+                    'created_at' => $order->created_at->toDateString(),
+                    'items_count' => $order->items->sum('quantity'),
+                ];
+            });
+
+        return Inertia::render('DashAdmin/DashTracking/DashTracking', [
+            'orders' => $orders,
+        ]);
+    }
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'order_status' => 'required|in:procesando,preparando,enviado,entregado,cancelado',
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->order_status = $request->order_status;
+        $order->save();
+
+    }
 }

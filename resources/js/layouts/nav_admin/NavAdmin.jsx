@@ -98,7 +98,7 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                                 <Link href={route('dashboard.orders')} className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
                                     Ordenes
                                 </Link>
-                                <Link href="/dashboard/order-tracking" className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                                <Link href={route('dashboard.tracking')} className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
                                     Seguimiento
                                 </Link>
                             </div>
