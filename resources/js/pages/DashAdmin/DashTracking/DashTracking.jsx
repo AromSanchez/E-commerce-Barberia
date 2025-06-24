@@ -167,6 +167,7 @@ export default function OrderTracking() {
                                     <button
                                       className="h-8 w-8 p-0 flex items-center justify-center rounded hover:bg-green-50 hover:text-green-600 transition-colors"
                                       title="Generar factura"
+                                      onClick={() => window.open(`/ordenes/${order.id}/factura`, '_blank')}
                                     >
                                       <FileText className="h-4 w-4" />
                                     </button>
