@@ -1,22 +1,14 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
 
 export default function Breadcrumb({ 
     baseItems = [], 
-    categoriaSeleccionada = null,
     currentPage = 1,
     onResetFilters,
-    onCategoriaClick,
     onHomeClick
 }) {
     // Construir los items del breadcrumb dinámicamente
     const buildBreadcrumbItems = () => {
         let items = [...baseItems];
-
-        // Agregar categoría si está seleccionada
-        if (categoriaSeleccionada) {
-            items.push(categoriaSeleccionada.name);
-        }
 
         // Agregar número de página si es mayor a 1
         if (currentPage > 1) {
@@ -33,11 +25,6 @@ export default function Breadcrumb({
                 break;
             case 1: // Tienda
                 onResetFilters?.();
-                break;
-            case 2: // Categoría
-                if (categoriaSeleccionada) {
-                    onCategoriaClick?.(categoriaSeleccionada);
-                }
                 break;
             default:
                 break;

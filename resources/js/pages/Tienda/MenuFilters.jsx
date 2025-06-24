@@ -8,6 +8,7 @@ export default function MenuFilters({
   onClose,
   categorias,
   marcas,
+  mainCategories = [],
   categoriasSeleccionadas,
   setCategoriasSeleccionadas,
   marcasSeleccionadas,
@@ -89,10 +90,12 @@ export default function MenuFilters({
             opciones={categorias.map(categoria => ({
               nombre: categoria.name,
               valor: categoria.id,
-              total: categoria.products_count
+              total: categoria.products_count,
+              main_category_id: categoria.main_category_id
             }))}
             seleccionados={categoriasSeleccionadas}
             setSeleccionados={handleCategorias}
+            mainCategories={mainCategories}
           />
         </div>
         <div className="mb-6">

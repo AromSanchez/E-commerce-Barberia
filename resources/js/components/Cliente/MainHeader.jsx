@@ -21,7 +21,8 @@ const MainHeader = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState({ productos: [], marcas: [] });
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const { categories, brands, auth } = usePage().props;
+  const { categories, brands, auth, mainCategories } = usePage().props;
+  console.log('MainHeader Props:', { categories, brands, mainCategories });
   const dropdownRef = useRef(null);
   const userDropdownRef = useRef(null);
   const suggestionsRef = useRef(null);
@@ -131,24 +132,28 @@ const MainHeader = ({
         </div>
 
         <div className="grid grid-cols-2 gap-6">
-          {/* Categorías */}
+          {/* Categorías Principales */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 px-2">
               <BiCategory className="w-5 h-5 text-gray-400" />
-              <h3 className="text-sm font-semibold text-gray-900">Categorías</h3>
+              <h3 className="text-sm font-semibold text-gray-900">Categorías Principales</h3>
             </div>
             <ul className="space-y-1">
-              {categories?.map((category) => (
-                <li key={category.id}>
-                  <Link
-                    href={route('products.category', category.slug)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-all duration-200 group"
-                  >
-                    <FiTag className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
-                    <span className="group-hover:text-gray-900">{category.name}</span>
-                  </Link>
-                </li>
-              ))}
+              {mainCategories && mainCategories.length > 0 ? (
+                mainCategories.map((mainCategory) => (
+                  <li key={mainCategory.id}>
+                    <Link
+                      href={route('products.index') + `?main_category_id=${mainCategory.id}`}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+                    >
+                      <FiTag className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+                      <span className="group-hover:text-gray-900">{mainCategory.name}</span>
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li className="px-4 py-2 text-sm text-gray-500">No hay categorías disponibles</li>
+              )}
             </ul>
           </div>
 

@@ -35,11 +35,13 @@ class PublicProductController extends Controller
 
         $categorias = Category::withCount('products')->get();
         $marcas = Brand::withCount('products')->get();
+        $mainCategories = \App\Models\MainCategory::where('is_active', true)->get();
 
         return Inertia::render('Tienda', [
             'productos' => $productos,
             'categorias' => $categorias,
             'marcas' => $marcas,
+            'mainCategories' => $mainCategories,
         ]);
     }
 
@@ -52,11 +54,13 @@ class PublicProductController extends Controller
 
         $categorias = Category::withCount('products')->get();
         $marcas = Brand::withCount('products')->get();
+        $mainCategories = \App\Models\MainCategory::where('is_active', true)->get();
 
         return Inertia::render('Tienda', [
             'productos' => $productos,
             'categorias' => $categorias,
             'marcas' => $marcas,
+            'mainCategories' => $mainCategories,
             'currentFilter' => [
                 'type' => 'category',
                 'value' => $category->id,
@@ -74,10 +78,12 @@ class PublicProductController extends Controller
 
         $categorias = Category::withCount('products')->get();
         $marcas = Brand::withCount('products')->get();
+        $mainCategories = \App\Models\MainCategory::where('is_active', true)->get();
 
         return Inertia::render('Tienda', [
             'productos' => $productos,
             'categorias' => $categorias,
+            'mainCategories' => $mainCategories,
             'marcas' => $marcas,
             'currentFilter' => [
                 'type' => 'brand',

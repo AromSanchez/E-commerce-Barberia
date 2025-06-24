@@ -1,9 +1,28 @@
-import { ShoppingBag, User, Search, BarChart3, Package, DollarSign, TrendingUp, CheckCircle } from 'lucide-react';
+import { ShoppingBag, User, Search, BarChart3, Package, DollarSign, TrendingUp, CheckCircle, X } from 'lucide-react';
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Select, { components } from 'react-select';
 import OrdenList from './OrdenList';
+
+// Componente personalizado para mostrar el punto de color en el valor seleccionado
+const SingleValue = (props) => (
+  <components.SingleValue {...props}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <span
+        style={{
+          display: 'inline-block',
+          backgroundColor: props.data.color,
+          borderRadius: '50%',
+          width: '10px',
+          height: '10px',
+          marginRight: '8px'
+        }}
+      />
+      {/* Mostramos directamente el label en lugar de props.children para evitar duplicar el punto */}
+      {props.data.label}
+    </div>
+  </components.SingleValue>
+);
 
 export default function MainHistorial({ orders, totals }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -205,33 +224,163 @@ export default function MainHistorial({ orders, totals }) {
 
 
         {/* Filters */}
-        <Card className="mb-6 bg-white border-gray-200">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Buscar por número de pedido o producto..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-white border-gray-300"
-                />
+        <div className="mb-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div className="p-4 md:p-5">
+            <div className="flex flex-col md:flex-row gap-5">
+              {/* Campo de búsqueda */}
+              <div className="flex-1 flex flex-col">
+                <label htmlFor="search-input" className="mb-2 text-sm text-gray-700 font-medium">Buscar:</label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    <Search className="h-4 w-4" />
+                  </div>
+                  <input
+                    id="search-input"
+                    type="text"
+                    placeholder="Número de pedido o nombre de producto..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-10 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black text-sm"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      aria-label="Limpiar búsqueda"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+                {searchTerm && (
+                  <div className="mt-1 text-xs text-blue-600">
+                    Buscando: "{searchTerm}"
+                  </div>
+                )}
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full md:w-48 bg-white border-gray-300">
-                  <SelectValue placeholder="Filtrar por estado" />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  <SelectItem value="all">Todos los estados</SelectItem>
-                  <SelectItem value="completed">Completado</SelectItem>
-                  <SelectItem value="shipped">Enviado</SelectItem>
-                  <SelectItem value="pending">Pendiente</SelectItem>
-                  <SelectItem value="cancelled">Cancelado</SelectItem>
-                </SelectContent>
-              </Select>
+              
+              {/* Selector de estado */}
+              <div className="w-full md:w-64 flex flex-col">
+                <label htmlFor="status-filter" className="mb-2 text-sm text-gray-700 font-medium">Estado:</label>
+                <Select
+                  inputId="status-filter"
+                  instanceId="status-select"
+                  value={{
+                    value: statusFilter,
+                    label: statusFilter === 'all' ? 'Todos los estados' :
+                           statusFilter === 'completed' ? 'Completado' :
+                           statusFilter === 'shipped' ? 'Enviado' :
+                           statusFilter === 'pending' ? 'Pendiente' : 'Cancelado',
+                    color: statusFilter === 'all' ? '#A0AEC0' :
+                           statusFilter === 'completed' ? '#10B981' :
+                           statusFilter === 'shipped' ? '#3B82F6' :
+                           statusFilter === 'pending' ? '#F59E0B' : '#EF4444'
+                  }}
+                  onChange={(option) => {
+                    console.log("Filtro seleccionado:", option.value);
+                    setStatusFilter(option.value);
+                  }}
+                  options={[
+                    { 
+                      value: 'all', 
+                      label: 'Todos los estados',
+                      color: '#A0AEC0' // gray-400
+                    },
+                    { 
+                      value: 'completed', 
+                      label: 'Completado',
+                      color: '#10B981' // emerald-500 
+                    },
+                    { 
+                      value: 'shipped', 
+                      label: 'Enviado',
+                      color: '#3B82F6' // blue-500
+                    },
+                    { 
+                      value: 'pending', 
+                      label: 'Pendiente',
+                      color: '#F59E0B' // amber-500
+                    },
+                    { 
+                      value: 'cancelled', 
+                      label: 'Cancelado',
+                      color: '#EF4444' // red-500
+                    }
+                  ]}
+                  isSearchable={false}
+                  formatOptionLabel={({ label, color }) => (
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
+                      <span>{label}</span>
+                    </div>
+                  )}
+                  components={{
+                    SingleValue
+                  }}
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      borderColor: state.isFocused ? '#000' : '#D1D5DB',
+                      boxShadow: state.isFocused ? '0 0 0 1px #000' : 'none',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        borderColor: '#000',
+                      },
+                      padding: '1px 8px',
+                    }),
+                    menu: (baseStyles) => ({
+                      ...baseStyles,
+                      zIndex: 50,
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    }),
+                    option: (baseStyles, { isSelected, isFocused, data }) => ({
+                      ...baseStyles,
+                      backgroundColor: isSelected 
+                        ? '#F3F4F6' 
+                        : isFocused 
+                          ? '#F9FAFB' 
+                          : undefined,
+                      color: '#000',
+                      padding: '8px 16px',
+                      cursor: 'pointer',
+                    }),
+                    dropdownIndicator: (baseStyles) => ({
+                      ...baseStyles,
+                      color: '#6B7280',
+                      '&:hover': {
+                        color: '#000',
+                      },
+                    }),
+                    indicatorSeparator: () => ({
+                      display: 'none',
+                    }),
+                  }}
+                  className="text-sm"
+                  placeholder="Seleccionar estado"
+                  maxMenuHeight={220}
+                />
+                
+                {/* Indicador de filtro activo */}
+                {statusFilter !== 'all' && (
+                  <div className="mt-2 py-1 px-3 bg-blue-50 text-blue-700 text-xs rounded-full inline-flex items-center">
+                    <div className={`h-2 w-2 rounded-full mr-2 ${
+                      statusFilter === 'completed' ? 'bg-emerald-500' : 
+                      statusFilter === 'shipped' ? 'bg-blue-500' : 
+                      statusFilter === 'pending' ? 'bg-amber-500' : 
+                      'bg-red-500'
+                    }`}></div>
+                    Filtrando por: {
+                      statusFilter === 'completed' ? 'Completado' : 
+                      statusFilter === 'shipped' ? 'Enviado' : 
+                      statusFilter === 'pending' ? 'Pendiente' : 
+                      'Cancelado'
+                    }
+                  </div>
+                )}
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Order Totals */}
         <div className="mb-6">

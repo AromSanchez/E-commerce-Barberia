@@ -16,12 +16,12 @@ class MainCategorySeeder extends Seeder
     {
         // Definir las 6 categorías principales
         $mainCategories = [
-            'Cuidado del cabello',
-            'Herramientas para barbería',
-            'Productos para afeitado',
-            'Cuidado de la barba',
-            'Cuidado facial',
-            'Kits y packs de regalo'
+            'Equipamientos',
+            'Accesorios',
+            'Maquinas y partes',
+            'Tijeras y navajas',
+            'Herramientas',
+            'Productos',
         ];
 
         foreach ($mainCategories as $categoryName) {

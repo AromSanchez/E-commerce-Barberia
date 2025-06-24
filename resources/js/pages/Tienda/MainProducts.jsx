@@ -36,7 +36,7 @@ const ORDER_OPTIONS = [
     { value: 'nuevos', label: 'Más recientes' }
 ];
 
-export default function MainProducts({ productos = [], categorias = [], marcas = [] }) {
+export default function MainProducts({ productos = [], categorias = [], marcas = [], mainCategories = [] }) {
     // Estados principales (usando persistencia)
     const [columnas, setColumnas] = useState(() => getPersisted('tienda_columnas', 4));
     const [productosPorPagina, setProductosPorPagina] = useState(() => getPersisted('tienda_productosPorPagina', 9));
@@ -126,14 +126,8 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                     <div className="flex-1 flex justify-start">
                         <Breadcrumb
                             baseItems={['Inicio', 'Tienda']}
-                            categoriaSeleccionada={categorias.find(cat => categoriasSeleccionadas.includes(cat.id))}
                             currentPage={currentPage}
                             onResetFilters={resetAllFilters}
-                            onCategoriaClick={categoria => {
-                                setCategoriasSeleccionadas([categoria.id]);
-                                setMarcasSeleccionadas([]);
-                                setCurrentPage(1);
-                            }}
                             onHomeClick={() => window.location.href = '/'}
                         />
                     </div>
@@ -157,10 +151,12 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                 opciones={categorias.map(categoria => ({
                                     nombre: categoria.name,
                                     valor: categoria.id,
-                                    total: categoria.products_count
+                                    total: categoria.products_count,
+                                    main_category_id: categoria.main_category_id
                                 }))}
                                 seleccionados={categoriasSeleccionadas}
                                 setSeleccionados={setCategoriasSeleccionadas}
+                                mainCategories={mainCategories}
                             />
                             <FiltroCheckbox
                                 titulo="Marcas"
@@ -189,11 +185,11 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                         <div className="flex flex-col mb-8">
                             <div className="flex justify-between items-center">
                                 <h1 className="text-3xl font-bold font-inter text-gray-900">
-                                    {categorias.find(cat => categoriasSeleccionadas.includes(cat.id))?.name || 'Tienda'}
+                                    Tienda
                                 </h1>
                                 <div className="flex items-center space-x-4">
                                     {/* Productos por página */}
-                                    <div className="flex items-center gap-3 hidden lg:flex">
+                                    <div className="items-center gap-3 hidden lg:flex">
                                         <span className="text-sm text-gray-500">Mostrar:</span>
                                         <div className="flex gap-1 items-center">
                                             {[9, 12, 18, 24].map(num => (
@@ -211,7 +207,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                                         </div>
                                     </div>
                                     {/* Selector columnas */}
-                                    <div className="flex items-center border border-gray-300 rounded-md hidden lg:flex">
+                                    <div className="items-center border border-gray-300 rounded-md hidden lg:flex">
                                         {[2, 3, 4].map(num => {
                                             const Icon = [TfiLayoutGrid2, TfiLayoutGrid3, TfiLayoutGrid4][num - 2];
                                             return (
@@ -392,6 +388,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
                 onClose={() => setMenuFiltersOpen(false)}
                 categorias={categorias}
                 marcas={marcas}
+                mainCategories={mainCategories}
                 categoriasSeleccionadas={categoriasSeleccionadas}
                 setCategoriasSeleccionadas={setCategoriasSeleccionadas}
                 marcasSeleccionadas={marcasSeleccionadas}
