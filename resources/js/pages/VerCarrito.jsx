@@ -15,7 +15,6 @@ export default function VerCarrito() {
   const [lastRemoved, setLastRemoved] = useState(null);
   const [undoTimeout, setUndoTimeout] = useState(null);
   const [couponCode, setCouponCode] = useState('');
-  const [shippingOption, setShippingOption] = useState('pickup');
   const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   // Función para obtener el carrito con manejo de errores mejorado
@@ -71,8 +70,10 @@ export default function VerCarrito() {
     return acc + (price * quantity);
   }, 0);
 
-  // Calcular total incluyendo envío
-  const shippingCost = shippingOption === 'delivery' ? 10.00 : 0;
+  // Calcular total incluyendo envío (gratis si el subtotal >= 50 soles)
+  const shippingCostBase = 10.00;
+  const isFreeShipping = subtotal >= 50;
+  const shippingCost = isFreeShipping ? 0 : shippingCostBase;
   const total = subtotal + shippingCost;
 
   const handleRemove = async (item) => {
@@ -226,7 +227,7 @@ export default function VerCarrito() {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = (totalConEnvio) => {
     if (cart.length === 0) {
       toast.warning('No hay productos en el carrito', {
         position: "top-right",
@@ -236,7 +237,7 @@ export default function VerCarrito() {
       return;
     }
 
-    window.location.href = route('checkout');
+    window.location.href = route('checkout', { total: totalConEnvio });
   };
 
   return (
@@ -283,8 +284,6 @@ export default function VerCarrito() {
             <PanelTotales
               cart={cart}
               subtotal={subtotal}
-              shippingOption={shippingOption}
-              setShippingOption={setShippingOption}
               total={total}
               updating={updating}
               handleCheckout={handleCheckout}

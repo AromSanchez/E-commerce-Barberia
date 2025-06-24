@@ -45,7 +45,7 @@ class PaymentController extends Controller
             // Convertir el monto de PEN a USD (usando una tasa aproximada de 1 PEN = 0.27 USD)
             // Nota: Deberías usar un servicio de tipos de cambio en tiempo real en producción
             $amountInPEN = $request->amount;
-            $exchangeRate = 0.27; // Tasa de cambio PEN a USD (actualizar según sea necesario)
+            $exchangeRate = 0.28; // Tasa de cambio PEN a USD (actualizar según sea necesario)
             $amountInUSD = $amountInPEN * $exchangeRate;
 
             // Log para debugging

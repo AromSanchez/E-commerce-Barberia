@@ -3,9 +3,10 @@ import { Dialog } from '@headlessui/react';
 import { router } from '@inertiajs/react';
 import { X } from 'lucide-react';
 
-export default function AddCategoryDialog({ isOpen, onClose, onSave }) {
+export default function AddCategoryDialog({ isOpen, onClose, onSave, mainCategories }) {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [mainCategoryId, setMainCategoryId] = useState('');
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
 
@@ -14,17 +15,30 @@ export default function AddCategoryDialog({ isOpen, onClose, onSave }) {
             // Resetear el formulario cuando se cierra el diálogo
             setName('');
             setDescription('');
+            setMainCategoryId('');
             setErrors({});
         }
     }, [isOpen]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        // Validar que se haya seleccionado una categoría principal
+        if (!mainCategoryId) {
+            setErrors({
+                ...errors,
+                main_category_id: 'Debes seleccionar una categoría principal'
+            });
+            return;
+        }
+        
         setProcessing(true);
 
         const formData = new FormData();
         formData.append('name', name);
         formData.append('description', description);
+        formData.append('main_category_id', mainCategoryId);
+        formData.append('main_category_id', mainCategoryId);
 
         router.post(route('dashboard.category.store'), formData, {
             onSuccess: (page) => {
@@ -89,6 +103,51 @@ export default function AddCategoryDialog({ isOpen, onClose, onSave }) {
                             ></textarea>
                             {errors.description && (
                                 <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+                            )}
+                        </div>
+                        
+                        <div className="mb-4">
+                            <label htmlFor="mainCategoryId" className="block text-sm font-medium text-gray-700 mb-1">
+                                Categoría Principal <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                id="mainCategoryId"
+                                value={mainCategoryId}
+                                onChange={(e) => setMainCategoryId(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                required
+                            >
+                                <option value="">Selecciona una categoría principal (obligatorio)</option>
+                                {mainCategories && mainCategories.map((category) => (
+                                    <option key={category.id} value={category.id}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.main_category_id && (
+                                <p className="mt-1 text-sm text-red-600">{errors.main_category_id}</p>
+                            )}
+                        </div>
+
+                        <div className="mb-4">
+                            <label htmlFor="main_category_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                Categoría Principal
+                            </label>
+                            <select
+                                id="main_category_id"
+                                value={mainCategoryId}
+                                onChange={(e) => setMainCategoryId(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="">Seleccione una categoría principal</option>
+                                {mainCategories.map((category) => (
+                                    <option key={category.id} value={category.id}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.main_category_id && (
+                                <p className="mt-1 text-sm text-red-600">{errors.main_category_id}</p>
                             )}
                         </div>
                         

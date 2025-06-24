@@ -147,14 +147,26 @@ Route::middleware(['auth'])->group(function () {
             return redirect()->route('carrito');
         }
 
-        $total = array_reduce($cart, function ($carry, $item) {
-            return $carry + ($item['price'] * $item['quantity']);
-        }, 0);
+        // Obtener el total enviado como parámetro que incluye el costo de envío
+        $total = request('total', null);
+        
+        // Si no se proporciona el total en la URL, calcularlo incluyendo el envío
+        if ($total === null) {
+            $subtotal = array_reduce($cart, function ($carry, $item) {
+                return $carry + ($item['price'] * $item['quantity']);
+            }, 0);
+            
+            // Envío gratis para compras mayores a 50 soles
+            $shipping = $subtotal >= 50 ? 0 : 10.00;
+            $total = $subtotal + $shipping;
+        }
 
         return \Inertia\Inertia::render('Checkout/Index', [
             'total' => $total,
             'stripeKey' => Config::get('services.stripe.key'),
             'cart' => $cart,
+            'includesShipping' => true, // Indicador para el frontend
+            'isFreeShipping' => $total == request('total') ? request('total') >= 50 : ($subtotal ?? 0) >= 50
         ]);
     })->name('checkout');
 });

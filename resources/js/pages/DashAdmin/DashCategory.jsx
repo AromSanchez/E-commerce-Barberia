@@ -10,7 +10,7 @@ import EditCategoryDialog from '@/components/DashCategory/EditCategoryDialog';
 import { Search, Package } from 'lucide-react';
 
 export default function DashCategory() {
-    const { categories } = usePage().props;
+    const { categories, mainCategories } = usePage().props;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [categoryList, setCategoryList] = useState([]);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -117,6 +117,7 @@ export default function DashCategory() {
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">#</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Nombre</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Descripción</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Categoría Principal</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Productos</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Acción</th>
                                                 </tr>
@@ -139,7 +140,18 @@ export default function DashCategory() {
                                                                     <span className="text-gray-400">Sin descripción</span>
                                                                 )}
                                                             </td>
-                                                            <td className="p-4 text-sm text-gray-600">{category.products_count || 0}</td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                {category.main_category ? (
+                                                                    <div>{category.main_category.name}</div>
+                                                                ) : (
+                                                                    <span className="text-gray-400">N/A</span>
+                                                                )}
+                                                            </td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                                                                    {category.products_count} {category.products_count === 1 ? 'producto' : 'productos'}
+                                                                </span>
+                                                            </td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
                                                                     <button 
@@ -160,7 +172,7 @@ export default function DashCategory() {
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
+                                                        <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
                                                             No hay categorías disponibles
                                                         </td>
                                                     </tr>
@@ -179,7 +191,8 @@ export default function DashCategory() {
             <AddCategoryDialog 
                 isOpen={isDialogOpen} 
                 onClose={() => setIsDialogOpen(false)} 
-                onSave={handleAddCategory} 
+                onSave={handleAddCategory}
+                mainCategories={mainCategories}
             />
             {/* Diálogo para editar categoría */}
             {categoryToEdit && (
@@ -187,7 +200,8 @@ export default function DashCategory() {
                     isOpen={editDialogOpen} 
                     category={categoryToEdit}
                     onClose={() => setEditDialogOpen(false)} 
-                    onSave={handleUpdateCategory} 
+                    onSave={handleUpdateCategory}
+                    mainCategories={mainCategories} 
                 />
             )}
         </AuthenticatedLayout>

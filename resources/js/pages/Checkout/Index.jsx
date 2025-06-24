@@ -4,7 +4,7 @@ import { useCart } from '@/contexts/CartContext'
 
 import MainLayout from '@/layouts/MainLayout';
 
-export default function Checkout({ total, stripeKey, cart }) {
+export default function Checkout({ total, stripeKey, cart, includesShipping = true, isFreeShipping = false }) {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [errors, setErrors] = useState({});
   const [paymentMethod, setPaymentMethod] = useState('stripe');
@@ -92,7 +92,14 @@ export default function Checkout({ total, stripeKey, cart }) {
 
         {/* Total y método de pago */}
         <div className="space-y-4">
-          <p className="text-lg font-semibold text-gray-800">Total a pagar: <span className="text-blue-600">S/ {Number(total).toFixed(2)}</span></p>
+          <div>
+            <p className="text-lg font-semibold text-gray-800">Total a pagar: <span className="text-blue-600">S/ {Number(total).toFixed(2)}</span></p>
+            {includesShipping && (
+              isFreeShipping ?
+                <p className="text-sm text-green-600 mt-1 font-medium">Incluye envío GRATIS</p> :
+                <p className="text-sm text-gray-600 mt-1">*Incluye S/ 10.00 de costo de envío</p>
+            )}
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Selecciona método de pago</label>

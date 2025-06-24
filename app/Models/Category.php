@@ -15,6 +15,7 @@ class Category extends Model
         'name',
         'description',
         'slug',
+        'main_category_id',
     ];
 
     protected static function boot()
@@ -34,5 +35,13 @@ class Category extends Model
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+    
+    /**
+     * Get the main category this category belongs to.
+     */
+    public function mainCategory()
+    {
+        return $this->belongsTo(MainCategory::class);
     }
 }

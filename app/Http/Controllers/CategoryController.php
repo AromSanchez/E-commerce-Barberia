@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\MainCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,10 +14,14 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::with('mainCategory')
+                        ->withCount('products')
+                        ->get();
+        $mainCategories = MainCategory::where('is_active', true)->get();
         
         return Inertia::render('DashAdmin/DashCategory', [
-            'categories' => $categories
+            'categories' => $categories,
+            'mainCategories' => $mainCategories
         ]);
     }
 
@@ -25,7 +30,10 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return Inertia::render('DashAdmin/DashCategory');
+        $mainCategories = MainCategory::where('is_active', true)->get();
+        return Inertia::render('DashAdmin/DashCategory', [
+            'mainCategories' => $mainCategories
+        ]);
     }
 
     /**
@@ -36,11 +44,19 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:category',
             'description' => 'nullable|string|max:255',
+            'main_category_id' => 'required|exists:main_categories,id',
+        ], [
+            'main_category_id.required' => 'Debes seleccionar una categoría principal',
+            'main_category_id.exists' => 'La categoría principal seleccionada no es válida',
         ]);
 
         $category = Category::create($validated);
+        
+        // Cargar la relación main_category y productos para el retorno
+        $category->load('mainCategory');
+        $category->loadCount('products');
 
-        return redirect()->route('dashboard.category');
+        return redirect()->route('dashboard.category')->with('category', $category);
     }
 
     /**
@@ -63,12 +79,21 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:category,name,' . $id,
             'description' => 'nullable|string|max:255',
+            'main_category_id' => 'required|exists:main_categories,id',
+        ], [
+            'main_category_id.required' => 'Debes seleccionar una categoría principal',
+            'main_category_id.exists' => 'La categoría principal seleccionada no es válida',
         ]);
 
         $category = Category::findOrFail($id);
         $category->update($validated);
+        
+        // Cargar la relación main_category y productos para el retorno
+        $category->load('mainCategory');
+        $category->loadCount('products');
 
         return redirect()->route('dashboard.category')
-            ->with('success', 'Categoría actualizada exitosamente.');
+            ->with('success', 'Categoría actualizada exitosamente.')
+            ->with('category', $category);
     }
 }
