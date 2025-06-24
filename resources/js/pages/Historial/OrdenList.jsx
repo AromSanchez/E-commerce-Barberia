@@ -59,6 +59,9 @@ export default function OrdenList({ orders, searchTerm, statusFilter, generarTra
         return 'bg-amber-100 text-amber-700';
       case 'cancelled':
         return 'bg-red-100 text-red-700';
+      case 'processing':
+      case 'procesando':
+        return 'bg-yellow-100 text-yellow-700';
       default:
         return 'bg-gray-100 text-gray-700';
     }
@@ -75,6 +78,9 @@ export default function OrdenList({ orders, searchTerm, statusFilter, generarTra
         return <Clock className="h-3.5 w-3.5" />;
       case 'cancelled':
         return <X className="h-3.5 w-3.5" />;
+      case 'processing':
+      case 'procesando':
+        return <RefreshCw className="h-3.5 w-3.5" />;
       default:
         return null;
     }
@@ -91,8 +97,12 @@ export default function OrdenList({ orders, searchTerm, statusFilter, generarTra
         return 'Pendiente';
       case 'cancelled':
         return 'Cancelado';
+      case 'processing':
+      case 'procesando':
+        return 'Procesando';
       default:
-        return 'Desconocido';
+        // Mostrar el valor real capitalizado si no está mapeado
+        return status ? status.charAt(0).toUpperCase() + status.slice(1) : '';
     }
   };
 
@@ -262,7 +272,7 @@ export default function OrdenList({ orders, searchTerm, statusFilter, generarTra
                       </Button>
                     )}
 
-                    {(order.status === "shipped" || order.status === "pending") && (
+                    {order.status !== "cancelled" && (
                       <Button
                         type="button"
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 h-10 px-4 py-2 gap-2"

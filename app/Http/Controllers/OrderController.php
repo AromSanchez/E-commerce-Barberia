@@ -30,8 +30,9 @@ class OrderController extends Controller
                     'date' => $order->created_at->toISOString(),
                     'total' => (float) $order->total_amount,
                     'status' => match ($order->order_status) {
-                        'procesando' => 'pending',
-                        'preparando', 'enviado' => 'shipped',
+                        'pendiente' => 'pending',
+                        'procesando' => 'processing',
+                        'enviado' => 'shipped',
                         'entregado' => 'completed',
                         'cancelado' => 'cancelled',
                         default => 'pending'
@@ -86,8 +87,8 @@ class OrderController extends Controller
                 'customer_name' => $request->customer_name,
                 'customer_phone' => $request->customer_phone,
                 'shipping_address' => $request->shipping_address,
-                'payment_status' => 'pagado', // ← en español
-                'order_status' => 'procesando', // ← en español
+                'payment_status' => 'pagado', 
+                'order_status' => 'pendiente', 
             ]);
             // Generar número personalizado
             $orderNumber = 'PED-' . now()->year . '-' . str_pad($order->id, 3, '0', STR_PAD_LEFT);
@@ -189,7 +190,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'order_status' => 'required|in:procesando,preparando,enviado,entregado,cancelado',
+            'order_status' => 'required|in:pendiente,procesando,enviado,entregado,cancelado',
         ]);
 
         $order = Order::findOrFail($id);

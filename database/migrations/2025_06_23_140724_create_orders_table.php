@@ -23,7 +23,7 @@ return new class extends Migration
 
             // 👇 Columnas en inglés, pero valores en español
             $table->enum('payment_status', ['pendiente', 'pagado', 'fallido'])->default('pendiente');
-            $table->enum('order_status', ['procesando', 'preparando',  'enviado', 'entregado', 'cancelado'])->default('procesando');
+            $table->enum('order_status', ['pendiente', 'procesando', 'enviado', 'entregado', 'cancelado'])->default('pendiente');
             $table->string('invoice_path')->nullable(); // Ruta del PDF generado
 
             $table->timestamps();

@@ -29,8 +29,10 @@ export default function MainHistorial({ orders, totals }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const mapOrderStatus = (status) => {
     switch (status) {
-      case 'procesando':
+      case 'pendiente':
         return 'pending';
+      case 'procesando':
+        return 'processing';
       case 'enviado':
         return 'shipped';
       case 'entregado':
@@ -38,7 +40,7 @@ export default function MainHistorial({ orders, totals }) {
       case 'cancelado':
         return 'cancelled';
       default:
-        return status;
+        return status; // Devuelve el estado real si no está mapeado
     }
   };
 
@@ -59,6 +61,7 @@ export default function MainHistorial({ orders, totals }) {
     // Determinar el índice del paso actual según el estado
     let currentStep = 0;
     if (mappedStatus === 'pending') currentStep = 1;
+    else if (mappedStatus === 'processing') currentStep = 2;
     else if (mappedStatus === 'shipped') currentStep = 4;
     else if (mappedStatus === 'completed') currentStep = 5;
     else if (mappedStatus === 'cancelled') currentStep = 0;
