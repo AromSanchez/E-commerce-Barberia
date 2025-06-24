@@ -153,7 +153,7 @@ export default function OrdenList({ orders, searchTerm, statusFilter, generarTra
                           {new Date(order.date).toLocaleDateString("es-ES")}
                         </div>
                         <div className="flex items-center gap-1">
-                          <DollarSign className="h-4 w-4" />${order.total.toFixed(2)}
+                          <span>S/ {order.total.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
@@ -262,13 +262,7 @@ export default function OrdenList({ orders, searchTerm, statusFilter, generarTra
                       </Button>
                     )}
 
-                    <Button
-                      variant="outline"
-                      className="bg-white text-black border-gray-300 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <Eye className="h-4 w-4" />
-                      Ver Detalles
-                    </Button>                      {(order.status === "shipped" || order.status === "pending") && (
+                    {(order.status === "shipped" || order.status === "pending") && (
                       <Button
                         type="button"
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 h-10 px-4 py-2 gap-2"

@@ -258,7 +258,7 @@ export default function MainHistorial({ orders, totals }) {
                   </div>
                 )}
               </div>
-              
+
               {/* Selector de estado */}
               <div className="w-full md:w-64 flex flex-col">
                 <label htmlFor="status-filter" className="mb-2 text-sm text-gray-700 font-medium">Estado:</label>
@@ -268,41 +268,41 @@ export default function MainHistorial({ orders, totals }) {
                   value={{
                     value: statusFilter,
                     label: statusFilter === 'all' ? 'Todos los estados' :
-                           statusFilter === 'completed' ? 'Completado' :
-                           statusFilter === 'shipped' ? 'Enviado' :
-                           statusFilter === 'pending' ? 'Pendiente' : 'Cancelado',
+                      statusFilter === 'completed' ? 'Completado' :
+                        statusFilter === 'shipped' ? 'Enviado' :
+                          statusFilter === 'pending' ? 'Pendiente' : 'Cancelado',
                     color: statusFilter === 'all' ? '#A0AEC0' :
-                           statusFilter === 'completed' ? '#10B981' :
-                           statusFilter === 'shipped' ? '#3B82F6' :
-                           statusFilter === 'pending' ? '#F59E0B' : '#EF4444'
+                      statusFilter === 'completed' ? '#10B981' :
+                        statusFilter === 'shipped' ? '#3B82F6' :
+                          statusFilter === 'pending' ? '#F59E0B' : '#EF4444'
                   }}
                   onChange={(option) => {
                     console.log("Filtro seleccionado:", option.value);
                     setStatusFilter(option.value);
                   }}
                   options={[
-                    { 
-                      value: 'all', 
+                    {
+                      value: 'all',
                       label: 'Todos los estados',
                       color: '#A0AEC0' // gray-400
                     },
-                    { 
-                      value: 'completed', 
+                    {
+                      value: 'completed',
                       label: 'Completado',
                       color: '#10B981' // emerald-500 
                     },
-                    { 
-                      value: 'shipped', 
+                    {
+                      value: 'shipped',
                       label: 'Enviado',
                       color: '#3B82F6' // blue-500
                     },
-                    { 
-                      value: 'pending', 
+                    {
+                      value: 'pending',
                       label: 'Pendiente',
                       color: '#F59E0B' // amber-500
                     },
-                    { 
-                      value: 'cancelled', 
+                    {
+                      value: 'cancelled',
                       label: 'Cancelado',
                       color: '#EF4444' // red-500
                     }
@@ -335,10 +335,10 @@ export default function MainHistorial({ orders, totals }) {
                     }),
                     option: (baseStyles, { isSelected, isFocused, data }) => ({
                       ...baseStyles,
-                      backgroundColor: isSelected 
-                        ? '#F3F4F6' 
-                        : isFocused 
-                          ? '#F9FAFB' 
+                      backgroundColor: isSelected
+                        ? '#F3F4F6'
+                        : isFocused
+                          ? '#F9FAFB'
                           : undefined,
                       color: '#000',
                       padding: '8px 16px',
@@ -359,21 +359,20 @@ export default function MainHistorial({ orders, totals }) {
                   placeholder="Seleccionar estado"
                   maxMenuHeight={220}
                 />
-                
+
                 {/* Indicador de filtro activo */}
                 {statusFilter !== 'all' && (
                   <div className="mt-2 py-1 px-3 bg-blue-50 text-blue-700 text-xs rounded-full inline-flex items-center">
-                    <div className={`h-2 w-2 rounded-full mr-2 ${
-                      statusFilter === 'completed' ? 'bg-emerald-500' : 
-                      statusFilter === 'shipped' ? 'bg-blue-500' : 
-                      statusFilter === 'pending' ? 'bg-amber-500' : 
-                      'bg-red-500'
-                    }`}></div>
+                    <div className={`h-2 w-2 rounded-full mr-2 ${statusFilter === 'completed' ? 'bg-emerald-500' :
+                      statusFilter === 'shipped' ? 'bg-blue-500' :
+                        statusFilter === 'pending' ? 'bg-amber-500' :
+                          'bg-red-500'
+                      }`}></div>
                     Filtrando por: {
-                      statusFilter === 'completed' ? 'Completado' : 
-                      statusFilter === 'shipped' ? 'Enviado' : 
-                      statusFilter === 'pending' ? 'Pendiente' : 
-                      'Cancelado'
+                      statusFilter === 'completed' ? 'Completado' :
+                        statusFilter === 'shipped' ? 'Enviado' :
+                          statusFilter === 'pending' ? 'Pendiente' :
+                            'Cancelado'
                     }
                   </div>
                 )}
@@ -411,13 +410,13 @@ export default function MainHistorial({ orders, totals }) {
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <DollarSign className="h-4 w-4 text-green-600" />
+                      <span className="h-4 w-4 text-green-600 font-bold">S/</span>
                       <span className="text-sm font-medium text-gray-600">Total Gastado</span>
                     </div>
-                    <p className="text-2xl font-bold text-black">${totals.totalSpent.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-black">S/{totals.totalSpent.toFixed(2)}</p>
                   </div>
                   <div className="bg-green-100 p-2 rounded-full">
-                    <DollarSign className="h-6 w-6 text-green-600" />
+                    <span className="h-10 w-10 text-green-600 font-bold">S/</span>
                   </div>
                 </div>
               </CardContent>
@@ -431,7 +430,7 @@ export default function MainHistorial({ orders, totals }) {
                       <TrendingUp className="h-4 w-4 text-purple-600" />
                       <span className="text-sm font-medium text-gray-600">Promedio</span>
                     </div>
-                    <p className="text-2xl font-bold text-black">${totals.averageOrder.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-black">S/{totals.averageOrder.toFixed(2)}</p>
                   </div>
                   <div className="bg-purple-100 p-2 rounded-full">
                     <TrendingUp className="h-6 w-6 text-purple-600" />
@@ -460,7 +459,7 @@ export default function MainHistorial({ orders, totals }) {
         </div>
 
         <OrdenList searchTerm={searchTerm} statusFilter={statusFilter} orders={orders} generarTracking={generarTracking}
-   />
+        />
 
       </div>
     </div>
