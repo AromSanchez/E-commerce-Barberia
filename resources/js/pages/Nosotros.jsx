@@ -3,6 +3,7 @@ import Section1 from "./Nosotros/Section1";
 import Section2 from "./Nosotros/Section2";
 import Section3 from "./Nosotros/Section3";
 import FloatingWhatsAppIcon from "@/components/Cliente/IconWhatssap";
+import IconChatBot from "@/components/Cliente/IconChatBot";
 
 export default function Nosotros() {
     return (
@@ -11,6 +12,7 @@ export default function Nosotros() {
             <Section1 />
             <Section2 />
             <Section3 />
+            <IconChatBot />
             <FloatingWhatsAppIcon />
             </div>
         </MainLayout>
