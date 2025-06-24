@@ -153,24 +153,7 @@ export default function Section3() {
                     ))}
                 </div>
 
-                {/* CTA Section */}
-                <div className="text-center mt-16 md:mt-20 pt-16 border-t border-gray-200">
-                    <h3 className="text-2xl md:text-3xl font-black text-gray-900 mb-4">
-                        ¿Necesitas asesoría personalizada?
-                    </h3>
-                    <p className="text-gray-600 mb-8 text-lg">
-                        Contáctanos y te ayudaremos a encontrar los mejores productos para tu barbería
-                    </p>
-                    <a 
-                        href="/contacto"
-                        className="inline-flex items-center gap-3 px-10 py-4 bg-black text-white font-bold text-lg rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
-                    >
-                        Contactar expertos
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                    </a>
-                </div>
+                
             </div>
         </section>
     );

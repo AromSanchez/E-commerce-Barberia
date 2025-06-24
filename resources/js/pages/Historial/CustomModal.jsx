@@ -39,14 +39,12 @@ export default function CustomModal({ isOpen, onClose, title, description, child
       onClick={handleOverlayClick}
       aria-modal="true"
       role="dialog"
-    >
-      <div 
-        className="max-w-3xl w-full bg-white rounded-lg shadow-lg animate-in fade-in zoom-in-95 duration-200"
+    >      <div 
+        className="w-120 max-h-[80vh] bg-white rounded-lg shadow-lg animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+      ><div className="flex items-center justify-between p-4 border-b border-gray-200">
           <div>
-            <h2 className="text-xl font-bold text-black">{title}</h2>
+            <h2 className="text-lg font-bold text-black">{title}</h2>
             {description && <p className="text-sm text-gray-600 mt-1">{description}</p>}
           </div>
           <button 
@@ -54,11 +52,10 @@ export default function CustomModal({ isOpen, onClose, title, description, child
             onClick={onClose}
             aria-label="Cerrar"
           >
-            <X className="h-5 w-5 text-gray-600" />
+            <X className="h-4 w-4 text-gray-600" />
           </button>
         </div>
-        
-        <div className="p-6">
+          <div className="p-4 max-h-[80vh] overflow-y-auto">
           {children}
         </div>
       </div>

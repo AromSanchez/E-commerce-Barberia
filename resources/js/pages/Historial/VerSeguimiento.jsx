@@ -8,7 +8,7 @@ export default function VerSeguimiento({ orderNumber, steps }) {
   const progress = (completedSteps / steps.length) * 100;
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mb-10">
       <div>
         <h3 className="text-lg font-semibold text-black mb-2 flex items-center gap-2">
           <Navigation className="h-5 w-5 text-blue-600" />
