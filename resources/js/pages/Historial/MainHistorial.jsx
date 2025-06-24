@@ -5,18 +5,74 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import OrdenList from './OrdenList';
 
-export default function MainHistorial() {
+export default function MainHistorial({ orders, totals }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  
+  const generarTracking = (order) => {
+    const createdDate = new Date(order.date);
+    const formato = (date) =>
+      date.toLocaleString('es-PE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+    const pasos = [
+      {
+        id: 1,
+        title: 'Pedido recibido',
+        description: 'Hemos recibido tu pedido y lo estamos procesando',
+        date: formato(createdDate),
+        completed: true,
+        current: order.status === 'pending'
+      },
+      {
+        id: 2,
+        title: 'Procesando pedido',
+        description: 'Tu pedido está siendo preparado para envío',
+        date: order.status !== 'pending' ? formato(new Date(createdDate.getTime() + 1 * 86400000)) : '',
+        completed: ['shipped', 'completed'].includes(order.status),
+        current: order.status === 'shipped'
+      },
+      {
+        id: 3,
+        title: 'Enviado',
+        description: 'Tu pedido ha sido enviado',
+        date: order.status === 'completed' ? formato(new Date(createdDate.getTime() + 2 * 86400000)) : '',
+        completed: order.status === 'completed',
+        current: false
+      },
+      {
+        id: 4,
+        title: 'En ruta',
+        description: 'Tu pedido está en camino hacia tu dirección',
+        date: '',
+        completed: false,
+        current: false
+      },
+      {
+        id: 5,
+        title: 'Entregado',
+        description: 'Tu pedido ha sido entregado con éxito',
+        date: '',
+        completed: order.status === 'completed',
+        current: false
+      }
+    ];
+
+    const index = pasos.findIndex(p => p.current);
+    if (index === -1) {
+      const next = pasos.find(p => !p.completed);
+      if (next) next.current = true;
+    }
+
+    return pasos;
+  };
+
   // Datos de ejemplo para mostrar en el dashboard
   // En un caso real, estos datos vendrían de una API o de Inertia props
-  const totals = {
-    totalOrders: 24,
-    totalSpent: 1450.75,
-    averageOrder: 60.45,
-    completedOrders: 18
-  };
 
   // Datos ficticios de pedidos
   const mockOrders = [
@@ -27,7 +83,8 @@ export default function MainHistorial() {
       total: 89.95,
       status: 'completed',
       items: [
-        {          id: 101,
+        {
+          id: 101,
           name: 'Gel de Fijación Extrafuerte',
           price: 24.99,
           quantity: 2,
@@ -57,7 +114,8 @@ export default function MainHistorial() {
       total: 145.50,
       status: 'shipped',
       items: [
-        {          id: 201,
+        {
+          id: 201,
           name: 'Maquina de Afeitar Profesional',
           price: 89.99,
           quantity: 1,
@@ -87,7 +145,8 @@ export default function MainHistorial() {
       total: 67.25,
       status: 'pending',
       items: [
-        {          id: 301,
+        {
+          id: 301,
           name: 'Champú para Barba',
           price: 22.99,
           quantity: 1,
@@ -117,7 +176,8 @@ export default function MainHistorial() {
       total: 54.99,
       status: 'cancelled',
       items: [
-        {          id: 401,
+        {
+          id: 401,
           name: 'Kit de Afeitado Tradicional',
           price: 54.99,
           quantity: 1,
@@ -130,19 +190,19 @@ export default function MainHistorial() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-        <div className="max-w-6xl mx-auto">
-            {/* Header */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-2">
-                  <ShoppingBag className="h-8 w-8 text-black" />
-                  <h1 className="text-3xl font-bold text-black">Historial de Pedidos</h1>
-              </div>
-              <p className="text-gray-600 flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Revisa todos tus pedidos anteriores y su estado actual
-              </p>
-            </div>
-        
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <ShoppingBag className="h-8 w-8 text-black" />
+            <h1 className="text-3xl font-bold text-black">Historial de Pedidos</h1>
+          </div>
+          <p className="text-gray-600 flex items-center gap-2">
+            <User className="h-4 w-4" />
+            Revisa todos tus pedidos anteriores y su estado actual
+          </p>
+        </div>
+
 
         {/* Filters */}
         <Card className="mb-6 bg-white border-gray-200">
@@ -250,7 +310,8 @@ export default function MainHistorial() {
           </div>
         </div>
 
-        <OrdenList searchTerm={searchTerm} statusFilter={statusFilter} orders={mockOrders} />
+        <OrdenList searchTerm={searchTerm} statusFilter={statusFilter} orders={orders} generarTracking={generarTracking}
+   />
 
       </div>
     </div>
