@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
@@ -87,6 +89,10 @@ class OrderController extends Controller
                 'payment_status' => 'pagado', // ← en español
                 'order_status' => 'procesando', // ← en español
             ]);
+            // Generar número personalizado
+            $orderNumber = 'PED-' . now()->year . '-' . str_pad($order->id, 3, '0', STR_PAD_LEFT);
+            $order->order_number = $orderNumber;
+            $order->save();
 
             Log::debug('Orden creada: ' . $order->id);
 
@@ -107,6 +113,21 @@ class OrderController extends Controller
             DB::commit();
 
             Log::info('Orden guardada con éxito');
+            // AQUI ES DONDE GENERAMOS EL PDF DE LA ORDEN
+            Log::debug('Generando PDF para la orden: ' . $order->id);
+
+            $order->load('items.product');
+
+            $pdf = Pdf::loadView('pdf.boleta', ['order' => $order]);
+
+            $filename = $order->order_number . '.pdf'; // 👈 aquí usas el número
+            $path = 'facturas/' . $filename;
+
+            Storage::disk('public')->makeDirectory('facturas'); // crea carpeta si no existe
+            Storage::disk('public')->put($path, $pdf->output());
+
+            // Guarda la ruta en la orden
+            $order->update(['invoice_path' => $path]);
             return response()->json(['message' => 'Orden guardada con éxito'], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -116,5 +137,30 @@ class OrderController extends Controller
                 'details' => $e->getMessage(),
             ], 500);
         }
+    }
+    public function indexAdmin()
+    {
+
+        $orders = Order::with('items.product', 'user')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'customer_name' => $order->customer_name,
+                    'phone' => $order->customer_phone,
+                    'shipping_address' => $order->shipping_address,
+                    'total' => (float) $order->total_amount,
+                    'status' => $order->order_status,
+                    'order_date' => $order->created_at->toDateString(),
+                    'delivered_on' => $order->order_status === 'entregado' ? $order->updated_at->toDateString() : null,
+                    'total_items' => $order->items->sum('quantity'),
+                ];
+            });
+
+        return Inertia::render('DashAdmin/DashOrders/DashOrder', [
+            'orders' => $orders,
+        ]);
     }
 }

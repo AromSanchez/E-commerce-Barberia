@@ -12,6 +12,8 @@ use App\Http\Controllers\OrderController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
+use Illuminate\Support\Facades\Storage;
+
 use Inertia\Inertia;
 use App\Http\Controllers\CartController;
 
@@ -23,6 +25,23 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+
+
+// Rutas de GENERAR FACTURA PARA DESCARGAR
+Route::get('/ordenes/{order}/factura', function (\App\Models\Order $order) {
+    if (!$order->invoice_path || !Storage::disk('public')->exists($order->invoice_path)) {
+        abort(404, 'Factura no encontrada');
+    }
+
+    return response()->download(storage_path('app/public/' . $order->invoice_path));
+})->name('orders.download-invoice');
+
+
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('/dashboard/orders', [OrderController::class, 'indexAdmin'])->name('dashboard.orders');
+});
+
 
 
 Route::middleware('auth')->get('/favoritos', [FavoriteController::class, 'index']);
@@ -106,9 +125,6 @@ Route::post('/dashboard/addproducts', [ProductController::class, 'store'])->midd
 Route::get('/dashboard/products/{product}/edit/', [ProductController::class, 'edit'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.products.edit');
 Route::patch('/dashboard/products/{product}/edit/', [ProductController::class, 'update'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.products.update');
 
-Route::get('/dashboard/orders', function () {
-    return Inertia::render('DashAdmin/DashOrders/DashOrder');
-})->middleware(['auth', 'verified', 'admin'])->name('dashboard.orders');
 
 // Rutas del carrito
 Route::group(['prefix' => 'cart'], function () {
