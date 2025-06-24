@@ -27,6 +27,21 @@ const SingleValue = (props) => (
 export default function MainHistorial({ orders, totals }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const mapOrderStatus = (status) => {
+    switch (status) {
+      case 'procesando':
+        return 'pending';
+      case 'enviado':
+        return 'shipped';
+      case 'entregado':
+        return 'completed';
+      case 'cancelado':
+        return 'cancelled';
+      default:
+        return status;
+    }
+  };
+
   const generarTracking = (order) => {
     const createdDate = new Date(order.date);
     const formato = (date) =>
@@ -38,54 +53,62 @@ export default function MainHistorial({ orders, totals }) {
         minute: '2-digit'
       });
 
+    // Mapear el estado real a los pasos visuales
+    const mappedStatus = mapOrderStatus(order.status);
+
+    // Determinar el índice del paso actual según el estado
+    let currentStep = 0;
+    if (mappedStatus === 'pending') currentStep = 1;
+    else if (mappedStatus === 'shipped') currentStep = 4;
+    else if (mappedStatus === 'completed') currentStep = 5;
+    else if (mappedStatus === 'cancelled') currentStep = 0;
+
     const pasos = [
       {
         id: 1,
         title: 'Pedido recibido',
         description: 'Hemos recibido tu pedido y lo estamos procesando',
         date: formato(createdDate),
-        completed: true,
-        current: order.status === 'pending'
+        completed: currentStep > 1,
+        current: currentStep === 1,
       },
       {
         id: 2,
         title: 'Procesando pedido',
         description: 'Tu pedido está siendo preparado para envío',
-        date: order.status !== 'pending' ? formato(new Date(createdDate.getTime() + 1 * 86400000)) : '',
-        completed: ['shipped', 'completed'].includes(order.status),
-        current: order.status === 'shipped'
+        date: mappedStatus !== 'pending' ? formato(new Date(createdDate.getTime() + 1 * 86400000)) : '',
+        completed: currentStep > 2,
+        current: currentStep === 2,
       },
       {
         id: 3,
         title: 'Enviado',
         description: 'Tu pedido ha sido enviado',
-        date: order.status === 'completed' ? formato(new Date(createdDate.getTime() + 2 * 86400000)) : '',
-        completed: order.status === 'completed',
-        current: false
+        date: mappedStatus === 'completed' ? formato(new Date(createdDate.getTime() + 2 * 86400000)) : '',
+        completed: currentStep > 3,
+        current: currentStep === 3,
       },
       {
         id: 4,
         title: 'En ruta',
         description: 'Tu pedido está en camino hacia tu dirección',
         date: '',
-        completed: false,
-        current: false
+        completed: currentStep > 4,
+        current: currentStep === 4,
       },
       {
         id: 5,
         title: 'Entregado',
         description: 'Tu pedido ha sido entregado con éxito',
         date: '',
-        completed: order.status === 'completed',
-        current: false
-      }
+        completed: currentStep === 5,
+        current: currentStep === 5,
+      },
     ];
 
-    const index = pasos.findIndex(p => p.current);
-    if (index === -1) {
-      const next = pasos.find(p => !p.completed);
-      if (next) next.current = true;
-    }
+    // Si el estado es 'shipped', los pasos 1, 2 y 3 deben estar completados, y el 4 actual
+    // Si el estado es 'completed', todos completados y el 5 actual
+    // Si el estado es 'pending', solo el 1 actual
 
     return pasos;
   };
