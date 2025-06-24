@@ -26,10 +26,9 @@ export default function DashOrder() {
                     order_number: 'ORD-001', 
                     customer_name: 'Juan Pérez',
                     phone: '123-456-7890',
-                    subtotal: 150.00,
-                    tax: 27.00,
+                    shipping_address: 'Calle Falsa 123',
                     total: 177.00,
-                    status: 'Pendiente',
+                    status: 'procesando',
                     order_date: '2023-07-15',
                     total_items: 3,
                     delivered_on: null
@@ -39,10 +38,9 @@ export default function DashOrder() {
                     order_number: 'ORD-002', 
                     customer_name: 'María López',
                     phone: '987-654-3210',
-                    subtotal: 200.00,
-                    tax: 36.00,
+                    shipping_address: 'Av. Siempre Viva 742',
                     total: 236.00,
-                    status: 'Entregado',
+                    status: 'entregado',
                     order_date: '2023-07-10',
                     total_items: 5,
                     delivered_on: '2023-07-12'
@@ -129,16 +127,15 @@ export default function DashOrder() {
                                         <table className="min-w-full">
                                             <thead className="sticky top-0 bg-white z-10 shadow-sm">
                                                 <tr>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">OrderNo</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Name</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Phone</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Subtotal</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Tax</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">N° Orden</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Cliente</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Teléfono</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Dirección</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Total</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Order Date</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Estado</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Fecha Orden</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Total Items</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Delivered On</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Entregado el</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Acción</th>
                                                 </tr>
                                             </thead>
@@ -149,18 +146,19 @@ export default function DashOrder() {
                                                             <td className="p-4 text-sm text-gray-600">{order.order_number}</td>
                                                             <td className="p-4 text-sm text-gray-600">{order.customer_name}</td>
                                                             <td className="p-4 text-sm text-gray-600">{order.phone}</td>
-                                                            <td className="p-4 text-sm text-gray-600">${order.subtotal.toFixed(2)}</td>
-                                                            <td className="p-4 text-sm text-gray-600">${order.tax.toFixed(2)}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{order.shipping_address}</td>
                                                             <td className="p-4 text-sm text-gray-600">${order.total.toFixed(2)}</td>
                                                             <td className="p-4 text-sm">
                                                                 <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                                                                    order.status === 'Entregado' 
+                                                                    order.status === 'entregado' 
                                                                         ? 'text-green-700 bg-green-100' 
-                                                                        : order.status === 'Pendiente'
+                                                                        : order.status === 'procesando'
                                                                             ? 'text-yellow-700 bg-yellow-100'
-                                                                            : 'text-gray-700 bg-gray-100'
+                                                                            : order.status === 'cancelado'
+                                                                                ? 'text-red-700 bg-red-100'
+                                                                                : 'text-gray-700 bg-gray-100'
                                                                 }`}>
-                                                                    {order.status}
+                                                                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                                                                 </span>
                                                             </td>
                                                             <td className="p-4 text-sm text-gray-600">{order.order_date}</td>
@@ -186,7 +184,7 @@ export default function DashOrder() {
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="11" className="px-6 py-4 text-center text-sm text-gray-500">
+                                                        <td colSpan="10" className="px-6 py-4 text-center text-sm text-gray-500">
                                                             No hay órdenes disponibles
                                                         </td>
                                                     </tr>

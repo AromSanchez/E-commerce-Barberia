@@ -98,9 +98,8 @@ export default function OrdenList({ orders, searchTerm, statusFilter, generarTra
 
   // Función para descargar una factura
   const downloadInvoice = (order) => {
-    console.log('Descargando factura para el pedido:', order.id);
-    // Implementación pendiente
-
+    const url = `/ordenes/${order.id}/factura`;
+    window.open(url, '_blank');
   };
 
   // Datos de seguimiento formateados para VerSeguimiento
@@ -191,42 +190,43 @@ export default function OrdenList({ orders, searchTerm, statusFilter, generarTra
                       Productos:
                     </h4>
                     {order.items.map((item) => {
-  console.log("Ruta imagen:", item.image); // 👈 Asegúrate que trae algo como: productos/imagen.jpg
+                      console.log("Ruta imagen:", item.image); // 👈 Asegúrate que trae algo como: productos/imagen.jpg
 
                       return (
-                      <div
-                        key={item.id}
-                        className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg border border-gray-100"
-                      >
-                        <div className="relative">   
-                          <img
-                          src={`http://localhost:8000/storage/${item.image}`}
-                          alt={item.name}
-                          className="w-12 h-12 object-cover rounded-md bg-white border border-gray-200"
-                          onError={(e) => { e.target.src = "https://placehold.co/200x200?text=Producto" }}
-                        />
-                          <div className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                            {item.quantity}
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg border border-gray-100"
+                        >
+                          <div className="relative">
+                            <img
+                              src={`http://localhost:8000/storage/${item.image}`}
+                              alt={item.name}
+                              className="w-12 h-12 object-cover rounded-md bg-white border border-gray-200"
+                              onError={(e) => { e.target.src = "https://placehold.co/200x200?text=Producto" }}
+                            />
+                            <div className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                              {item.quantity}
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <h5 className="font-medium text-black flex items-center gap-2">
+                              <Star className="h-3 w-3 text-yellow-500" />
+                              {item.name}
+                            </h5>
+                            <p className="text-sm text-gray-600 flex items-center gap-1">
+                              <Package className="h-3 w-3" />
+                              Cantidad: {item.quantity}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-black flex items-center gap-1">
+                              <span className="font-semibold text-green-600 text-sm">S/</span>
+                              {item.price.toFixed(2)}
+                            </p>
                           </div>
                         </div>
-                        <div className="flex-1">
-                          <h5 className="font-medium text-black flex items-center gap-2">
-                            <Star className="h-3 w-3 text-yellow-500" />
-                            {item.name}
-                          </h5>
-                          <p className="text-sm text-gray-600 flex items-center gap-1">
-                            <Package className="h-3 w-3" />
-                            Cantidad: {item.quantity}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-black flex items-center gap-1">
-                            <span className="font-semibold text-green-600 text-sm">S/</span>
-                            {item.price.toFixed(2)}
-                          </p>
-                        </div>
-                      </div>
-)})}
+                      )
+                    })}
                   </div>
 
                   {/* Shipping Address */}

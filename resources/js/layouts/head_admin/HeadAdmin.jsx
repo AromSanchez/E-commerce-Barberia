@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Bell, Search, LogOut, Settings, User, Mail, FileText, Headphones, Package } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
 const HeadAdmin = () => {
+    const { auth } = usePage().props;
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -131,13 +132,8 @@ const HeadAdmin = () => {
                             onClick={() => setIsProfileOpen(!isProfileOpen)}
                             className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
                         >
-                            <img 
-                                src="\images\Mia-Khalifa-murio.webp" 
-                                alt="Usuario" 
-                                className="h-8 w-8 rounded-full"
-                            />
                             <div className="flex flex-col items-start">
-                                <span className="text-sm font-medium">Admin</span>
+                                <span className="text-sm font-medium">{auth?.user?.name || 'Usuario'}</span>
                                 <span className="text-xs text-gray-500">Administrador</span>
                             </div>
                         </button>
