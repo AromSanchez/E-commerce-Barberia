@@ -31,6 +31,17 @@ export default {
                 'xl': '1280px',
                 '2xl': '1536px',
             },
+            
+            // Añadiendo utilidades de máscara personalizadas
+            maskImage: {
+                'luminance': 'linear-gradient(to right, transparent, white)'
+            },
+            maskPosition: {
+                'r-from-50%': '50%'
+            },
+            maskSize: {
+                'r-to-black': 'cover'
+            }
         },
     },
 
@@ -39,5 +50,7 @@ export default {
         require('tailwind-scrollbar-hide'),
         // Plugin oficial para la clase "text-balance"
         require('tailwindcss-text-balance'),
+        // Plugin para máscaras de gradiente
+        
     ],
 };

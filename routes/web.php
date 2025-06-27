@@ -157,7 +157,7 @@ Route::post('/orden/guardar', [OrderController::class, 'store'])->name('order.st
 
 
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/checkout', function () {
         $cart = session('cart', []);
 

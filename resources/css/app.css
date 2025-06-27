@@ -4,8 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 .custom-fade-mask {
-  -webkit-mask-image: linear-gradient(black 80%, transparent);
-  mask-image: linear-gradient(black 80%, transparent);
+  mask-image: linear-gradient(to right, black 75%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 75%, transparent 100%);
 }
 
 /* Centrar el spinner en el medio de la página */

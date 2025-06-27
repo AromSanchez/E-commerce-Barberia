@@ -35,6 +35,7 @@
     "dependencies": {
         "@headlessui/react": "^0.0.0-insiders.bc76bbd",
         "@headlessui/vue": "^0.0.0-insiders.bc76bbd",
+        "@heroicons/react": "^2.2.0",
         "@inertiajs/progress": "^0.2.7",
         "@inertiajs/react": "^2.0.0",
         "@mercadopago/sdk-react": "^1.0.3",
