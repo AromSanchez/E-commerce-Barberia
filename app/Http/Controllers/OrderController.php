@@ -179,7 +179,14 @@ class OrderController extends Controller
                     'total_amount' => (float) $order->total_amount,
                     'order_status' => $order->order_status,
                     'created_at' => $order->created_at->toDateString(),
-                    'items_count' => $order->items->sum('quantity'),
+                    'items' => $order->items->map(function ($item) {
+                        return [
+                            'product_name' => $item->product->name,
+                            'quantity' => $item->quantity,
+                            'unit_price' => (float) $item->price,
+                            'total_price' => (float) $item->price * $item->quantity,
+                        ];
+                    }),
                 ];
             });
 

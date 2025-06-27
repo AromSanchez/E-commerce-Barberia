@@ -5,6 +5,7 @@ import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
 import { useState } from "react"
 import { Search, Truck, Eye, FileText } from "lucide-react"
 import { usePage, router } from '@inertiajs/react';
+import OrderDetailsModal from './OrderDetailsModal';
 
 const statusOptions = ["pendiente", "procesando", "enviado", "entregado", "cancelado"];
 
@@ -37,6 +38,9 @@ export default function OrderTracking() {
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState({});
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("");
 
   const handleStatusChange = (orderId, newStatus) => {
     // Actualiza en el frontend inmediatamente (optimista)
@@ -57,8 +61,11 @@ export default function OrderTracking() {
 
   const filteredOrders = orders.filter(
     (order) =>
-      order.order_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      (filterStatus === "" || order.order_status === filterStatus) &&
+      (
+        order.order_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
   return (
@@ -89,8 +96,8 @@ export default function OrderTracking() {
 
                   {/* Search Bar */}
                   <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <div className="p-6">
-                      <div className="relative">
+                    <div className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                         <input
                           type="text"
@@ -99,6 +106,18 @@ export default function OrderTracking() {
                           onChange={(e) => setSearchTerm(e.target.value)}
                           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
+                      </div>
+                      <div className="relative w-full md:w-auto">
+                        <select
+                          value={filterStatus}
+                          onChange={e => setFilterStatus(e.target.value)}
+                          className="w-full md:w-[200px] px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        >
+                          <option value="">Todos los estados</option>
+                          {statusOptions.map(status => (
+                            <option key={status} value={status}>{statusLabels[status]}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -161,6 +180,7 @@ export default function OrderTracking() {
                                     <button
                                       className="h-8 w-8 p-0 flex items-center justify-center rounded hover:bg-blue-50 hover:text-blue-600 transition-colors"
                                       title="Ver detalles"
+                                      onClick={() => { setSelectedOrder(order); setModalOpen(true); }}
                                     >
                                       <Eye className="h-4 w-4" />
                                     </button>
@@ -220,6 +240,11 @@ export default function OrderTracking() {
           </div>
         </div>
       </div>
+      <OrderDetailsModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        order={selectedOrder}
+      />
     </AuthenticatedLayout>
   );
 }
