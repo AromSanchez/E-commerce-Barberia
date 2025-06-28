@@ -3,8 +3,9 @@ import { AiOutlineHeart, AiOutlineShoppingCart, AiOutlineUser, AiOutlineDashboar
 import { CgProfile } from 'react-icons/cg';
 import { BiCategory } from 'react-icons/bi';
 import { MdOutlineLocalOffer } from 'react-icons/md';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 import { useCart } from '@/contexts/CartContext';
+import { useFilter } from '@/contexts/FilterContext';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 
@@ -14,6 +15,7 @@ const MainHeader = ({
   navLinks
 }) => {
   const { openCart } = useCart();
+  const { addBrandFilter, addMainCategoryFilter, clearAllFilters } = useFilter();
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -114,6 +116,32 @@ const MainHeader = ({
     window.location.href = href;
   };
 
+  const handleBrandClick = (brandId) => {
+    // Detectar si ya estamos en la tienda
+    const tiendaPath = route('products.index');
+    const isOnTienda = typeof window !== 'undefined' && window.location.pathname === new URL(tiendaPath, window.location.origin).pathname;
+    clearAllFilters();
+    addBrandFilter(brandId);
+    setShowDropdown(false); // Cerrar dropdown automáticamente
+    if (!isOnTienda) {
+      router.visit(tiendaPath);
+    }
+    // Si ya estamos en la tienda, solo actualizamos los filtros (no recargar)
+  };
+
+  const handleMainCategoryClick = (mainCategoryId) => {
+    // Detectar si ya estamos en la tienda
+    const tiendaPath = route('products.index');
+    const isOnTienda = typeof window !== 'undefined' && window.location.pathname === new URL(tiendaPath, window.location.origin).pathname;
+    clearAllFilters();
+    addMainCategoryFilter(mainCategoryId);
+    setShowDropdown(false); // Cerrar dropdown automáticamente
+    if (!isOnTienda) {
+      router.visit(tiendaPath);
+    }
+    // Si ya estamos en la tienda, solo actualizamos los filtros (no recargar)
+  };
+
   const renderDropdownContent = () => (
     <div
       ref={dropdownRef}
@@ -142,13 +170,13 @@ const MainHeader = ({
               {mainCategories && mainCategories.length > 0 ? (
                 mainCategories.map((mainCategory) => (
                   <li key={mainCategory.id}>
-                    <Link
-                      href={route('products.index') + `?main_category_id=${mainCategory.id}`}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+                    <button
+                      onClick={() => handleMainCategoryClick(mainCategory.id)}
+                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-all duration-200 group text-left"
                     >
                       <FiTag className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
                       <span className="group-hover:text-gray-900">{mainCategory.name}</span>
-                    </Link>
+                    </button>
                   </li>
                 ))
               ) : (
@@ -166,27 +194,17 @@ const MainHeader = ({
             <ul className="space-y-1">
               {brands?.map((brand) => (
                 <li key={brand.id}>
-                  <Link
-                    href={route('products.brand', brand.slug)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-all duration-200 group"
+                  <button
+                    onClick={() => handleBrandClick(brand.id)}
+                    className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-all duration-200 group text-left"
                   >
                     <FiTag className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
                     <span className="group-hover:text-gray-900">{brand.name}</span>
-                  </Link>
+                  </button>
                 </li>
               ))}
             </ul>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-4 pt-3 border-t border-gray-100 text-center">
-          <Link
-            href={route('products.index')}
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            Ver todos los productos →
-          </Link>
         </div>
       </div>
     </div>

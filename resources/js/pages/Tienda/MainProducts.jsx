@@ -9,6 +9,7 @@ import { TfiLayoutGrid2, TfiLayoutGrid3, TfiLayoutGrid4 } from 'react-icons/tfi'
 import CategoryFilter from './CategoryFilter';
 import MenuFilters from './MenuFilters';
 import { FiFilter } from 'react-icons/fi';
+import { useFilter } from '@/contexts/FilterContext';
 
 // Utilidades de persistencia en localStorage (reutilizables)
 const getPersisted = (key, defaultValue) => {
@@ -37,16 +38,31 @@ const ORDER_OPTIONS = [
 ];
 
 export default function MainProducts({ productos = [], categorias = [], marcas = [], mainCategories = [] }) {
+    // Contexto de filtros
+    const { 
+        selectedBrands, 
+        setSelectedBrands, 
+        selectedCategories, 
+        setSelectedCategories,
+        selectedMainCategories,
+        setSelectedMainCategories,
+        priceRange,
+        setPriceRange,
+        clearAllFilters: clearContextFilters,
+        addMainCategoryFilter,
+        setExpandedMainCategories
+    } = useFilter();
+
     // Estados principales (usando persistencia)
     const [columnas, setColumnas] = useState(() => getPersisted('tienda_columnas', 4));
     const [productosPorPagina, setProductosPorPagina] = useState(() => getPersisted('tienda_productosPorPagina', 9));
     const [orden, setOrden] = useState(() => getPersisted('tienda_orden', 'predeterminado'));
     const [currentPage, setCurrentPage] = useState(1);
 
-    // Filtros
+    // Estados locales para los filtros (sincronizados con el contexto)
     const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState([]);
     const [marcasSeleccionadas, setMarcasSeleccionadas] = useState([]);
-    const [precio, setPrecio] = useState({ min: 0, max: 0 }); // max se define luego
+    const [precio, setPrecio] = useState({ min: 0, max: 0 });
     const [menuFiltersOpen, setMenuFiltersOpen] = useState(false);
 
     // Determinar el precio máximo real de productos
@@ -63,20 +79,106 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
         }));
     }, [maxPrecio]);
 
+    // Sincronizar filtros del contexto con los estados locales
+    useEffect(() => {
+        if (selectedBrands.length > 0) {
+            setMarcasSeleccionadas(selectedBrands);
+        }
+    }, [selectedBrands]);
+
+    useEffect(() => {
+        if (selectedCategories.length > 0) {
+            setCategoriasSeleccionadas(selectedCategories);
+        }
+    }, [selectedCategories]);
+
+    // Manejar filtro por categoría principal
+    useEffect(() => {
+        if (selectedMainCategories.length > 0) {
+            // No seleccionamos ninguna subcategoría cuando se selecciona una categoría principal
+            setCategoriasSeleccionadas([]);
+        }
+    }, [selectedMainCategories]);
+
+    useEffect(() => {
+        if (priceRange.min !== 0 || priceRange.max !== 0) {
+            setPrecio(priceRange);
+        }
+    }, [priceRange]);
+
+    // Sincronizar cambios locales con el contexto
+    useEffect(() => {
+        setSelectedBrands(marcasSeleccionadas);
+    }, [marcasSeleccionadas, setSelectedBrands]);
+
+    useEffect(() => {
+        setSelectedCategories(categoriasSeleccionadas);
+    }, [categoriasSeleccionadas, setSelectedCategories]);
+
+    useEffect(() => {
+        setPriceRange(precio);
+    }, [precio, setPriceRange]);
+
     // Guardar configuración persistente en localStorage
     useEffect(() => { setPersisted('tienda_columnas', columnas); }, [columnas]);
     useEffect(() => { setPersisted('tienda_productosPorPagina', productosPorPagina); }, [productosPorPagina]);
     useEffect(() => { setPersisted('tienda_orden', orden); }, [orden]);
 
+    // Al cargar la tienda, verificar si hay una categoría principal a expandir desde sessionStorage
+    useEffect(() => {
+        const mainCategoryToExpand = sessionStorage.getItem('mainCategoryToExpand');
+        if (mainCategoryToExpand) {
+            addMainCategoryFilter(Number(mainCategoryToExpand));
+            sessionStorage.removeItem('mainCategoryToExpand');
+        }
+        // Limpiar la categoría principal seleccionada y el estado expandido al desmontar la tienda
+        return () => {
+            setSelectedMainCategories([]);
+            // Colapsar todas las categorías principales visualmente
+            if (typeof setExpandedMainCategories === 'function' && Array.isArray(mainCategories)) {
+                const collapsed = {};
+                mainCategories.forEach(cat => { collapsed[cat.id] = false; });
+                setExpandedMainCategories(collapsed);
+            }
+            if (typeof window !== 'undefined') {
+                // Limpiar el estado global de filtros
+                const event = new Event('clearAllFiltersFromCategoryPanel');
+                window.dispatchEvent(event);
+            }
+        };
+    }, []);
+
     // Filtrado de productos
     const productosFiltrados = useMemo(() => productos.filter(producto => {
         const precioProducto = producto.sale_price ?? producto.regular_price;
+
+        // 1. Si hay subcategorías seleccionadas, filtrar SOLO por esas subcategorías
+        if (categoriasSeleccionadas.length > 0) {
+            return (
+                categoriasSeleccionadas.includes(producto.category_id) &&
+                (marcasSeleccionadas.length === 0 || marcasSeleccionadas.includes(producto.brand_id)) &&
+                precioProducto >= precio.min && precioProducto <= precio.max
+            );
+        }
+
+        // 2. Si no hay subcategorías pero sí principal, filtrar por todas las subcategorías de esa principal
+        if (selectedMainCategories.length > 0) {
+            const categoriasDeMainCategories = categorias
+                .filter(cat => selectedMainCategories.includes(cat.main_category_id))
+                .map(cat => cat.id);
+            return (
+                categoriasDeMainCategories.includes(producto.category_id) &&
+                (marcasSeleccionadas.length === 0 || marcasSeleccionadas.includes(producto.brand_id)) &&
+                precioProducto >= precio.min && precioProducto <= precio.max
+            );
+        }
+
+        // 3. Si no hay filtros de categoría, mostrar todos
         return (
-            (categoriasSeleccionadas.length === 0 || categoriasSeleccionadas.includes(producto.category_id)) &&
             (marcasSeleccionadas.length === 0 || marcasSeleccionadas.includes(producto.brand_id)) &&
             precioProducto >= precio.min && precioProducto <= precio.max
         );
-    }), [productos, categoriasSeleccionadas, marcasSeleccionadas, precio]);
+    }), [productos, categoriasSeleccionadas, selectedMainCategories, categorias, marcasSeleccionadas, precio]);
 
     // Ordenar productos sin mutar el array original
     const ordenarProductos = useCallback((items) => {
@@ -106,6 +208,7 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
         setMarcasSeleccionadas([]);
         setPrecio({ min: 0, max: maxPrecio });
         setCurrentPage(1);
+        clearContextFilters();
     };
 
     // Cambiar número de columnas
@@ -116,6 +219,20 @@ export default function MainProducts({ productos = [], categorias = [], marcas =
         setProductosPorPagina(num);
         setCurrentPage(1);
     };
+
+    // Escuchar el evento global para limpiar todos los filtros desde el panel de categorías
+    useEffect(() => {
+        function clearAllFiltersHandler() {
+            setCategoriasSeleccionadas([]);
+            setMarcasSeleccionadas([]);
+            setPrecio({ min: 0, max: maxPrecio });
+            setSelectedMainCategories([]);
+            setSelectedBrands([]);
+            setPriceRange({ min: 0, max: maxPrecio });
+        }
+        window.addEventListener('clearAllFiltersFromCategoryPanel', clearAllFiltersHandler);
+        return () => window.removeEventListener('clearAllFiltersFromCategoryPanel', clearAllFiltersHandler);
+    }, [maxPrecio, setSelectedMainCategories, setSelectedBrands, setPriceRange]);
 
     // --------- Render principal ----------
     return (

@@ -1,22 +1,23 @@
 import React, { useState, useMemo } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useFilter } from '@/contexts/FilterContext';
 
 export default function CategoryFilter({ titulo, opciones = [], seleccionados = [], setSeleccionados, mainCategories = [] }) {
     const [abierto, setAbierto] = useState(true);
-    const [expandedGroups, setExpandedGroups] = useState({});
     const [loadingGroup, setLoadingGroup] = useState(null);
+    const { expandedMainCategories, setExpandedMainCategories, selectedMainCategories, setSelectedMainCategories } = useFilter();
 
     // Agrupar las opciones por categoría principal
     const categoriasPorGrupo = useMemo(() => {
         const grupos = {};
         
         // Por defecto, todas las principales están colapsadas (cambiado de expandidas a colapsadas)
-        if (!Object.keys(expandedGroups).length && mainCategories.length) {
+        if (!Object.keys(expandedMainCategories).length && mainCategories.length) {
             const initialExpanded = {};
             mainCategories.forEach(cat => {
                 initialExpanded[cat.id] = false; // Inicialmente colapsadas
             });
-            setExpandedGroups(initialExpanded);
+            setExpandedMainCategories(initialExpanded);
         }
         
         // Crear un grupo "Sin clasificar" para categorías sin categoría principal
@@ -37,7 +38,7 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
         });
         
         return grupos;
-    }, [opciones, mainCategories, expandedGroups]);
+    }, [opciones, mainCategories, expandedMainCategories, setExpandedMainCategories]);
 
     // Calcular el total de productos por categoría principal
     const totalPorCategoriaPrincipal = useMemo(() => {
@@ -57,35 +58,39 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
 
     // Manejar clic en una categoría
     const handleCategoriaClick = (categoriaId) => {
+        // Encontrar la categoría principal a la que pertenece esta subcategoría
+        const opcion = opciones.find(opt => opt.valor === categoriaId);
+        const mainCategoryId = opcion?.main_category_id || 'sin_clasificar';
+        
+        // Permitir solo una subcategoría seleccionada a la vez
         setSeleccionados(
-            seleccionados.includes(categoriaId) 
-                ? seleccionados.filter(id => id !== categoriaId)
+            seleccionados.includes(categoriaId)
+                ? [] // Si la subcategoría ya está seleccionada, solo la desmarcamos
                 : [categoriaId]
         );
+        
+        // Si estamos seleccionando una subcategoría, mantenemos la categoría principal
+        if (!seleccionados.includes(categoriaId)) {
+            setSelectedMainCategories([mainCategoryId]);
+        }
     };
     
-    // Alternar visibilidad de un grupo
-    const toggleGroup = (groupId) => {
-        // Si se está cerrando, no mostrar carga
-        if (expandedGroups[groupId]) {
-            setExpandedGroups(prev => ({
-                ...prev,
-                [groupId]: false
-            }));
-            return;
-        }
-        
-        // Mostrar indicador de carga
-        setLoadingGroup(groupId);
-        
-        // Simular carga con un pequeño retraso
-        setTimeout(() => {
-            setExpandedGroups(prev => ({
-                ...prev,
-                [groupId]: true
-            }));
-            setLoadingGroup(null);
-        }, 800); // 800ms de "carga" para que sea más visible
+    // Alternar visibilidad de un grupo (drop) siempre con un solo click
+    const handleMainCategoryClick = (mainCategoryId) => {
+        setExpandedMainCategories(prev => {
+            const isExpanded = !!prev[mainCategoryId];
+            const newExpanded = {};
+            mainCategories.forEach(cat => { newExpanded[cat.id] = false; });
+            if (!isExpanded) {
+                newExpanded[mainCategoryId] = true;
+                setSelectedMainCategories([mainCategoryId]);
+            } else {
+                // Al cerrar el grupo, limpiamos todos los filtros para mostrar todos los productos
+                setSelectedMainCategories([]);
+                setSeleccionados([]); // Limpiar subcategoría al cerrar el drop
+            }
+            return newExpanded;
+        });
     };
 
     // Renderizar un elemento de categoría
@@ -119,12 +124,44 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
         <div className="pb-2 mb-4 w-52 text-left">
             <div
                 className="flex items-center justify-between cursor-pointer mb-1"
-                onClick={() => setAbierto(!abierto)}
+                onClick={e => {
+                    e.stopPropagation();
+                    setAbierto(prev => {
+                        const next = !prev;
+                        if (!next) {
+                            setSeleccionados([]);
+                            setSelectedMainCategories([]);
+                            // Colapsar todas las categorías principales
+                            const collapsed = {};
+                            mainCategories.forEach(cat => { collapsed[cat.id] = false; });
+                            setExpandedMainCategories(collapsed);
+                            // Limpiar marcas y precio si están en el contexto
+                            if (typeof window !== 'undefined') {
+                                // Disparar evento para limpiar filtros globales
+                                window.dispatchEvent(new Event('clearAllFiltersFromCategoryPanel'));
+                            }
+                        }
+                        return next;
+                    });
+                }}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
-                        setAbierto(!abierto);
+                        setAbierto(prev => {
+                            const next = !prev;
+                            if (!next) {
+                                setSeleccionados([]);
+                                setSelectedMainCategories([]);
+                                const collapsed = {};
+                                mainCategories.forEach(cat => { collapsed[cat.id] = false; });
+                                setExpandedMainCategories(collapsed);
+                                if (typeof window !== 'undefined') {
+                                    window.dispatchEvent(new Event('clearAllFiltersFromCategoryPanel'));
+                                }
+                            }
+                            return next;
+                        });
                     }
                 }}
             >
@@ -140,18 +177,18 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
                                 {/* Título de la categoría principal como botón clicable */}
                                 <div 
                                     className={`flex items-center justify-between cursor-pointer py-1.5 transition-colors group ${
-                                        loadingGroup === mainCategory.id || expandedGroups[mainCategory.id]
+                                        loadingGroup === mainCategory.id || expandedMainCategories[mainCategory.id]
                                             ? 'text-gray-900 bg-gray-100 rounded-md px-1' 
                                             : 'text-gray-800 hover:text-gray-900'
                                     }`}
-                                    onClick={() => toggleGroup(mainCategory.id)}
+                                    onClick={() => handleMainCategoryClick(mainCategory.id)}
                                 >
                                     <span className="text-sm font-semibold">{mainCategory.name}</span>
                                     <div className="flex items-center gap-2">
                                         {/* Contador de elementos */}
                                         <span className={`
                                             inline-flex items-center justify-center w-5 h-5 rounded-lg text-xs
-                                            ${loadingGroup === mainCategory.id || expandedGroups[mainCategory.id]
+                                            ${loadingGroup === mainCategory.id || expandedMainCategories[mainCategory.id]
                                                 ? 'bg-gray-900 text-white'
                                                 : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
                                             }
@@ -161,7 +198,7 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
                                         {/* Icono de expansión o loading */}
                                         {loadingGroup === mainCategory.id ? (
                                             <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
-                                        ) : expandedGroups[mainCategory.id] ? (
+                                        ) : expandedMainCategories[mainCategory.id] ? (
                                             <ChevronUp size={16} className="text-gray-500" />
                                         ) : (
                                             <ChevronDown size={16} className="text-gray-500" />
@@ -171,7 +208,7 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
                                 
                                 {/* Subcategorías - con animación al expandirse */}
                                 <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                                    expandedGroups[mainCategory.id] 
+                                    expandedMainCategories[mainCategory.id] 
                                         ? 'max-h-[500px] opacity-100' 
                                         : 'max-h-0 opacity-0'
                                 }`}>
@@ -179,9 +216,13 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
                                         <div className="pl-2 border-l border-gray-200 ml-1 mt-1 py-3 flex justify-center">
                                             <div className="w-6 h-6 border-3 border-gray-200 border-t-gray-800 rounded-full animate-spin"></div>
                                         </div>
-                                    ) : categoriasPorGrupo[mainCategory.id] && (
+                                    ) : (
                                         <div className="pl-2 border-l border-gray-200 ml-1 mt-1 space-y-1">
-                                            {categoriasPorGrupo[mainCategory.id].map(renderCategoryItem)}
+                                            {categoriasPorGrupo[mainCategory.id] && categoriasPorGrupo[mainCategory.id].length > 0 ? (
+                                                categoriasPorGrupo[mainCategory.id].map(renderCategoryItem)
+                                            ) : (
+                                                <div className="text-gray-400 text-xs px-2 py-2">No hay subcategorías ni productos en esta categoría.</div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -193,17 +234,17 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
                             <div className="mt-2">
                                 <div 
                                     className={`flex items-center justify-between cursor-pointer py-1 transition-colors group ${
-                                        loadingGroup === 'sin_clasificar' || expandedGroups['sin_clasificar']
+                                        loadingGroup === 'sin_clasificar' || expandedMainCategories['sin_clasificar']
                                             ? 'text-gray-900 bg-gray-100 rounded-md px-1'
                                             : 'text-gray-800 hover:text-gray-900'
                                     }`}
-                                    onClick={() => toggleGroup('sin_clasificar')}
+                                    onClick={() => handleMainCategoryClick('sin_clasificar')}
                                 >
                                     <span className="text-sm font-semibold">Otras</span>
                                     <div className="flex items-center gap-2">
                                         <span className={`
                                             inline-flex items-center justify-center w-5 h-5 rounded-lg text-xs
-                                            ${loadingGroup === 'sin_clasificar' || expandedGroups['sin_clasificar']
+                                            ${loadingGroup === 'sin_clasificar' || expandedMainCategories['sin_clasificar']
                                                 ? 'bg-gray-900 text-white'
                                                 : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
                                             }
@@ -212,7 +253,7 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
                                         </span>
                                         {loadingGroup === 'sin_clasificar' ? (
                                             <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
-                                        ) : expandedGroups['sin_clasificar'] ? (
+                                        ) : expandedMainCategories['sin_clasificar'] ? (
                                             <ChevronUp size={16} className="text-gray-500" />
                                         ) : (
                                             <ChevronDown size={16} className="text-gray-500" />
@@ -221,7 +262,7 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
                                 </div>
                                 
                                 <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                                    expandedGroups['sin_clasificar'] 
+                                    expandedMainCategories['sin_clasificar'] 
                                         ? 'max-h-[500px] opacity-100' 
                                         : 'max-h-0 opacity-0'
                                 }`}>

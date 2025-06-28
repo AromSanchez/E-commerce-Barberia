@@ -1,15 +1,10 @@
+import { useFilter } from '@/contexts/FilterContext';
+
 export default function Section2() {
+    const { addMainCategoryFilter } = useFilter();
     const categories = [
         {
             id: 1,
-            name: 'Accesorios',
-            slug: 'accesorios',
-            image: '/images/accesorios.jpg',
-            alt: 'Accesorios de barbería',
-            description: 'Complementos esenciales para el barbero profesional'
-        },
-        {
-            id: 2,
             name: 'Equipamientos',
             slug: 'equipamientos',
             image: '/images/lavaCate.jpg',
@@ -17,7 +12,23 @@ export default function Section2() {
             description: 'Mobiliario y equipos para tu barbería'
         },
         {
+            id: 2,
+            name: 'Accesorios',
+            slug: 'accesorios',
+            image: '/images/accesorios.jpg',
+            alt: 'Accesorios de barbería',
+            description: 'Complementos esenciales para el barbero profesional'
+        },
+        {
             id: 3,
+            name: 'Máquinas y Partes',
+            slug: 'maquinas-partes',
+            image: '/images/maquina.jpg',
+            alt: 'Máquinas y Partes',
+            description: 'Cortadoras y repuestos de calidad profesional'
+        },
+        {
+            id: 4,
             name: 'Tijeras y Navajas',
             slug: 'tijeras-navajas',
             image: '/images/tijerac.jpg',
@@ -25,20 +36,12 @@ export default function Section2() {
             description: 'Herramientas de corte de alta precisión'
         },
         {
-            id: 4,
+            id: 5,
             name: 'Herramientas',
             slug: 'herramientas',
-            image: '/images/herramientas.jpg',
+            image: '/images/herramientas.png',
             alt: 'Herramientas de barbería',
             description: 'Instrumentos profesionales para el cuidado masculino'
-        },
-        {
-            id: 5,
-            name: 'Máquinas y Partes',
-            slug: 'maquinas-partes',
-            image: '/images/maquina.jpg',
-            alt: 'Máquinas y Partes',
-            description: 'Cortadoras y repuestos de calidad profesional'
         },
         {
             id: 6,
@@ -66,7 +69,8 @@ export default function Section2() {
 
                 {/* Grid de categorías mejorado */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {categories.map((category, index) => (                        <div
+                    {categories.map((category, index) => (
+                        <div
                             key={category.id}
                             className={`transform transition-all duration-500 hover:scale-105 ${
                                 index % 2 === 0 ? 'animate-fade-in-up' : 'animate-fade-in-up delay-200'
@@ -75,8 +79,14 @@ export default function Section2() {
                                 animationDelay: `${index * 100}ms`
                             }}
                         >
-                            <a 
-                                href={`/categorias/${category.slug}`} 
+                            <a
+                                href={"/productos"}
+                                onClick={e => {
+                                    e.preventDefault();
+                                    // Guardar la categoría principal seleccionada en sessionStorage
+                                    sessionStorage.setItem('mainCategoryToExpand', category.id);
+                                    window.location.href = "/productos";
+                                }}
                                 className="group block relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300"
                             >
                                 {/* Imagen con overlay mejorado */}

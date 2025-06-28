@@ -45,23 +45,24 @@ export default function UpdatePasswordForm({ className = '' }) {
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Update Password
+        <section className={`${className} mx-auto max-w-3xl`}>
+            <header className="bg-black p-5 rounded-lg shadow-md mb-6 text-center">
+                <h2 className="text-xl font-bold text-white">
+                    Actualizar Contraseña
                 </h2>
 
-                <p className="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay
-                    secure.
+                <p className="mt-1 text-sm text-gray-300">
+                    Asegúrate de que tu cuenta utiliza una contraseña larga y aleatoria para 
+                    mantener tu seguridad.
                 </p>
             </header>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
+            <form onSubmit={updatePassword} className="mt-6 space-y-6 bg-white p-6 rounded-lg shadow-sm border border-gray-200 mx-auto">
+                <div className="transition-all duration-300 ease-in-out hover:shadow-md p-4 rounded-lg bg-gray-50">
                     <InputLabel
                         htmlFor="current_password"
-                        value="Current Password"
+                        value="Contraseña Actual"
+                        className="text-gray-800 font-semibold"
                     />
 
                     <TextInput
@@ -72,7 +73,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                             setData('current_password', e.target.value)
                         }
                         type="password"
-                        className="mt-1 block w-full"
+                        className="mt-1 block w-full border-gray-300 focus:border-black focus:ring focus:ring-gray-300 focus:ring-opacity-50 rounded-md shadow-sm bg-white text-gray-900"
                         autoComplete="current-password"
                     />
 
@@ -82,8 +83,12 @@ export default function UpdatePasswordForm({ className = '' }) {
                     />
                 </div>
 
-                <div>
-                    <InputLabel htmlFor="password" value="New Password" />
+                <div className="transition-all duration-300 ease-in-out hover:shadow-md p-4 rounded-lg bg-gray-50">
+                    <InputLabel 
+                        htmlFor="password" 
+                        value="Nueva Contraseña" 
+                        className="text-gray-800 font-semibold"
+                    />
 
                     <TextInput
                         id="password"
@@ -91,17 +96,18 @@ export default function UpdatePasswordForm({ className = '' }) {
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
                         type="password"
-                        className="mt-1 block w-full"
+                        className="mt-1 block w-full border-gray-300 focus:border-black focus:ring focus:ring-gray-300 focus:ring-opacity-50 rounded-md shadow-sm bg-white text-gray-900"
                         autoComplete="new-password"
                     />
 
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div>
+                <div className="transition-all duration-300 ease-in-out hover:shadow-md p-4 rounded-lg bg-gray-50">
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="Confirmar Contraseña"
+                        className="text-gray-800 font-semibold"
                     />
 
                     <TextInput
@@ -111,7 +117,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                             setData('password_confirmation', e.target.value)
                         }
                         type="password"
-                        className="mt-1 block w-full"
+                        className="mt-1 block w-full border-gray-300 focus:border-black focus:ring focus:ring-gray-300 focus:ring-opacity-50 rounded-md shadow-sm bg-white text-gray-900"
                         autoComplete="new-password"
                     />
 
@@ -121,18 +127,24 @@ export default function UpdatePasswordForm({ className = '' }) {
                     />
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                <div className="flex items-center justify-center gap-4 pt-4 border-t border-gray-300 mt-6">
+                    <PrimaryButton 
+                        disabled={processing}
+                        className="bg-black hover:bg-gray-800 focus:ring-gray-500 px-6 py-2 transition-all duration-300 text-white"
+                    >
+                        Guardar
+                    </PrimaryButton>
 
                     <Transition
                         show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
+                        enter="transition ease-in-out duration-500"
+                        enterFrom="opacity-0 translate-y-2"
+                        enterTo="opacity-100 translate-y-0"
+                        leave="transition ease-in-out duration-300"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">
-                            Saved.
+                        <p className="text-sm bg-gray-100 text-gray-800 px-4 py-2 rounded-md border border-gray-300">
+                            Guardado con éxito
                         </p>
                     </Transition>
                 </div>

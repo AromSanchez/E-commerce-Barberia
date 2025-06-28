@@ -8,6 +8,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
 import { CartProvider } from '@/contexts/CartContext';
+import { FilterProvider } from '@/contexts/FilterContext';
 
 // Configuración de NProgress
 NProgress.configure({
@@ -53,8 +54,10 @@ createInertiaApp({
         const root = createRoot(el);
         root.render(
             <CartProvider>
-                <App {...props} />
-                <ToastContainer />
+                <FilterProvider>
+                    <App {...props} />
+                    <ToastContainer />
+                </FilterProvider>
             </CartProvider>
         );
     },
