@@ -8,8 +8,11 @@ use App\Models\OrderItem;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
+use App\Mail\OrderReceiptMail;
+use App\Services\PDFService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 
@@ -108,27 +111,36 @@ class OrderController extends Controller
                     'price' => $product->sale_price ?? $product->regular_price,
                 ]);
 
+                // Reducir stock si no se hizo en PaymentController
                 $product->decrement('stock', $item['quantity']);
+            }
+            
+            // Generar la boleta PDF
+            try {
+                $pdfService = new PDFService();
+                $pdfPath = $pdfService->generateReceiptPDF($order);
+                
+                // Guardar ruta del PDF en la orden
+                $order->invoice_path = $pdfPath;
+                $order->save();
+                
+                // Enviar correo con la boleta si tenemos un usuario con email
+                if ($user && $user->email) {
+                    Mail::to($user->email)->send(new OrderReceiptMail($order, $pdfPath));
+                    Log::info('Boleta enviada por correo a: ' . $user->email);
+                } else if ($request->has('customer_email') && filter_var($request->customer_email, FILTER_VALIDATE_EMAIL)) {
+                    // Si no hay usuario pero tenemos un email en la solicitud
+                    Mail::to($request->customer_email)->send(new OrderReceiptMail($order, $pdfPath));
+                    Log::info('Boleta enviada por correo a: ' . $request->customer_email);
+                }
+            } catch (\Exception $e) {
+                // Si hay un error en la generación o envío del PDF, lo registramos pero no fallamos la orden
+                Log::error('Error al generar/enviar la boleta: ' . $e->getMessage());
             }
 
             DB::commit();
 
             Log::info('Orden guardada con éxito');
-            // AQUI ES DONDE GENERAMOS EL PDF DE LA ORDEN
-            Log::debug('Generando PDF para la orden: ' . $order->id);
-
-            $order->load('items.product');
-
-            $pdf = Pdf::loadView('pdf.boleta', ['order' => $order]);
-
-            $filename = $order->order_number . '.pdf'; // 👈 aquí usas el número
-            $path = 'facturas/' . $filename;
-
-            Storage::disk('public')->makeDirectory('facturas'); // crea carpeta si no existe
-            Storage::disk('public')->put($path, $pdf->output());
-
-            // Guarda la ruta en la orden
-            $order->update(['invoice_path' => $path]);
             return response()->json(['message' => 'Orden guardada con éxito'], 201);
         } catch (\Exception $e) {
             DB::rollBack();

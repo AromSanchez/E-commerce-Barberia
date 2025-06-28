@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useFilter } from '@/contexts/FilterContext';
 
@@ -10,23 +10,11 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
     // Agrupar las opciones por categoría principal
     const categoriasPorGrupo = useMemo(() => {
         const grupos = {};
-        
-        // Por defecto, todas las principales están colapsadas (cambiado de expandidas a colapsadas)
-        if (!Object.keys(expandedMainCategories).length && mainCategories.length) {
-            const initialExpanded = {};
-            mainCategories.forEach(cat => {
-                initialExpanded[cat.id] = false; // Inicialmente colapsadas
-            });
-            setExpandedMainCategories(initialExpanded);
-        }
-        
         // Crear un grupo "Sin clasificar" para categorías sin categoría principal
         grupos['sin_clasificar'] = [];
-        
         // Agrupar las opciones por su main_category_id
         opciones.forEach(opcion => {
             const mainCategoryId = opcion.main_category_id;
-            
             if (mainCategoryId) {
                 if (!grupos[mainCategoryId]) {
                     grupos[mainCategoryId] = [];
@@ -36,9 +24,21 @@ export default function CategoryFilter({ titulo, opciones = [], seleccionados = 
                 grupos['sin_clasificar'].push(opcion);
             }
         });
-        
         return grupos;
-    }, [opciones, mainCategories, expandedMainCategories, setExpandedMainCategories]);
+    }, [opciones, mainCategories]);
+
+    // Solo inicializar expandedMainCategories una vez, en un efecto
+    const initializedExpanded = useRef(false);
+    useEffect(() => {
+        if (!initializedExpanded.current && mainCategories.length && Object.keys(expandedMainCategories).length === 0) {
+            const initialExpanded = {};
+            mainCategories.forEach(cat => {
+                initialExpanded[cat.id] = false;
+            });
+            setExpandedMainCategories(initialExpanded);
+            initializedExpanded.current = true;
+        }
+    }, [mainCategories, expandedMainCategories, setExpandedMainCategories]);
 
     // Calcular el total de productos por categoría principal
     const totalPorCategoriaPrincipal = useMemo(() => {

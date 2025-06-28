@@ -45,6 +45,7 @@ const CheckoutForm = ({ total = 0, amount = 0, onSuccess, customerData = {}, pro
         amount: paymentAmount,
         customer_name: customerData.customer_name,
         customer_phone: customerData.customer_phone,
+        customer_email: customerData.customer_email, // Añadimos el email
         shipping_address: customerData.shipping_address,
         products: products.map(p => ({
           id: p.id,
@@ -76,6 +77,7 @@ const CheckoutForm = ({ total = 0, amount = 0, onSuccess, customerData = {}, pro
             amount: paymentAmount,
             customer_name: customerData.customer_name,
             customer_phone: customerData.customer_phone,
+            customer_email: customerData.customer_email, // Añadimos el email
             shipping_address: customerData.shipping_address,
             products: products.map(p => ({
               id: p.id,
@@ -87,7 +89,7 @@ const CheckoutForm = ({ total = 0, amount = 0, onSuccess, customerData = {}, pro
           await axios.post(route('cart.clear'));
 
           setSuccess(true);
-          toast.success('¡Pago realizado y orden guardada!');
+          toast.success('¡Pago realizado y orden guardada! Recibirás la factura en tu correo.');
           if (onSuccess) onSuccess();
 
           // Redirigir a la tienda después de 2 segundos

@@ -15,6 +15,7 @@ import {
   Truck,
   X
 } from 'lucide-react';
+import { route } from 'ziggy-js';
 import VerSeguimiento from './VerSeguimiento';
 import CustomModal from './CustomModal';
 import { Badge } from '@/components/ui/badge';
@@ -108,7 +109,8 @@ export default function OrdenList({ orders, searchTerm, statusFilter, generarTra
 
   // Función para descargar una factura
   const downloadInvoice = (order) => {
-    const url = `/ordenes/${order.id}/factura`;
+    // Usar route() para generar la URL correcta
+    const url = route('orders.download-invoice', { order: order.id });
     window.open(url, '_blank');
   };
 
