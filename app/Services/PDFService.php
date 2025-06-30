@@ -18,23 +18,23 @@ class PDFService
     public function generateReceiptPDF(Order $order): string
     {
         $pdf = PDF::loadView('pdf.boleta', ['order' => $order]);
-        
+
         // Definir ruta relativa al disco "public"
         $relativePath = 'pdf/receipts';
-        
+
         // Asegurar que el directorio existe
         Storage::disk('public')->makeDirectory($relativePath);
-        
+
         // Generar un nombre único para el PDF
-        $fileName = 'boleta_' . $order->id . '_' . Str::random(8) . '.pdf';
+        $fileName = $order->order_number . '.pdf';
         $fullRelativePath = $relativePath . '/' . $fileName;
-        
+
         // Guardar el PDF usando Storage
         Storage::disk('public')->put(
-            $fullRelativePath, 
+            $fullRelativePath,
             $pdf->output()
         );
-        
+
         // Devolver la ruta relativa para guardar en la base de datos
         return $fullRelativePath;
     }

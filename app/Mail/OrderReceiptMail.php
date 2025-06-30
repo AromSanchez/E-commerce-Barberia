@@ -60,7 +60,7 @@ class OrderReceiptMail extends Mailable
         
         return [
             Attachment::fromPath($fullPath)
-                ->as('boleta_compra_' . $this->order->id . '.pdf')
+                ->as('boleta_' . $this->order->order_number . '.pdf')
                 ->withMime('application/pdf'),
         ];
     }
