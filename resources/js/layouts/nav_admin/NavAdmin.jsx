@@ -97,9 +97,6 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                                 )}
                             </button>
                             <div className={`pl-10 mt-2 space-y-2 overflow-hidden transition-all duration-300 ${activeDropdown === 'orders' && !isCollapsed ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                <Link href={route('dashboard.orders')} className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                                    Ordenes
-                                </Link>
                                 <Link href={route('dashboard.tracking')} className="block p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
                                     Seguimiento
                                 </Link>

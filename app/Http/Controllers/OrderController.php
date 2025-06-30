@@ -160,31 +160,7 @@ class OrderController extends Controller
             ], 500);
         }
     }
-    public function indexAdmin()
-    {
-
-        $orders = Order::with('items.product', 'user')
-            ->orderByDesc('created_at')
-            ->get()
-            ->map(function ($order) {
-                return [
-                    'id' => $order->id,
-                    'order_number' => $order->order_number,
-                    'customer_name' => $order->customer_name,
-                    'phone' => $order->customer_phone,
-                    'shipping_address' => $order->shipping_address,
-                    'total' => (float) $order->total_amount,
-                    'status' => $order->order_status,
-                    'order_date' => $order->created_at->toDateString(),
-                    'delivered_on' => $order->order_status === 'entregado' ? $order->updated_at->toDateString() : null,
-                    'total_items' => $order->items->sum('quantity'),
-                ];
-            });
-
-        return Inertia::render('DashAdmin/DashOrders/DashOrder', [
-            'orders' => $orders,
-        ]);
-    }
+    
     public function indexSeguimiento()
     {
         $orders = Order::with(['user', 'items.product'])

@@ -45,9 +45,6 @@ Route::get('/ordenes/{order}/factura', function (\App\Models\Order $order) {
 
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
-    Route::get('/dashboard/orders', [OrderController::class, 'indexAdmin'])->name('dashboard.orders');
-
-    // Nueva ruta para el seguimiento
     Route::get('/dashboard/tracking', [OrderController::class, 'indexSeguimiento'])->name('dashboard.tracking');
 });
 
