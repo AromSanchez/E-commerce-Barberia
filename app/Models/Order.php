@@ -31,6 +31,8 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    
+    public function refundRequest()
+    {
+        return $this->hasOne(\App\Models\RefundRequest::class);
+    }
 }

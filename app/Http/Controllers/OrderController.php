@@ -22,7 +22,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        $orders = Order::with('items.product')
+        $orders = Order::with(['items.product', 'refundRequest'])
             ->where('user_id', $user->id)
             ->orderByDesc('created_at')
             ->get()
@@ -43,11 +43,20 @@ class OrderController extends Controller
                     'items' => $order->items->map(fn($item) => [
                         'id' => $item->product_id,
                         'name' => $item->product->name,
-                        'price' => (float) $item->price, // 👈 aquí la magia
+                        'price' => (float) $item->price,
                         'quantity' => $item->quantity,
                         'image' => $item->product->image ?? 'https://placehold.co/200x200?text=Producto'
                     ]),
-                    'shippingAddress' => $order->shipping_address
+                    'shippingAddress' => $order->shipping_address,
+                    'refund_request' => $order->refundRequest ? [
+                        'id' => $order->refundRequest->id,
+                        'status' => $order->refundRequest->status,
+                        'reason' => $order->refundRequest->reason,
+                        'user_comment' => $order->refundRequest->user_comment,
+                        'admin_response' => $order->refundRequest->admin_response,
+                        'created_at' => $order->refundRequest->created_at,
+                        'updated_at' => $order->refundRequest->updated_at,
+                    ] : null,
                 ];
             });
 
@@ -90,8 +99,8 @@ class OrderController extends Controller
                 'customer_name' => $request->customer_name,
                 'customer_phone' => $request->customer_phone,
                 'shipping_address' => $request->shipping_address,
-                'payment_status' => 'pagado', 
-                'order_status' => 'pendiente', 
+                'payment_status' => 'pagado',
+                'order_status' => 'pendiente',
             ]);
             // Generar número personalizado
             $orderNumber = 'PED-' . now()->year . '-' . str_pad($order->id, 3, '0', STR_PAD_LEFT);
@@ -114,16 +123,16 @@ class OrderController extends Controller
                 // Reducir stock si no se hizo en PaymentController
                 $product->decrement('stock', $item['quantity']);
             }
-            
+
             // Generar la boleta PDF
             try {
                 $pdfService = new PDFService();
                 $pdfPath = $pdfService->generateReceiptPDF($order);
-                
+
                 // Guardar ruta del PDF en la orden
                 $order->invoice_path = $pdfPath;
                 $order->save();
-                
+
                 // Enviar correo con la boleta si tenemos un usuario con email
                 if ($user && $user->email) {
                     Mail::to($user->email)->send(new OrderReceiptMail($order, $pdfPath));
@@ -215,6 +224,5 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $order->order_status = $request->order_status;
         $order->save();
-
     }
 }

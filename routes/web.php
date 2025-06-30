@@ -9,6 +9,7 @@ use App\Http\Controllers\PublicProductController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RefundRequestController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
@@ -26,6 +27,9 @@ Route::get('/', function () {
     ]);
 });
 
+Route::post('/refund-requests', [RefundRequestController::class, 'store'])
+    ->middleware(['auth', 'verified'])
+    ->name('refund-requests.store');
 
 
 // Rutas de GENERAR FACTURA PARA DESCARGAR
@@ -84,6 +88,14 @@ Route::get('/ofertas', [PublicProductController::class, 'ofertas'])->name('ofert
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified', 'admin'])->name('dashboard');
+
+
+// Refund Requests (Solicitudes de reembolso)
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('/dashboard/requests', [RefundRequestController::class, 'index'])->name('dashboard.requests');
+
+    Route::put('/dashboard/requests/{refundRequest}/status', [RefundRequestController::class, 'updateStatus'])->name('dashboard.requests.updateStatus');
+});
 
 // Category Routes 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
@@ -167,13 +179,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Obtener el total enviado como parámetro que incluye el costo de envío
         $total = request('total', null);
-        
+
         // Si no se proporciona el total en la URL, calcularlo incluyendo el envío
         if ($total === null) {
             $subtotal = array_reduce($cart, function ($carry, $item) {
                 return $carry + ($item['price'] * $item['quantity']);
             }, 0);
-            
+
             // Envío gratis para compras mayores a 50 soles
             $shipping = $subtotal >= 50 ? 0 : 10.00;
             $total = $subtotal + $shipping;

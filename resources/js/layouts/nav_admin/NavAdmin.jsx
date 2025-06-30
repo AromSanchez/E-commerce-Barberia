@@ -7,7 +7,8 @@ import {
     Grid,
     Layers,
     FilePlus,
-    Tag
+    Tag,
+    RefreshCw
 } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 
@@ -79,6 +80,7 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                             </div>
                         </div>
                     </li>
+                    
                     {/* Orders Dropdown */}
                     <li>
                         <div className="relative">
@@ -128,6 +130,14 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                         </Link>
                     </li>
 
+                    {/* Reembolsos */}
+                    <li>
+                        <Link href={route('dashboard.requests')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
+                            <RefreshCw className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
+                            {!isCollapsed && <span>Reembolsos</span>}
+                        </Link>
+                    </li>
+
                     <li>
                         <Link href={route('dashboard.users')} className={`flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 ${isCollapsed ? 'justify-center' : ''}`}>
                             <Users className={`${isCollapsed ? 'text-2xl' : 'text-lg mr-3'}`} />
@@ -139,7 +149,7 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
                 </ul>
             </nav>
         </div>
-    );z
+    );
 };
 
 export default NavAdmin;
