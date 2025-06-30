@@ -49,6 +49,12 @@ class RefundRequestController extends Controller
             'admin_response' => $request->admin_response,
             'processed_at' => now(),
         ]);
+        // Si se aprueba, también cancela el pedido
+        if ($request->action === 'aprobar') {
+            $refundRequest->order->update([
+                'order_status' => 'cancelado',
+            ]);
+        }
 
         return back()->with('success', 'Solicitud de reembolso actualizada.');
     }
