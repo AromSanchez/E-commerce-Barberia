@@ -1,12 +1,68 @@
-import React, { useState } from 'react';
-import { Bell, Search, LogOut, Settings, User, Mail, FileText, Headphones, Package } from 'lucide-react';
-import { Link, usePage } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Bell, Search, LogOut, User, Mail, Package, ShoppingBag } from 'lucide-react';
+import { Link, usePage, router } from '@inertiajs/react';
 
 const HeadAdmin = () => {
-    const { auth } = usePage().props;
+    const { auth, products } = usePage().props; // Obtener productos de las props
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Función para filtrar productos
+    const filterProducts = (term) => {
+        if (!term.trim()) {
+            setFilteredProducts([]);
+            return;
+        }
+
+        // Si tienes productos en props, úsalos
+        if (products && products.length > 0) {
+            const filtered = products.filter(product =>
+                product.name.toLowerCase().includes(term.toLowerCase()) ||
+                (product.short_description && product.short_description.toLowerCase().includes(term.toLowerCase()))
+            ).slice(0, 5); // Limitar a 5 resultados
+            setFilteredProducts(filtered);
+        } else {
+            // Si no tienes productos en props, hacer una petición AJAX
+            searchProductsAjax(term);
+        }
+    };
+
+    // Función para buscar productos via AJAX (opcional)
+    const searchProductsAjax = async (term) => {
+        setIsLoading(true);
+        try {
+            const response = await fetch(`/admin/search-products?q=${encodeURIComponent(term)}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                }
+            });
+            const data = await response.json();
+            setFilteredProducts(data.products || []);
+        } catch (error) {
+            console.error('Error searching products:', error);
+            setFilteredProducts([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Efecto para búsqueda en tiempo real
+    useEffect(() => {
+        const delayedSearch = setTimeout(() => {
+            if (searchTerm && isSearchActive) {
+                filterProducts(searchTerm);
+            } else {
+                setFilteredProducts([]);
+            }
+        }, 300); // Debounce de 300ms
+
+        return () => clearTimeout(delayedSearch);
+    }, [searchTerm, isSearchActive, products]);
 
     // Función para cerrar los dropdowns cuando se hace clic fuera
     const handleClickOutside = (e) => {
@@ -16,37 +72,154 @@ const HeadAdmin = () => {
         if (!e.target.closest('.notifications-dropdown')) {
             setIsNotificationsOpen(false);
         }
+        if (!e.target.closest('.search-dropdown')) {
+            setIsSearchActive(false);
+            setSearchTerm('');
+            setFilteredProducts([]);
+        }
     };
 
     // Efecto para agregar el event listener
-    React.useEffect(() => {
+    useEffect(() => {
         document.addEventListener('click', handleClickOutside);
         return () => {
             document.removeEventListener('click', handleClickOutside);
         };
     }, []);
 
+    // Función para manejar el submit del formulario
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (searchTerm.trim()) {
+            // Redirigir a página de resultados completos
+            router.get('/admin/products', { search: searchTerm });
+        }
+    };
+
+    // Función para formatear precio
+    const formatPrice = (regularPrice, salePrice) => {
+        if (salePrice && salePrice < regularPrice) {
+            return (
+                <div className="flex items-center space-x-2">
+                    <span className="text-red-600 font-semibold">${salePrice}</span>
+                    <span className="text-gray-400 line-through text-sm">${regularPrice}</span>
+                </div>
+            );
+        }
+        return <span className="font-semibold">${regularPrice}</span>;
+    };
+
     return (
         <div className="bg-white border-b px-6 py-2.5">
             <div className="flex items-center justify-between">
                 <div className="flex-1 max-w-3xl">
-                    <form className="relative">
+                    <form className="relative search-dropdown" onSubmit={handleSearchSubmit}>
                         <input 
                             type="text" 
-                            placeholder="Buscar aquí..." 
+                            placeholder="Buscar productos..." 
                             className="w-full pl-4 pr-10 py-2.5 border rounded-lg focus:outline-none focus:border-blue-500"
                             name="search"
-                            onClick={() => setIsSearchActive(true)}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onFocus={() => setIsSearchActive(true)}
                         />
                         <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
                             <Search className="h-5 w-5 text-gray-400" />
                         </button>
                         
-                        {isSearchActive && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border p-4">
-                                <h3 className="text-sm font-semibold mb-3">Productos más vendidos</h3>
-                                <div className="border-t border-gray-200 my-2"></div>
-                                {/* Lista de productos */}
+                        {isSearchActive && (searchTerm || filteredProducts.length > 0) && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border max-h-96 overflow-y-auto z-50">
+                                {isLoading ? (
+                                    <div className="p-4 text-center">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+                                        <p className="text-sm text-gray-500 mt-2">Buscando...</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {filteredProducts.length > 0 ? (
+                                            <>
+                                                <div className="p-4 border-b">
+                                                    <h3 className="text-sm font-semibold text-gray-700">
+                                                        Productos encontrados ({filteredProducts.length})
+                                                    </h3>
+                                                </div>
+                                                <div className="py-2">
+                                                    {filteredProducts.map((product) => (
+                                                        <Link
+                                                            key={product.id}
+                                                            href={`/admin/products/${product.id}`}
+                                                            className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors duration-200"
+                                                        >
+                                                            <div className="flex-shrink-0 mr-3">
+                                                                {product.image ? (
+                                                                    <img 
+                                                                        src={`/storage/${product.image}`} 
+                                                                        alt={product.name}
+                                                                        className="h-10 w-10 rounded-lg object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="h-10 w-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                                                                        <ShoppingBag className="h-5 w-5 text-gray-400" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center justify-between">
+                                                                    <h4 className="text-sm font-medium text-gray-900 truncate">
+                                                                        {product.name}
+                                                                    </h4>
+                                                                    <div className="ml-2 flex-shrink-0">
+                                                                        {formatPrice(product.regular_price, product.sale_price)}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center justify-between mt-1">
+                                                                    <p className="text-xs text-gray-500 truncate">
+                                                                        {product.short_description || 'Sin descripción'}
+                                                                    </p>
+                                                                    <div className="flex items-center space-x-2 ml-2">
+                                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                                                            product.stock > 0 
+                                                                                ? 'bg-green-100 text-green-800' 
+                                                                                : 'bg-red-100 text-red-800'
+                                                                        }`}>
+                                                                            Stock: {product.stock}
+                                                                        </span>
+                                                                        {product.is_featured === 'yes' && (
+                                                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                                                Destacado
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                                <div className="border-t p-3">
+                                                    <button 
+                                                        type="submit"
+                                                        className="w-full py-2 text-center text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200 text-sm font-medium"
+                                                    >
+                                                        Ver todos los resultados para "{searchTerm}"
+                                                    </button>
+                                                </div>
+                                            </>
+                                        ) : searchTerm && (
+                                            <div className="p-4 text-center">
+                                                <ShoppingBag className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                                                <p className="text-sm text-gray-500">
+                                                    No se encontraron productos para "{searchTerm}"
+                                                </p>
+                                                <button 
+                                                    type="submit"
+                                                    className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                                >
+                                                    Buscar en todos los productos
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </div>
                         )}
                     </form>
