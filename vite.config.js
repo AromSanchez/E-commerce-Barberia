@@ -12,6 +12,14 @@ export default defineConfig({
         }),
         react(),
     ],
+    server: {
+        host: '0.0.0.0', // Permite conexiones desde cualquier dirección IP
+        port: 5173, // Puerto por defecto de Vite
+        strictPort: false, // Si el puerto está ocupado, intenta con el siguiente
+        hmr: {
+            host: 'localhost',
+        },
+    },
     resolve: {
         alias: {
             '@': path.resolve(__dirname, 'resources/js'), // 👉 alias configurado
