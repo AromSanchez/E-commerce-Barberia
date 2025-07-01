@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use App\Models\Coupon;
 use App\Models\Product;
 use Inertia\Inertia;
 
@@ -27,7 +28,7 @@ class CartController extends Controller
 
         $cart = Session::get('cart', []);
         $product = Product::findOrFail($validated['product_id']);
-        
+
         $cartItem = [
             'id' => $product->id,
             'name' => $product->name,
@@ -123,20 +124,89 @@ class CartController extends Controller
     public function getCart()
     {
         $cart = Session::get('cart', []);
+        $coupon = Session::get('coupon');
         $total = 0;
 
-        // Asegurarse de que todas las imágenes tengan la ruta correcta
+        // Calcular el total y corregir rutas de imágenes
         foreach ($cart as &$item) {
             $total += $item['price'] * $item['quantity'];
-            // Si la imagen no tiene el prefijo /storage/ o /images/, agregarlo
+
             if ($item['image'] && !str_starts_with($item['image'], '/storage/') && !str_starts_with($item['image'], '/images/')) {
                 $item['image'] = '/storage/' . $item['image'];
             }
         }
 
+        $discount = 0;
+
+        // Si hay un cupón en sesión, aplicar descuento
+        if ($coupon) {
+            if ($coupon['type'] === 'fixed') {
+                $discount = $coupon['value'];
+            } elseif ($coupon['type'] === 'percentage') {
+                $discount = $total * ($coupon['value'] / 100);
+            }
+        }
+
+        $totalAfterDiscount = max(0, $total - $discount);
+
         return response()->json([
             'items' => $cart,
-            'total' => $total
+            'total' => round($total, 2),
+            'discount' => round($discount, 2),
+            'total_after_discount' => round($totalAfterDiscount, 2),
+            'coupon' => $coupon
+        ]);
+    }
+
+
+    public function applyCoupon(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|exists:coupons,code'
+        ]);
+
+        $coupon = Coupon::where('code', $request->code)->where('is_active', true)->first();
+
+        if (!$coupon) {
+            return response()->json(['message' => 'Cupón inválido o inactivo'], 404);
+        }
+
+        if ($coupon->expires_at && $coupon->expires_at->isPast()) {
+            return response()->json(['message' => 'El cupón ha expirado'], 400);
+        }
+
+        if ($coupon->usage_limit !== null && $coupon->usage_count >= $coupon->usage_limit) {
+            return response()->json(['message' => 'El cupón ha alcanzado su límite de uso'], 400);
+        }
+
+        $cart = Session::get('cart', []);
+        $total = 0;
+
+        foreach ($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+
+        if ($coupon->min_amount !== null && $total < $coupon->min_amount) {
+            return response()->json(['message' => 'El total del carrito no cumple con el mínimo requerido para este cupón'], 400);
+        }
+
+        $discount = 0;
+        if ($coupon->type === 'fixed') {
+            $discount = $coupon->value;
+        } elseif ($coupon->type === 'percentage') {
+            $discount = $total * ($coupon->value / 100);
+        }
+
+        $newTotal = max(0, $total - $discount);
+
+        // Puedes guardar el cupón en la sesión
+        Session::put('coupon', $coupon);
+
+        return response()->json([
+            'message' => 'Cupón aplicado exitosamente',
+            'coupon' => $coupon,
+            'discount' => round($discount, 2),
+            'new_total' => round($newTotal, 2)
         ]);
     }
 }

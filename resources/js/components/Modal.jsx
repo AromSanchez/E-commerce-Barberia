@@ -1,27 +1,25 @@
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog } from '@headlessui/react';
 import { Fragment } from 'react';
 
 export default function Modal({
     children,
-    show = false,
-    maxWidth = '2xl',
+    open = false,
     closeable = true,
     onClose = () => {},
 }) {
     return (
-        <Transition show={show} as={Fragment}>
-            <Dialog
-                as="div"
-                className="fixed inset-0 z-50 overflow-y-auto"
-                onClose={closeable ? onClose : () => {}}
-            >
-                <div className="min-h-screen px-4 text-center">
-                    <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-                    <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
-                        {children}
-                    </div>
-                </div>
-            </Dialog>
-        </Transition>
+        <Dialog
+            as={Fragment}
+            open={open}
+            onClose={closeable ? onClose : () => {}}
+        >
+            <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+                <div className="fixed inset-0 bg-black/50" aria-hidden="true" />
+                
+                <Dialog.Panel className="relative z-10 w-full max-w-md p-6 mx-auto my-8 bg-white rounded-lg shadow-xl">
+                    {children}
+                </Dialog.Panel>
+            </div>
+        </Dialog>
     );
 }

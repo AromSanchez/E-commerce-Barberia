@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RefundRequestController;
+use App\Http\Controllers\CouponController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
@@ -17,6 +18,9 @@ use Illuminate\Support\Facades\Storage;
 
 use Inertia\Inertia;
 use App\Http\Controllers\CartController;
+
+Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
+
 
 Route::get('/', function () {
     return Inertia::render('Home', [
@@ -122,9 +126,12 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
 
 
-Route::get('/dashboard/coupon', function () {
-    return Inertia::render('DashAdmin/DashCoupon');
-})->middleware(['auth', 'verified', 'admin'])->name('dashboard.coupon');
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('/dashboard/coupon', [CouponController::class, 'index'])->name('dashboard.coupon');
+    Route::post('/coupons', [CouponController::class, 'store'])->name('coupons.store');
+    Route::put('/coupons/{coupon}', [CouponController::class, 'update'])->name('coupons.update');
+    Route::delete('/coupons/{coupon}', [CouponController::class, 'destroy'])->name('coupons.destroy');
+});
 
 Route::get('/dashboard/users', [UsersController::class, 'index'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.users');
 Route::put('/dashboard/users/{id}', [UsersController::class, 'updateRole'])->middleware(['auth', 'verified', 'admin'])->name('dashboard.users.update-role');
