@@ -1,5 +1,5 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import NavAdmin from '@/layouts/nav_admin/NavAdmin';
 import HeadAdmin from '@/layouts/head_admin/HeadAdmin';
 import { Head, usePage, router } from '@inertiajs/react';
 import EditIcon from '@/components/Icons/EditIcon';
