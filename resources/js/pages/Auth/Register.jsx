@@ -49,7 +49,8 @@ export default function Register() {
             <div className="hidden lg:block lg:w-1/2 relative overflow-hidden">
                 {/* Imagen principal con máscara mejorada */}
                 <div 
-                    className="absolute inset-0 bg-[url('/images/loginbann.png')] bg-cover bg-center h-full"
+                    style={{ backgroundImage: `url('/images/loginbann.png')` }}
+                    className="absolute inset-0 bg-cover bg-center h-full"
                 ></div>
             </div>
 

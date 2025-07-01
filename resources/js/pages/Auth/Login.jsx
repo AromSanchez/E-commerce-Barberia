@@ -43,7 +43,8 @@ export default function Login({ status, canResetPassword }) {
         
         {/* Imagen principal con máscara mejorada */}
         <div 
-          className="absolute inset-0 bg-[url('/images/loginbann.png')] bg-cover bg-center"
+          style={{ backgroundImage: `url('/images/loginbann.png')` }}
+          className="absolute inset-0 bg-cover bg-center"
         ></div>
         
       </div>
