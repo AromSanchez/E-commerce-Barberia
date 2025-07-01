@@ -1,7 +1,7 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import HeadAdmin from '@/Layouts/head_admin/HeadAdmin';
-import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
+import HeadAdmin from '@/layouts/head_admin/HeadAdmin';
+import NavAdmin from '@/layouts/nav_admin/NavAdmin';
 import { useState } from "react"
 import { Search, Truck, Eye, FileText } from "lucide-react"
 import { usePage, router } from '@inertiajs/react';

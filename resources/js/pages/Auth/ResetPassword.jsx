@@ -1,7 +1,7 @@
-import InputError from '@/Components/InputError';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
+import InputError from '@/components/InputError';
+import PrimaryButton from '@/components/PrimaryButton';
+import TextInput from '@/components/TextInput';
+import GuestLayout from '@/layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';

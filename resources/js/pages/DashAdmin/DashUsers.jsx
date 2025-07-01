@@ -1,7 +1,7 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Head, usePage, router } from '@inertiajs/react';
-import HeadAdmin from '@/Layouts/head_admin/HeadAdmin';
-import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
+import HeadAdmin from '@/layouts/head_admin/HeadAdmin';
+import NavAdmin from '@/layouts/nav_admin/NavAdmin';
 import { useState, useEffect } from 'react';
 import EditIcon from '@/components/Icons/EditIcon';
 // Importamos los iconos necesarios

@@ -1,6 +1,6 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
+import NavAdmin from '@/layouts/nav_admin/NavAdmin';
 import HeadAdmin from '@/layouts/head_admin/HeadAdmin';
 import React, { useState } from 'react';
 import Cards from '@/components/AdminDash/Cards';
