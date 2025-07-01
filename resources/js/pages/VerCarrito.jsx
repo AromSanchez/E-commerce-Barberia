@@ -9,6 +9,7 @@ import PaymentForm from '@/components/PaymentForm';
 
 export default function VerCarrito() {
   const [cart, setCart] = useState([]);
+  
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [showUndo, setShowUndo] = useState(false);
@@ -21,7 +22,7 @@ export default function VerCarrito() {
   const fetchCart = useCallback(async () => {
     try {
       const response = await axios.get(route('cart.get'));
-      
+
       // Validar que la respuesta tenga la estructura esperada
       if (!response.data || !response.data.items) {
         throw new Error('Respuesta del servidor inválida');
@@ -35,7 +36,7 @@ export default function VerCarrito() {
         name: item.name || 'Producto sin nombre',
         image: item.image || '/images/no-image.png'
       }));
-      
+
       setCart(itemsWithNumericPrices);
     } catch (error) {
       console.error('Error al cargar el carrito:', error);
@@ -164,7 +165,7 @@ export default function VerCarrito() {
     }
 
     const newQuantity = item.quantity + delta;
-    
+
     if (newQuantity < 1) {
       // Si la cantidad sería 0 o negativa, preguntar si quiere eliminar
       if (window.confirm('¿Deseas eliminar este producto del carrito?')) {
@@ -174,13 +175,13 @@ export default function VerCarrito() {
     }
 
     setUpdating(true);
-    
+
     try {
       await axios.post(route('cart.update'), {
         product_id: id,
         quantity: newQuantity
       });
-      
+
       await fetchCart();
     } catch (error) {
       console.error('Error al actualizar cantidad:', error);
@@ -196,31 +197,29 @@ export default function VerCarrito() {
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
-      toast.warning('Por favor, ingresa un código de cupón', {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: true
-      });
+      toast.warning('Por favor, ingresa un código de cupón', { position: "top-right", autoClose: 2000 });
       return;
     }
 
     setUpdating(true);
-    
+
     try {
-      // Aquí iría la lógica para aplicar el cupón
-      // await axios.post(route('cart.applyCoupon'), { code: couponCode });
-      
-      toast.info('Funcionalidad de cupones próximamente disponible', {
+      const response = await axios.post(route('cart.applyCoupon'), { code: couponCode });
+
+      toast.success(response.data.message, {
         position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: true
+        autoClose: 2000
       });
+
+      // Si deseas guardar la info del cupón aplicado y mostrarla en el carrito:
+      // puedes setear estados: setDescuento(response.data.discount) etc.
+
     } catch (error) {
       console.error('Error al aplicar cupón:', error);
-      toast.error('Código de cupón inválido', {
+
+      toast.error(error.response?.data?.message || 'Cupón inválido', {
         position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true
+        autoClose: 3000
       });
     } finally {
       setUpdating(false);

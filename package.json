@@ -36,7 +36,7 @@
         "@ant-design/plots": "^2.5.0",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.1",
-        "@headlessui/react": "^0.0.0-insiders.bc76bbd",
+        "@headlessui/react": "^2.2.4",
         "@headlessui/vue": "^0.0.0-insiders.bc76bbd",
         "@heroicons/react": "^2.2.0",
         "@inertiajs/progress": "^0.2.7",

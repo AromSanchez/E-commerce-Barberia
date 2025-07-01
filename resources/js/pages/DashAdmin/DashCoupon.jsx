@@ -6,39 +6,44 @@ import { useState, useEffect } from 'react';
 import EditIcon from '@/components/Icons/EditIcon';
 import DeleteIcon from '@/components/Icons/DeleteIcon';
 import { Search, Tag } from 'lucide-react';
+import AddCouponDialog from '@/components/Dialogs/AddCouponDialog';
 
 export default function DashCoupon() {
+    const { coupons } = usePage().props;
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [couponList, setCouponList] = useState([]);
+    const [couponList, setCouponList] = useState(coupons || []);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [couponToEdit, setCouponToEdit] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Aquí podrías cargar los cupones desde props
-    // const { coupons } = usePage().props;
-    // useEffect(() => {
-    //     if (coupons) {
-    //         setCouponList(coupons);
-    //     }
-    // }, [coupons]);
-
-    // Datos de ejemplo para mostrar en la tabla
     useEffect(() => {
-        setCouponList([
-            { id: 1, code: 'WELCOME10', type: 'Porcentaje', value: '10%', cart_value: '$50.00', expiry_date: '2023-12-31' },
-            { id: 2, code: 'SUMMER20', type: 'Porcentaje', value: '20%', cart_value: '$100.00', expiry_date: '2023-09-30' },
-            { id: 3, code: 'FREESHIP', type: 'Fijo', value: '$15.00', cart_value: '$75.00', expiry_date: '2023-10-15' }
-        ]);
-    }, []);
+        setCouponList(coupons);
+    }, [coupons]);
 
     const handleAddCoupon = (newCoupon) => {
-        setCouponList([...couponList, newCoupon]);
+        router.post(route('coupons.store'), newCoupon, {
+            onSuccess: () => {
+                setIsDialogOpen(false);
+                router.reload({ only: ['coupons'] });
+            },
+            onError: (errors) => {
+                console.error('Error adding coupon:', errors);
+            }
+        });
     };
 
     const handleDeleteCoupon = (id) => {
-        // Implementar la lógica de eliminación
-        setCouponList(couponList.filter(coupon => coupon.id !== id));
+        if (confirm('¿Estás seguro de que quieres eliminar este cupón?')) {
+            router.delete(route('coupons.destroy', id), {
+                onSuccess: () => {
+                    router.reload({ only: ['coupons'] });
+                },
+                onError: (errors) => {
+                    console.error('Error deleting coupon:', errors);
+                }
+            });
+        }
     };
 
     const handleEditCoupon = (coupon) => {
@@ -47,16 +52,23 @@ export default function DashCoupon() {
     };
 
     const handleUpdateCoupon = (updatedCoupon) => {
-        setCouponList(couponList.map(coupon => 
-            coupon.id === updatedCoupon.id ? updatedCoupon : coupon
-        ));
-        setEditDialogOpen(false);
+        router.put(route('coupons.update', updatedCoupon.id), updatedCoupon, {
+            onSuccess: () => {
+                setEditDialogOpen(false);
+                router.reload({ only: ['coupons'] });
+            },
+            onError: (errors) => {
+                console.error('Error updating coupon:', errors);
+            }
+        });
     };
 
-    // Filtrar cupones según el término de búsqueda
     const filteredCoupons = couponList.filter(coupon => 
         coupon.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        coupon.type?.toLowerCase().includes(searchTerm.toLowerCase())
+        coupon.type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        coupon.value?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+        coupon.min_amount?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+        coupon.expires_at?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -113,12 +125,15 @@ export default function DashCoupon() {
                                             <thead className="sticky top-0 bg-white z-10 shadow-sm">
                                                 <tr>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">#</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Code</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Type</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Value</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Cart Value</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Expiry Date</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Action</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Código</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Tipo</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Valor</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Monto Mínimo</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Límite de Uso</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Usos</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Expira El</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Activo</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Acción</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-100">
@@ -136,8 +151,11 @@ export default function DashCoupon() {
                                                             </td>
                                                             <td className="p-4 text-sm text-gray-600">{coupon.type}</td>
                                                             <td className="p-4 text-sm text-gray-600">{coupon.value}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{coupon.cart_value}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{coupon.expiry_date}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{coupon.min_amount || 'N/A'}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{coupon.usage_limit || 'Unlimited'}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{coupon.usage_count}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() : 'N/A'}</td>
+                                                            <td className="p-4 text-sm text-gray-600">{coupon.is_active ? 'Yes' : 'No'}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
                                                                     <button 
@@ -158,7 +176,7 @@ export default function DashCoupon() {
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
+                                                        <td colSpan="10" className="px-6 py-4 text-center text-sm text-gray-500">
                                                             No hay cupones disponibles
                                                         </td>
                                                     </tr>
@@ -173,8 +191,18 @@ export default function DashCoupon() {
                 </div>
             </div>
 
-            {/* Aquí puedes añadir los componentes de diálogo para añadir y editar cupones */}
-            {/* Similar a AddCategoryDialog y EditCategoryDialog */}
+            <AddCouponDialog 
+                isOpen={isDialogOpen} 
+                onClose={() => setIsDialogOpen(false)} 
+                onAddCoupon={handleAddCoupon} 
+            />
+
+            {/* <EditCouponDialog 
+                isOpen={editDialogOpen} 
+                onClose={() => setEditDialogOpen(false)} 
+                coupon={couponToEdit} 
+                onUpdateCoupon={handleUpdateCoupon} 
+            /> */}
         </AuthenticatedLayout>
     );
 }
