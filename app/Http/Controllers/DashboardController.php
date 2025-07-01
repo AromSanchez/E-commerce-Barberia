@@ -16,13 +16,13 @@ class DashboardController extends Controller
         
         // Obtener datos mensuales de ingresos y pedidos para el año actual
         $monthlyStats = Order::select(
-            DB::raw('MONTH(created_at) as month'),
+            DB::raw('EXTRACT(MONTH FROM created_at) as month'),
             DB::raw('SUM(total_amount) as ingresos'),
             DB::raw('COUNT(*) as pedidos')
         )
         ->whereYear('created_at', $currentYear)
         ->where('payment_status', 'pagado')
-        ->groupBy(DB::raw('MONTH(created_at)'))
+        ->groupBy(DB::raw('EXTRACT(MONTH FROM created_at)'))
         ->orderBy('month')
         ->get();
         
@@ -96,13 +96,13 @@ class DashboardController extends Controller
         
         // Obtener datos mensuales de ventas (número de pedidos) y ganancias (total de ingresos)
         $monthlyStats = Order::select(
-            DB::raw('MONTH(created_at) as month'),
+            DB::raw('EXTRACT(MONTH FROM created_at) as month'),
             DB::raw('COUNT(*) as ventas'),
             DB::raw('SUM(total_amount) as ganancia')
         )
         ->whereYear('created_at', $currentYear)
         ->where('payment_status', 'pagado')
-        ->groupBy(DB::raw('MONTH(created_at)'))
+        ->groupBy(DB::raw('EXTRACT(MONTH FROM created_at)'))
         ->orderBy('month')
         ->get();
         
@@ -165,13 +165,13 @@ class DashboardController extends Controller
         
         // Obtener datos anuales de ventas (número de pedidos) y ganancias (total de ingresos)
         $yearlyStats = Order::select(
-            DB::raw('YEAR(created_at) as year'),
+            DB::raw('EXTRACT(YEAR FROM created_at) as year'),
             DB::raw('COUNT(*) as ventas'),
             DB::raw('SUM(total_amount) as ganancia')
         )
         ->whereYear('created_at', '>=', $startYear)
         ->where('payment_status', 'pagado')
-        ->groupBy(DB::raw('YEAR(created_at)'))
+        ->groupBy(DB::raw('EXTRACT(YEAR FROM created_at)'))
         ->orderBy('year')
         ->get();
         
