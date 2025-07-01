@@ -211,8 +211,12 @@ export default function VerCarrito() {
         autoClose: 2000
       });
 
-      // Si deseas guardar la info del cupón aplicado y mostrarla en el carrito:
-      // puedes setear estados: setDescuento(response.data.discount) etc.
+      // Actualizar el carrito para reflejar el descuento del cupón inmediatamente
+      await fetchCart();
+      setCouponCode(''); // Limpiar el campo después de aplicar el cupón
+      
+      // Disparar evento personalizado para notificar la actualización del carrito
+      window.dispatchEvent(new Event('cartUpdated'));
 
     } catch (error) {
       console.error('Error al aplicar cupón:', error);

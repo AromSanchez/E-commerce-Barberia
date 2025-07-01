@@ -93,15 +93,51 @@ class OrderController extends Controller
 
         try {
             Log::debug('Creando orden...');
+            
+            // Obtener cupón de la sesión si existe
+            $coupon = session()->get('coupon');
+            $discount = 0;
+            $couponId = null;
+
+            // Calcular el total sin descuentos
+            $total = 0;
+            foreach ($request->products as $item) {
+                $product = Product::findOrFail($item['id']);
+                $price = $product->sale_price ?? $product->regular_price;
+                $total += $price * $item['quantity'];
+            }
+            
+            // Aplicar descuento del cupón si existe
+            if ($coupon) {
+                if ($coupon['type'] === 'fixed') {
+                    $discount = $coupon['value'];
+                } elseif ($coupon['type'] === 'percentage') {
+                    $discount = $total * ($coupon['value'] / 100);
+                }
+                $couponId = $coupon['id'];
+                
+                // Actualizar contador de uso del cupón
+                $couponModel = \App\Models\Coupon::find($couponId);
+                if ($couponModel) {
+                    $couponModel->increment('usage_count');
+                }
+            }
+
+            // Total final después del descuento
+            $finalTotal = max(0, $total - $discount);
+            
             $order = Order::create([
                 'user_id' => $userId,
-                'total_amount' => $request->amount,
+                'total_amount' => $finalTotal,
                 'customer_name' => $request->customer_name,
                 'customer_phone' => $request->customer_phone,
                 'shipping_address' => $request->shipping_address,
                 'payment_status' => 'pagado',
                 'order_status' => 'pendiente',
+                'coupon_id' => $couponId,
+                'discount_amount' => $discount,
             ]);
+            
             // Generar número personalizado
             $orderNumber = 'PED-' . now()->year . '-' . str_pad($order->id, 3, '0', STR_PAD_LEFT);
             $order->order_number = $orderNumber;
@@ -109,6 +145,8 @@ class OrderController extends Controller
 
             Log::debug('Orden creada: ' . $order->id);
 
+            // Limpiar el cupón de la sesión después de usar
+            session()->forget('coupon');
 
             foreach ($request->products as $item) {
                 $product = Product::findOrFail($item['id']);

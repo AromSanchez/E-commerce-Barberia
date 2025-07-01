@@ -140,11 +140,18 @@ class CartController extends Controller
 
         // Si hay un cupón en sesión, aplicar descuento
         if ($coupon) {
-            if ($coupon['type'] === 'fixed') {
+            if (isset($coupon['discount'])) {
+                // Si ya tenemos el valor del descuento calculado
+                $discount = $coupon['discount'];
+            } else if ($coupon['type'] === 'fixed') {
                 $discount = $coupon['value'];
-            } elseif ($coupon['type'] === 'percentage') {
+            } else if ($coupon['type'] === 'percentage') {
                 $discount = $total * ($coupon['value'] / 100);
             }
+            
+            // Actualizar el valor del descuento en la sesión
+            $coupon['discount'] = $discount;
+            Session::put('coupon', $coupon);
         }
 
         $totalAfterDiscount = max(0, $total - $discount);
@@ -165,7 +172,7 @@ class CartController extends Controller
             'code' => 'required|string|exists:coupons,code'
         ]);
 
-        $coupon = Coupon::where('code', $request->code)->where('is_active', true)->first();
+        $coupon = Coupon::with(['brands', 'categories'])->where('code', $request->code)->where('is_active', true)->first();
 
         if (!$coupon) {
             return response()->json(['message' => 'Cupón inválido o inactivo'], 404);
@@ -181,9 +188,47 @@ class CartController extends Controller
 
         $cart = Session::get('cart', []);
         $total = 0;
-
-        foreach ($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
+        $applicableTotal = 0;
+        $hasCategoryOrBrandRestriction = $coupon->brands->count() > 0 || $coupon->categories->count() > 0;
+        
+        // Si hay restricciones de marca o categoría, verificar qué productos son aplicables
+        if ($hasCategoryOrBrandRestriction) {
+            $applicableProducts = [];
+            $brandIds = $coupon->brands->pluck('id')->toArray();
+            $categoryIds = $coupon->categories->pluck('id')->toArray();
+            
+            foreach ($cart as $itemId => $item) {
+                $product = Product::with(['category', 'brand'])->find($itemId);
+                
+                if ($product) {
+                    $isApplicable = false;
+                    
+                    if (count($brandIds) > 0 && in_array($product->brand_id, $brandIds)) {
+                        $isApplicable = true;
+                    }
+                    
+                    if (count($categoryIds) > 0 && in_array($product->category_id, $categoryIds)) {
+                        $isApplicable = true;
+                    }
+                    
+                    if ($isApplicable) {
+                        $applicableProducts[] = $itemId;
+                        $applicableTotal += $item['price'] * $item['quantity'];
+                    }
+                    
+                    $total += $item['price'] * $item['quantity'];
+                }
+            }
+            
+            if (empty($applicableProducts)) {
+                return response()->json(['message' => 'El cupón no es aplicable a ninguno de los productos en tu carrito'], 400);
+            }
+        } else {
+            // Si no hay restricciones, todos los productos son aplicables
+            foreach ($cart as $item) {
+                $total += $item['price'] * $item['quantity'];
+            }
+            $applicableTotal = $total;
         }
 
         if ($coupon->min_amount !== null && $total < $coupon->min_amount) {
@@ -192,21 +237,38 @@ class CartController extends Controller
 
         $discount = 0;
         if ($coupon->type === 'fixed') {
-            $discount = $coupon->value;
+            $discount = min($coupon->value, $applicableTotal);
         } elseif ($coupon->type === 'percentage') {
-            $discount = $total * ($coupon->value / 100);
+            $discount = $applicableTotal * ($coupon->value / 100);
         }
 
         $newTotal = max(0, $total - $discount);
 
-        // Puedes guardar el cupón en la sesión
-        Session::put('coupon', $coupon);
+        // Guardar el cupón en la sesión con sus detalles
+        Session::put('coupon', [
+            'id' => $coupon->id,
+            'code' => $coupon->code,
+            'type' => $coupon->type,
+            'value' => $coupon->value,
+            'min_amount' => $coupon->min_amount,
+            'discount' => $discount,
+            'brands' => $coupon->brands->count() > 0 ? $coupon->brands->pluck('id')->toArray() : [],
+            'categories' => $coupon->categories->count() > 0 ? $coupon->categories->pluck('id')->toArray() : [],
+        ]);
 
         return response()->json([
             'message' => 'Cupón aplicado exitosamente',
             'coupon' => $coupon,
             'discount' => round($discount, 2),
             'new_total' => round($newTotal, 2)
+        ]);
+    }
+
+    public function removeCoupon()
+    {
+        Session::forget('coupon');
+        return response()->json([
+            'message' => 'Cupón eliminado correctamente'
         ]);
     }
 }

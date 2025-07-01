@@ -7,9 +7,11 @@ import EditIcon from '@/components/Icons/EditIcon';
 import DeleteIcon from '@/components/Icons/DeleteIcon';
 import { Search, Tag } from 'lucide-react';
 import AddCouponDialog from '@/components/Dialogs/AddCouponDialog';
+import EditCouponDialog from '@/components/Dialogs/EditCouponDialog';
+import Swal from 'sweetalert2';
 
 export default function DashCoupon() {
-    const { coupons } = usePage().props;
+    const { coupons, brands, categories } = usePage().props;
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [couponList, setCouponList] = useState(coupons || []);
@@ -25,25 +27,67 @@ export default function DashCoupon() {
         router.post(route('coupons.store'), newCoupon, {
             onSuccess: () => {
                 setIsDialogOpen(false);
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+                
+                Toast.fire({
+                    icon: 'success',
+                    title: '¡Cupón creado exitosamente!'
+                })
                 router.reload({ only: ['coupons'] });
             },
             onError: (errors) => {
                 console.error('Error adding coupon:', errors);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo crear el cupón. Por favor, revisa los campos e intenta nuevamente.',
+                })
             }
         });
     };
 
     const handleDeleteCoupon = (id) => {
-        if (confirm('¿Estás seguro de que quieres eliminar este cupón?')) {
-            router.delete(route('coupons.destroy', id), {
-                onSuccess: () => {
-                    router.reload({ only: ['coupons'] });
-                },
-                onError: (errors) => {
-                    console.error('Error deleting coupon:', errors);
-                }
-            });
-        }
+        Swal.fire({
+            title: '¿Eliminar cupón?',
+            text: "Esta acción no se puede revertir",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(route('coupons.destroy', id), {
+                    onSuccess: () => {
+                        Swal.fire(
+                            '¡Eliminado!',
+                            'El cupón ha sido eliminado correctamente.',
+                            'success'
+                        );
+                        router.reload({ only: ['coupons'] });
+                    },
+                    onError: (errors) => {
+                        console.error('Error deleting coupon:', errors);
+                        Swal.fire(
+                            'Error',
+                            'No se pudo eliminar el cupón',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
     };
 
     const handleEditCoupon = (coupon) => {
@@ -55,12 +99,61 @@ export default function DashCoupon() {
         router.put(route('coupons.update', updatedCoupon.id), updatedCoupon, {
             onSuccess: () => {
                 setEditDialogOpen(false);
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+                
+                Toast.fire({
+                    icon: 'success',
+                    title: '¡Cupón actualizado exitosamente!'
+                });
                 router.reload({ only: ['coupons'] });
             },
             onError: (errors) => {
                 console.error('Error updating coupon:', errors);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo actualizar el cupón. Por favor, revisa los campos e intenta nuevamente.',
+                });
             }
         });
+    };
+
+    // Función para mostrar las restricciones del cupón (marcas/categorías)
+    const displayRestrictions = (coupon) => {
+        const hasBrands = coupon.brands && coupon.brands.length > 0;
+        const hasCategories = coupon.categories && coupon.categories.length > 0;
+        
+        if (!hasBrands && !hasCategories) {
+            return "Todos los productos";
+        }
+        
+        let restrictions = [];
+        
+        if (hasBrands) {
+            const brandsText = coupon.brands.length > 1 
+                ? `${coupon.brands.length} marcas` 
+                : coupon.brands[0].name;
+            restrictions.push(`Marcas: ${brandsText}`);
+        }
+        
+        if (hasCategories) {
+            const categoriesText = coupon.categories.length > 1 
+                ? `${coupon.categories.length} categorías` 
+                : coupon.categories[0].name;
+            restrictions.push(`Categorías: ${categoriesText}`);
+        }
+        
+        return restrictions.join(', ');
     };
 
     const filteredCoupons = couponList.filter(coupon => 
@@ -129,57 +222,80 @@ export default function DashCoupon() {
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Tipo</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Valor</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Monto Mínimo</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Límite de Uso</th>
+                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Restricciones</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Usos</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Expira El</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Activo</th>
-                                                    <th className="p-4 text-left text-sm font-semibold text-gray-600">Acción</th>
+                                                    <th className="p-4 text-center text-sm font-semibold text-gray-600">Acciones</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-gray-100">
-                                                {filteredCoupons.length > 0 ? (
+                                            <tbody>
+                                                {filteredCoupons.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan="10" className="text-center p-4 text-gray-500">No hay cupones para mostrar</td>
+                                                    </tr>
+                                                ) : (
                                                     filteredCoupons.map((coupon, index) => (
                                                         <tr key={coupon.id} className="hover:bg-gray-50">
                                                             <td className="p-4 text-sm text-gray-600">{index + 1}</td>
-                                                            <td className="p-4">
-                                                                <div className="flex items-center">
-                                                                    <div className="w-10 h-10 bg-blue-100 rounded-md mr-3 flex items-center justify-center">
-                                                                        <Tag className="w-6 h-6 text-blue-600" />
-                                                                    </div>
-                                                                    <span className="text-sm font-medium text-gray-900">{coupon.code}</span>
-                                                                </div>
+                                                            <td className="p-4 text-sm font-medium text-gray-800">
+                                                                <span className="px-2 py-1 bg-gray-100 rounded-md">{coupon.code}</span>
                                                             </td>
-                                                            <td className="p-4 text-sm text-gray-600">{coupon.type}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{coupon.value}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{coupon.min_amount || 'N/A'}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{coupon.usage_limit || 'Unlimited'}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{coupon.usage_count}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() : 'N/A'}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{coupon.is_active ? 'Yes' : 'No'}</td>
-                                                            <td className="p-4">
-                                                                <div className="flex items-center space-x-2">
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                {coupon.type === 'fixed' ? (
+                                                                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                                                                        Monto Fijo
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                                                                        Porcentaje
+                                                                    </span>
+                                                                )}
+                                                            </td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                {coupon.type === 'fixed' ? `S/ ${coupon.value}` : `${coupon.value}%`}
+                                                            </td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                {coupon.min_amount ? `S/ ${coupon.min_amount}` : '-'}
+                                                            </td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                <span className="text-xs text-gray-500">
+                                                                    {displayRestrictions(coupon)}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                {coupon.usage_count} / {coupon.usage_limit || '∞'}
+                                                            </td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() : 'No expira'}
+                                                            </td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                                                    coupon.is_active 
+                                                                        ? 'bg-green-100 text-green-800' 
+                                                                        : 'bg-red-100 text-red-800'
+                                                                }`}>
+                                                                    {coupon.is_active ? 'Activo' : 'Inactivo'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                <div className="flex justify-center gap-2">
                                                                     <button 
-                                                                        className="text-green-600 hover:text-green-900 p-1"
                                                                         onClick={() => handleEditCoupon(coupon)}
+                                                                        className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
                                                                     >
-                                                                        <EditIcon />
+                                                                        <EditIcon className="h-5 w-5" />
                                                                     </button>
                                                                     <button 
-                                                                        className="text-red-600 hover:text-red-900 p-1"
                                                                         onClick={() => handleDeleteCoupon(coupon.id)}
+                                                                        className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
                                                                     >
-                                                                        <DeleteIcon />
+                                                                        <DeleteIcon className="h-5 w-5" />
                                                                     </button>
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                     ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan="10" className="px-6 py-4 text-center text-sm text-gray-500">
-                                                            No hay cupones disponibles
-                                                        </td>
-                                                    </tr>
                                                 )}
                                             </tbody>
                                         </table>
@@ -191,18 +307,23 @@ export default function DashCoupon() {
                 </div>
             </div>
 
+            {/* Diálogos para añadir/editar cupones */}
             <AddCouponDialog 
                 isOpen={isDialogOpen} 
                 onClose={() => setIsDialogOpen(false)} 
-                onAddCoupon={handleAddCoupon} 
+                onAddCoupon={handleAddCoupon}
+                brands={brands}
+                categories={categories}
             />
 
-            {/* <EditCouponDialog 
+            <EditCouponDialog 
                 isOpen={editDialogOpen} 
                 onClose={() => setEditDialogOpen(false)} 
                 coupon={couponToEdit} 
-                onUpdateCoupon={handleUpdateCoupon} 
-            /> */}
+                onUpdateCoupon={handleUpdateCoupon}
+                brands={brands}
+                categories={categories}
+            />
         </AuthenticatedLayout>
     );
 }

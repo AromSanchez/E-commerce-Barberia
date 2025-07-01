@@ -9,6 +9,8 @@ const MenuCart = ({ isOpen, onClose, auth }) => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState({}); // Track which items are being updated
+    const [discount, setDiscount] = useState(0); // Para almacenar el descuento del cupón
+    const [couponCode, setCouponCode] = useState(null); // Para almacenar el código del cupón
 
     const fetchCart = useCallback(async () => {
         try {
@@ -20,6 +22,19 @@ const MenuCart = ({ isOpen, onClose, auth }) => {
                 quantity: parseInt(item.quantity) || 0
             }));
             setCartItems(itemsWithNumericPrices);
+            
+            // Guardar información del cupón si existe
+            if (response.data.discount !== undefined) {
+                setDiscount(parseFloat(response.data.discount) || 0);
+            } else {
+                setDiscount(0);
+            }
+            
+            if (response.data.coupon) {
+                setCouponCode(response.data.coupon.code);
+            } else {
+                setCouponCode(null);
+            }
         } catch (error) {
             console.error('Error al cargar el carrito:', error);
             toast.error('Error al cargar el carrito', {
@@ -37,6 +52,19 @@ const MenuCart = ({ isOpen, onClose, auth }) => {
             fetchCart();
         }
     }, [isOpen, fetchCart]);
+    
+    // Escuchar el evento de actualización del carrito para cupones
+    useEffect(() => {
+        const handleCartUpdate = () => {
+            fetchCart();
+        };
+        
+        window.addEventListener('cartUpdated', handleCartUpdate);
+        
+        return () => {
+            window.removeEventListener('cartUpdated', handleCartUpdate);
+        };
+    }, [fetchCart]);
 
     const handleQuantityChange = async (productId, newQuantity) => {
         if (newQuantity < 1) return;
@@ -135,7 +163,11 @@ const MenuCart = ({ isOpen, onClose, auth }) => {
         }
     };
 
-    const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    // Calcular el subtotal de los productos
+    const itemsSubtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    
+    // Calcular el total final considerando el descuento del cupón
+    const subtotal = Math.max(0, itemsSubtotal - discount);
 
     // Handle click outside to close cart
     useEffect(() => {
@@ -304,11 +336,29 @@ const MenuCart = ({ isOpen, onClose, auth }) => {
                 {/* Footer with totals and actions */}
                 {cartItems.length > 0 && (
                     <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="text-sm font-medium text-gray-800">Subtotal:</span>
-                            <span className="text-lg font-semibold text-gray-800">
-                                S/ {subtotal.toFixed(2)}
-                            </span>
+                        <div className="space-y-2 mb-3">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium text-gray-800">Productos:</span>
+                                <span className="text-sm font-medium text-gray-800">
+                                    S/ {itemsSubtotal.toFixed(2)}
+                                </span>
+                            </div>
+                            
+                            {discount > 0 && (
+                                <div className="flex justify-between items-center text-green-600">
+                                    <span className="text-sm font-medium">Descuento{couponCode ? ` (${couponCode})` : ''}:</span>
+                                    <span className="text-sm font-medium">
+                                        -S/ {discount.toFixed(2)}
+                                    </span>
+                                </div>
+                            )}
+                            
+                            <div className="flex justify-between items-center pt-1">
+                                <span className="text-sm font-semibold text-gray-900">Total:</span>
+                                <span className="text-lg font-bold text-gray-900">
+                                    S/ {subtotal.toFixed(2)}
+                                </span>
+                            </div>
                         </div>
                         
                         <div className="space-y-2">
@@ -325,7 +375,14 @@ const MenuCart = ({ isOpen, onClose, auth }) => {
                                     if (!auth?.user) {
                                         window.location.href = route('login');
                                     } else {
-                                        window.location.href = route('checkout');
+                                        // Calcular el costo de envío (suponiendo que es la misma lógica que en PanelTotales)
+                                        const costoEnvioBase = 10.00;
+                                        const envioGratis = subtotal >= 50;
+                                        const costoEnvio = envioGratis ? 0 : costoEnvioBase;
+                                        const totalConEnvio = subtotal + costoEnvio;
+                                        
+                                        // Redireccionar con el total correcto que incluye el descuento del cupón
+                                        window.location.href = route('checkout', { total: totalConEnvio });
                                     }
                                 }}
                                 className="block w-full bg-black text-white py-3 rounded-md hover:bg-gray-900 text-center transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-gray-600"

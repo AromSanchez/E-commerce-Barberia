@@ -1,13 +1,40 @@
 
 
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
 export default function PanelTotales({
   cart,
   subtotal,
-  discount = 0,
-  coupon = null,
   updating,
   handleCheckout
 }) {
+  const [discount, setDiscount] = useState(0);
+  const [coupon, setCoupon] = useState(null);
+
+  // Obtener información del carrito, incluido el descuento aplicado
+  useEffect(() => {
+    const getCartDetails = async () => {
+      try {
+        const response = await axios.get(route('cart.get'));
+        if (response.data && response.data.discount !== undefined) {
+          setDiscount(parseFloat(response.data.discount) || 0);
+        }
+        if (response.data && response.data.coupon) {
+          setCoupon(response.data.coupon);
+        } else {
+          // Si no hay cupón, asegúrate de limpiar el estado previo
+          setCoupon(null);
+          setDiscount(0);
+        }
+      } catch (error) {
+        console.error('Error al obtener detalles del carrito:', error);
+      }
+    };
+
+    getCartDetails();
+  }, [cart, subtotal]); // Observar también los cambios en subtotal
   if (cart.length === 0) return null;
 
   const costoEnvioBase = 10.00;
@@ -27,9 +54,38 @@ export default function PanelTotales({
         </div>
 
         {discount > 0 && (
-          <div className="flex justify-between text-green-600 font-semibold">
-            <span>Descuento ({coupon?.code})</span>
-            <span>-S/ {discount.toFixed(2)}</span>
+          <div className="flex flex-col">
+            <div className="flex justify-between text-green-600 font-semibold">
+              <span>Descuento ({coupon?.code})</span>
+              <span>-S/ {discount.toFixed(2)}</span>
+            </div>
+            <button 
+              onClick={async () => {
+                try {
+                  await axios.post(route('cart.removeCoupon'));
+                  setDiscount(0);
+                  setCoupon(null);
+                  toast.success('Cupón eliminado correctamente', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: true
+                  });
+                  
+                  // Disparar evento personalizado para notificar la actualización del carrito
+                  window.dispatchEvent(new Event('cartUpdated'));
+                } catch (error) {
+                  console.error('Error al eliminar el cupón:', error);
+                  toast.error('Error al eliminar el cupón', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true
+                  });
+                }
+              }}
+              className="text-xs text-red-600 hover:underline mt-1 self-end"
+            >
+              Eliminar cupón
+            </button>
           </div>
         )}
 

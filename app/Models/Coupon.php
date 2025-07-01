@@ -26,4 +26,28 @@ class Coupon extends Model
         'value' => 'decimal:2',
         'min_amount' => 'decimal:2',
     ];
+    
+    /**
+     * Obtener las marcas a las que aplica este cupón.
+     */
+    public function brands()
+    {
+        return $this->belongsToMany(Brand::class, 'coupon_brand');
+    }
+    
+    /**
+     * Obtener las categorías a las que aplica este cupón.
+     */
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'coupon_category');
+    }
+    
+    /**
+     * Determina si el cupón aplica a todos los productos o solo a marcas/categorías específicas
+     */
+    public function appliesToAll()
+    {
+        return $this->brands->isEmpty() && $this->categories->isEmpty();
+    }
 }

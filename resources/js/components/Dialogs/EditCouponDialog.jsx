@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '@/components/Modal';
 import TextInput from '@/components/TextInput';
 import InputLabel from '@/components/InputLabel';
@@ -7,16 +7,27 @@ import PrimaryButton from '@/components/PrimaryButton';
 import SecondaryButton from '@/components/SecondaryButton';
 import { useForm } from '@inertiajs/react';
 
-// Componente para mostrar el tipo de cupón como una insignia
+// Componente para mostrar visualmente el tipo de cupón
 const CouponTypeBadge = ({ type }) => {
-    const bgColor = type === 'fixed' ? 'bg-green-100' : 'bg-blue-100';
-    const textColor = type === 'fixed' ? 'text-green-800' : 'text-blue-800';
-    const label = type === 'fixed' ? 'Monto Fijo' : 'Porcentaje';
-    
     return (
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${bgColor} ${textColor}`}>
-            {label}
-        </span>
+        <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+            type === 'fixed' 
+                ? 'bg-green-100 text-green-800 border border-green-200' 
+                : 'bg-blue-100 text-blue-800 border border-blue-200'
+        }`}>
+            {type === 'fixed' ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+            ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            )}
+            {type === 'fixed' ? 'Monto Fijo' : 'Porcentaje'}
+        </div>
     );
 };
 
@@ -24,85 +35,90 @@ const CouponTypeBadge = ({ type }) => {
 const MultiSelect = ({ options, selectedValues, onChange, placeholder }) => {
     const [isOpen, setIsOpen] = useState(false);
     
-    const handleToggleOption = (id) => {
-        if (selectedValues.includes(id)) {
-            onChange(selectedValues.filter(value => value !== id));
-        } else {
-            onChange([...selectedValues, id]);
-        }
+    const toggleOption = (id) => {
+        const newSelected = selectedValues.includes(id)
+            ? selectedValues.filter(item => item !== id)
+            : [...selectedValues, id];
+        
+        onChange(newSelected);
     };
-
+    
     // Limpiar todas las selecciones
     const clearSelection = () => {
         onChange([]);
     };
-
-    const getSelectedLabels = () => {
-        if (selectedValues.length === 0) return placeholder;
-        
-        const selected = options
-            .filter(option => selectedValues.includes(option.id))
-            .map(option => option.name);
-        
-        if (selected.length <= 2) {
-            return selected.join(', ');
-        }
-        
-        return `${selected.length} seleccionados`;
+    
+    // Aplicar a ninguna (comportamiento especial: array vacío)
+    const selectNone = () => {
+        onChange([]);
     };
-
+    
     return (
         <div className="relative">
-            <button
-                type="button"
-                className="relative w-full bg-white border border-gray-300 rounded-lg pl-3 pr-10 py-1.5 text-left text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            <div 
+                className="flex items-center justify-between border border-gray-300 rounded-lg p-2 text-sm cursor-pointer"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <span className="block truncate">
-                    {getSelectedLabels()}
-                </span>
-                <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                </span>
-            </button>
-
+                <div className="flex flex-wrap gap-1 max-w-full">
+                    {selectedValues.length > 0 ? (
+                        options
+                            .filter(option => selectedValues.includes(option.id))
+                            .map(option => (
+                                <span 
+                                    key={option.id}
+                                    className="bg-blue-100 text-blue-800 text-xs px-1.5 py-0.5 rounded-full"
+                                >
+                                    {option.name}
+                                </span>
+                            ))
+                    ) : (
+                        <span className="text-gray-500">{placeholder}</span>
+                    )}
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${isOpen ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+            
             {isOpen && (
-                <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-40 rounded-md py-1 text-xs ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none">
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
                     {/* Opción para seleccionar "Todas" */}
-                    <div className="px-3 py-1.5 border-b border-gray-100">
+                    <div className="p-1.5 border-b border-gray-100">
                         <div 
-                            className="rounded-md font-medium text-blue-600 flex items-center cursor-pointer"
-                            onClick={clearSelection}
+                            className="p-1.5 rounded-md text-sm cursor-pointer flex items-center hover:bg-gray-100"
+                            onClick={selectNone}
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                            </svg>
-                            {selectedValues.length > 0 ? "Limpiar selección" : "Aplicar a todas"}
+                            <span className="font-medium text-blue-600 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                                </svg>
+                                {selectedValues.length > 0 ? "Limpiar selección" : "Aplicar a todas"}
+                            </span>
                         </div>
                     </div>
                     
-                    {options.length > 0 ? (
-                        options.map((option) => (
-                            <div
-                                key={option.id}
-                                className="flex items-center px-3 py-1.5 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => handleToggleOption(option.id)}
-                            >
-                                <input
-                                    type="checkbox"
-                                    className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                    checked={selectedValues.includes(option.id)}
-                                    onChange={() => {}}
-                                />
-                                <label className="ml-2 block truncate">
-                                    {option.name}
-                                </label>
-                            </div>
-                        ))
+                    {options.length === 0 ? (
+                        <div className="p-2 text-sm text-gray-500">No hay opciones disponibles</div>
                     ) : (
-                        <div className="px-3 py-2 text-gray-500">No hay opciones disponibles</div>
+                        <div className="p-1">
+                            {options.map(option => (
+                                <div 
+                                    key={option.id}
+                                    className={`p-1.5 rounded-md text-sm cursor-pointer flex items-center ${
+                                        selectedValues.includes(option.id) ? 'bg-blue-50' : 'hover:bg-gray-100'
+                                    }`}
+                                    onClick={() => toggleOption(option.id)}
+                                >
+                                    <input 
+                                        type="checkbox" 
+                                        checked={selectedValues.includes(option.id)} 
+                                        readOnly
+                                        className="mr-2 rounded border-gray-300"
+                                    />
+                                    <span>{option.name}</span>
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </div>
             )}
@@ -110,21 +126,42 @@ const MultiSelect = ({ options, selectedValues, onChange, placeholder }) => {
     );
 };
 
-export default function AddCouponDialog({ isOpen, onClose, onAddCoupon, brands, categories }) {
-    const { data, setData, processing, errors, reset } = useForm({
+export default function EditCouponDialog({ isOpen, onClose, coupon, onUpdateCoupon, brands, categories }) {
+    const { data, setData, errors, reset } = useForm({
+        id: '',
         code: '',
         type: 'fixed',
         value: '',
         min_amount: '',
         usage_limit: '',
+        usage_count: 0,
         expires_at: '',
+        is_active: true,
         brand_ids: [],
         category_ids: [],
     });
 
+    useEffect(() => {
+        if (coupon) {
+            setData({
+                id: coupon.id || '',
+                code: coupon.code || '',
+                type: coupon.type || 'fixed',
+                value: coupon.value || '',
+                min_amount: coupon.min_amount || '',
+                usage_limit: coupon.usage_limit || '',
+                usage_count: coupon.usage_count || 0,
+                expires_at: coupon.expires_at ? coupon.expires_at.split('T')[0] : '',
+                is_active: coupon.is_active !== undefined ? coupon.is_active : true,
+                brand_ids: coupon.brands ? coupon.brands.map(b => b.id) : [],
+                category_ids: coupon.categories ? coupon.categories.map(c => c.id) : [],
+            });
+        }
+    }, [coupon]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        onAddCoupon(data);
+        onUpdateCoupon(data);
     };
 
     const handleClose = () => {
@@ -144,7 +181,7 @@ export default function AddCouponDialog({ isOpen, onClose, onAddCoupon, brands, 
                         </svg>
                     </div>
                     <h2 className="text-lg font-bold text-gray-900">
-                        Crear Nuevo Cupón
+                        Editar Cupón
                     </h2>
                 </div>
 
@@ -161,11 +198,7 @@ export default function AddCouponDialog({ isOpen, onClose, onAddCoupon, brands, 
                                 className="mt-1 block w-full rounded-lg text-sm py-1.5"
                                 onChange={(e) => setData('code', e.target.value.toUpperCase())}
                                 required
-                                placeholder="Ej: VERANO2025"
                             />
-                            <p className="text-xs text-gray-500 mt-0.5">
-                                El código debe ser único y fácil de recordar
-                            </p>
                             <InputError message={errors.code} className="mt-1" />
                         </div>
 
@@ -264,6 +297,24 @@ export default function AddCouponDialog({ isOpen, onClose, onAddCoupon, brands, 
                                 <InputError message={errors.expires_at} className="mt-1" />
                             </div>
                         </div>
+
+                        <div>
+                            <div className="flex items-center mt-2">
+                                <input
+                                    type="checkbox"
+                                    id="is_active"
+                                    checked={data.is_active}
+                                    onChange={(e) => setData('is_active', e.target.checked)}
+                                    className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                />
+                                <label htmlFor="is_active" className="ml-2 text-sm text-gray-700">
+                                    Cupón Activo
+                                </label>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1 ml-6">
+                                Desactiva el cupón para que no pueda ser utilizado
+                            </p>
+                        </div>
                     </div>
                     
                     {/* Columna derecha: Restricciones y notas */}
@@ -297,38 +348,38 @@ export default function AddCouponDialog({ isOpen, onClose, onAddCoupon, brands, 
                                             onChange={value => setData('brand_ids', value)}
                                             placeholder="Todas las marcas"
                                         />
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-0.5">
-                                        Si no seleccionas ninguna marca, el cupón se aplicará a todas las marcas
-                                    </p>
+                                    </div>                                <p className="text-xs text-gray-500 mt-0.5">
+                                    Si no seleccionas ninguna marca, el cupón se aplicará a todas las marcas
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <InputLabel htmlFor="categories" value="Categorías Aplicables" className="text-xs font-semibold" />
+                                <div className="mt-1">
+                                    <MultiSelect 
+                                        options={categories || []} 
+                                        selectedValues={data.category_ids}
+                                        onChange={value => setData('category_ids', value)}
+                                        placeholder="Todas las categorías"
+                                    />
                                 </div>
-                                
-                                <div>
-                                    <InputLabel htmlFor="categories" value="Categorías Aplicables" className="text-xs font-semibold" />
-                                    <div className="mt-1">
-                                        <MultiSelect 
-                                            options={categories || []} 
-                                            selectedValues={data.category_ids}
-                                            onChange={value => setData('category_ids', value)}
-                                            placeholder="Todas las categorías"
-                                        />
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-0.5">
-                                        Si no seleccionas ninguna categoría, el cupón se aplicará a todas las categorías
-                                    </p>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                    Si no seleccionas ninguna categoría, el cupón se aplicará a todas las categorías
+                                </p>
                                 </div>
                             </div>
 
-                            <div className="p-2 bg-blue-50 rounded-lg text-blue-700 text-xs mt-4">
+                            <div className="p-2 bg-amber-50 rounded-lg text-amber-700 text-xs mt-4">
                                 <div className="flex items-start gap-1.5">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <line x1="12" y1="8" x2="12" y2="12"></line>
                                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                                     </svg>
-                                    <span>
-                                        Los cupones creados se activarán inmediatamente. Puedes editarlos posteriormente para cambiar su estado o parámetros.
-                                    </span>
+                                    <div>
+                                        <div className="font-medium">Información del Cupón:</div>
+                                        <div className="mt-1">Usos: {data.usage_count || 0} {data.usage_limit ? ` / ${data.usage_limit}` : ''}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -345,13 +396,13 @@ export default function AddCouponDialog({ isOpen, onClose, onAddCoupon, brands, 
 
                     <PrimaryButton 
                         className="rounded-lg bg-blue-600 hover:bg-blue-700 text-sm py-1.5 px-3"
-                        disabled={processing}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
                         </svg>
-                        Crear Cupón
+                        Guardar Cambios
                     </PrimaryButton>
                 </div>
             </form>

@@ -34,16 +34,42 @@ const MainHeader = ({
 
 
   const fetchCartInfo = async () => {
-    const response = await axios.get(route('cart.get'));
-    const items = Object.values(response.data.items || {});
-    setCartCount(items.reduce((sum, item) => sum + item.quantity, 0));
-    setCartTotal(items.reduce((sum, item) => sum + (item.price * item.quantity), 0));
+    try {
+      const response = await axios.get(route('cart.get'));
+      const items = Object.values(response.data.items || {});
+      setCartCount(items.reduce((sum, item) => sum + item.quantity, 0));
+      
+      // Calcular el total teniendo en cuenta el descuento si existe
+      let calculatedTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      if (response.data.discount !== undefined && response.data.discount > 0) {
+        calculatedTotal = Math.max(0, calculatedTotal - parseFloat(response.data.discount));
+      }
+      
+      setCartTotal(calculatedTotal);
+    } catch (error) {
+      console.error('Error al obtener información del carrito:', error);
+    }
   };
 
+  // Suscribirse a un evento personalizado para actualizar el carrito cuando cambia
   useEffect(() => {
     fetchCartInfo();
+    
+    // Crear un evento personalizado para actualizar el carrito
+    const handleCartUpdate = () => {
+      fetchCartInfo();
+    };
+    
+    // Registrar el evento
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    
+    // Intervalo de actualización regular
     const interval = setInterval(fetchCartInfo, 5000);
-    return () => clearInterval(interval);
+    
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleMouseEnter = () => {
@@ -513,7 +539,24 @@ const MainHeader = ({
           </div>
           {/* Carrito siempre visible */}
           <button
-            onClick={openCart}
+            onClick={() => {
+              // Verificar si estamos en la página VerCarrito
+              const isOnCartPage = typeof window !== 'undefined' && 
+                window.location.pathname === route('carrito').replace(/^https?:\/\/[^/]+/g, '');
+              
+              if (isOnCartPage) {
+                // Si ya estamos en la página de carrito, solo recargamos la página
+                window.location.href = route('carrito');
+              } else {
+                // Si no estamos en carrito, usamos la función openCart normal
+                if (typeof openCart === 'function') {
+                  openCart();
+                } else {
+                  // Redirección de respaldo si openCart no está disponible
+                  window.location.href = route('carrito');
+                }
+              }
+            }}
             className="flex items-center text-gray-600 hover:text-black transition-colors focus:outline-none"
             aria-label="Abrir carrito"
           >
