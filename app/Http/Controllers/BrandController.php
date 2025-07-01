@@ -14,7 +14,7 @@ class BrandController extends Controller
      */
     public function index()
     {
-        $brands = Brand::all();
+        $brands = Brand::withCount('products')->get();
         return Inertia::render('DashAdmin/DashBrand', [
             'brands' => $brands
         ]);

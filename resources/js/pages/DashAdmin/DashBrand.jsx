@@ -147,7 +147,14 @@ export default function DashBrand() {
                                                                 </div>
                                                             </td>
                                                             <td className="p-4 text-sm text-gray-600">{brand.description || 'Sin descripción'}</td>
-                                                            <td className="p-4 text-sm text-gray-600">{brand.products_count || 0}</td>
+                                                            <td className="p-4 text-sm text-gray-600">
+                                                                <div className="flex items-center">
+                                                                    <div className="bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center mr-2">
+                                                                        <span className="font-medium text-gray-700">{brand.products_count || 0}</span>
+                                                                    </div>
+                                                                    <span className="text-gray-600">{brand.products_count === 1 ? 'producto' : 'productos'}</span>
+                                                                </div>
+                                                            </td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
                                                                     <button

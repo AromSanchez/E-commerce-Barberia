@@ -189,4 +189,54 @@ class PublicProductController extends Controller
             'categorias' => $categorias
         ]);
     }
+
+    /**
+     * Obtiene los productos marcados como destacados
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getFeaturedProducts()
+    {
+        // Obtener el usuario autenticado
+        $user = Auth::user();
+
+        // Obtener productos destacados
+        $featuredProducts = Product::with(['brand', 'category'])
+            ->where('is_featured', 'yes')
+            ->where('stock', '>', 0) // Solo productos con stock
+            ->latest()
+            ->take(8) // Limitar a 8 productos destacados
+            ->get();
+
+        // Marcar favoritos para el usuario actual
+        if ($user) {
+            $user->load('favorites');
+            
+            $featuredProducts->each(function ($product) use ($user) {
+                $product->isFavorite = $user->favorites->contains($product->id);
+            });
+        } else {
+            $featuredProducts->each(function ($product) {
+                $product->isFavorite = false;
+            });
+        }
+
+        // Transformar los datos para que coincidan con lo esperado por CardProduct
+        $featuredProducts = $featuredProducts->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'regular_price' => $product->regular_price,
+                'sale_price' => $product->sale_price,
+                'main_image' => $product->image,
+                'brand' => $product->brand,
+                'in_stock' => $product->stock > 0,
+                'is_new' => $product->is_new === 'yes',
+                'isFavorite' => $product->isFavorite
+            ];
+        });
+
+        return response()->json($featuredProducts);
+    }
 }

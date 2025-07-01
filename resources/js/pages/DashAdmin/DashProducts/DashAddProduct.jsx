@@ -7,7 +7,6 @@ import { ShoppingBag } from 'lucide-react';
 
 export default function DashAddProduct() {
     const { categories, brands } = usePage().props;
-
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [formData, setFormData] = useState({
         name: '',

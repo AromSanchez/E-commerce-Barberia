@@ -251,47 +251,53 @@ export default function VerCarrito() {
         </div>
         {/* Notificación de deshacer */}
         {showUndo && lastRemoved && (
-          <div className="w-full lg:max-w-5xl bg-red-400 text-black px-6 py-4 mb-6 flex flex-col sm:flex-row items-center justify-between rounded-xl shadow-md mx-auto">
-            <span className="text-center sm:text-left w-full">
-              <span className="font-bold mr-2">✓</span>
-              "{lastRemoved.name}" eliminado del carrito.
-            </span>
-            <button
-              onClick={handleUndo}
-              disabled={updating}
-              className="underline font-semibold hover:text-gray-800 mt-3 sm:mt-0 sm:ml-4 disabled:opacity-50"
-            >
-              {updating ? 'Restaurando...' : 'Deshacer'}
-            </button>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+            <div className="w-full max-w-4xl mx-auto bg-red-400 text-black px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between rounded-xl shadow-md">
+              <span className="text-center sm:text-left w-full">
+                <span className="font-bold mr-2">✓</span>
+                "{lastRemoved.name}" eliminado del carrito.
+              </span>
+              <button
+                onClick={handleUndo}
+                disabled={updating}
+                className="underline font-semibold hover:text-gray-800 mt-3 sm:mt-0 sm:ml-4 disabled:opacity-50"
+              >
+                {updating ? 'Restaurando...' : 'Deshacer'}
+              </button>
+            </div>
           </div>
         )}
-        <div className="flex flex-col lg:flex-row gap-6 mx-auto mb-10 max-w-7xl w-full items-start overflow-x-auto">
-          <div className="flex-1 min-w-0">
-            <TablaProductos
-              cart={cart}
-              loading={loading}
-              updating={updating}
-              handleQuantity={handleQuantity}
-              handleRemove={handleRemove}
-              showUndo={showUndo}
-              lastRemoved={lastRemoved}
-              handleUndo={handleUndo}
-              undoTimeout={undoTimeout}
-              couponCode={couponCode}
-              setCouponCode={setCouponCode}
-              handleApplyCoupon={handleApplyCoupon}
-              fullWidth // Prop extra para ajustar la tabla al contenedor
-            />
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 mx-auto mb-10 max-w-7xl w-full items-start justify-center px-4 sm:px-6 lg:px-8">
+          <div className="w-full lg:flex-1 lg:min-w-0 flex justify-center">
+            <div className="w-full max-w-4xl">
+              <TablaProductos
+                cart={cart}
+                loading={loading}
+                updating={updating}
+                handleQuantity={handleQuantity}
+                handleRemove={handleRemove}
+                showUndo={showUndo}
+                lastRemoved={lastRemoved}
+                handleUndo={handleUndo}
+                undoTimeout={undoTimeout}
+                couponCode={couponCode}
+                setCouponCode={setCouponCode}
+                handleApplyCoupon={handleApplyCoupon}
+                fullWidth // Prop extra para ajustar la tabla al contenedor
+              />
+            </div>
           </div>
-          <div className="w-full max-w-xs lg:w-80 flex-shrink-0">
-            <PanelTotales
-              cart={cart}
-              subtotal={subtotal}
-              total={total}
-              updating={updating}
-              handleCheckout={handleCheckout}
-            />
-            {/* Eliminado el formulario de pago embebido */}
+          <div className="w-full lg:w-80 flex justify-center lg:justify-start">
+            <div className="w-full max-w-sm sm:max-w-md lg:max-w-none lg:w-80">
+              <PanelTotales
+                cart={cart}
+                subtotal={subtotal}
+                total={total}
+                updating={updating}
+                handleCheckout={handleCheckout}
+              />
+              {/* Eliminado el formulario de pago embebido */}
+            </div>
           </div>
         </div>
       </div>

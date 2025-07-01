@@ -43,4 +43,18 @@ class FavoriteController extends Controller
             return response()->json(['message' => 'Producto agregado a favoritos']);
         }
     }
+
+    // ✅ Obtener el conteo de favoritos para API
+    public function getCount()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json(['count' => 0]);
+        }
+
+        $count = $user->favorites()->count();
+        return response()->json(['count' => $count]);
+    }
 }

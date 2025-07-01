@@ -56,6 +56,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
 Route::middleware('auth')->get('/favoritos', [FavoriteController::class, 'index']);
 Route::middleware('auth')->post('/favorites/{productId}/toggle', [FavoriteController::class, 'toggleFavorite']);
+Route::middleware('auth')->get('/api/favorites/count', [FavoriteController::class, 'getCount']);
 
 
 
@@ -232,6 +233,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::patch('/admin/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('dashboard.orders.updateStatus');
+
+
+// API para productos destacados
+Route::get('/api/products/featured', [PublicProductController::class, 'getFeaturedProducts']);
 
 
 require __DIR__ . '/auth.php';

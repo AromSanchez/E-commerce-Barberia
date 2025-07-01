@@ -16,21 +16,23 @@ const MainHeader = ({
 }) => {
   const { openCart } = useCart();
   const { addBrandFilter, addMainCategoryFilter, clearAllFilters } = useFilter();
+  const { categories, brands, auth, mainCategories, favoriteCount } = usePage().props;
+  
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
+  const [favoriteCountState, setFavoriteCountState] = useState(favoriteCount || 0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState({ productos: [], marcas: [] });
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const { categories, brands, auth, mainCategories } = usePage().props;
+  
   console.log('MainHeader Props:', { categories, brands, mainCategories });
   const dropdownRef = useRef(null);
   const userDropdownRef = useRef(null);
   const suggestionsRef = useRef(null);
   const timeoutRef = useRef(null);
   const userTimeoutRef = useRef(null);
-  const { favoriteCount } = usePage().props; // ¡Aquí está la magia!
 
 
   const fetchCartInfo = async () => {
@@ -51,26 +53,52 @@ const MainHeader = ({
     }
   };
 
+  const fetchFavoriteCount = async () => {
+    try {
+      // Solo actualizar si el usuario está autenticado
+      if (auth?.user) {
+        const response = await axios.get('/api/favorites/count');
+        setFavoriteCountState(response.data.count || 0);
+      } else {
+        setFavoriteCountState(0);
+      }
+    } catch (error) {
+      console.error('Error al obtener información de favoritos:', error);
+      // Si hay error, mantener el valor actual o usar el prop inicial
+      setFavoriteCountState(favoriteCount || 0);
+    }
+  };
+
   // Suscribirse a un evento personalizado para actualizar el carrito cuando cambia
   useEffect(() => {
     fetchCartInfo();
+    fetchFavoriteCount();
     
-    // Crear un evento personalizado para actualizar el carrito
+    // Crear eventos personalizados para actualizar el carrito y favoritos
     const handleCartUpdate = () => {
       fetchCartInfo();
     };
     
-    // Registrar el evento
+    const handleFavoritesUpdate = () => {
+      fetchFavoriteCount();
+    };
+    
+    // Registrar los eventos
     window.addEventListener('cartUpdated', handleCartUpdate);
+    window.addEventListener('favoritesUpdated', handleFavoritesUpdate);
     
     // Intervalo de actualización regular
-    const interval = setInterval(fetchCartInfo, 5000);
+    const interval = setInterval(() => {
+      fetchCartInfo();
+      fetchFavoriteCount();
+    }, 10000); // Cada 10 segundos para no sobrecargar
     
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate);
+      window.removeEventListener('favoritesUpdated', handleFavoritesUpdate);
       clearInterval(interval);
     };
-  }, []);
+  }, [auth?.user]); // Dependencia del usuario para actualizar cuando cambie el estado de autenticación
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
@@ -530,9 +558,9 @@ const MainHeader = ({
             </div>
             <Link href="/favoritos" className="p-1 text-gray-600 hover:text-black transition-colors relative">
               <AiOutlineHeart size={20} />
-              {favoriteCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[10px] rounded-full flex items-center justify-center shadow">
-                  {favoriteCount}
+              {favoriteCountState > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center shadow">
+                  {favoriteCountState}
                 </span>
               )}
             </Link>

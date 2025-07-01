@@ -24,9 +24,9 @@ const NavAdmin = ({ isCollapsed, setIsCollapsed }) => {
         <div className={`${isCollapsed ? 'w-20' : 'w-64'} bg-white shadow-lg p-4 flex flex-col border-r border-gray-200 relative z-0 overflow-y-auto scrollbar-hide h-screen`}>
             <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} mb-8`}>
                 {!isCollapsed && (
-                    <div className="flex items-center">
-                        <img src="\images\logo.png" alt="Logo" className="h-12 w-auto" />
-                    </div>
+                    <Link href="/" className="flex items-center">
+                        <img src="/images/logo.png" alt="Logo" className="h-12 w-auto" />
+                    </Link>
                 )}
                 <button 
                     onClick={() => setIsCollapsed(!isCollapsed)}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HiHeart, HiOutlineHeart, HiShoppingCart, HiEye } from 'react-icons/hi';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
@@ -17,11 +17,17 @@ export default function CardProduct({
   isNew,
   isFavorite,
   showOfferBadge, // <-- Agregado para recibir el prop correctamente
+  onFavoriteToggle, // <-- Nueva prop para comunicar cambios al padre
 }) {
   const [isWishlisted, setIsWishlisted] = useState(isFavorite || false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { openCart } = useCart();
+
+  // Sincronizar el estado local con el prop cuando cambie
+  useEffect(() => {
+    setIsWishlisted(isFavorite || false);
+  }, [isFavorite]);
 
   const regularPriceValue = typeof regularPrice === 'number' ? regularPrice : parseFloat(regularPrice) || 0;
   const salePriceValue = salePrice && salePrice > 0 ? (typeof salePrice === 'number' ? salePrice : parseFloat(salePrice)) : null;
@@ -74,7 +80,16 @@ export default function CardProduct({
   const handleToggleWishlist = async () => {
     try {
       await axios.post(`/favorites/${id}/toggle`);
-      setIsWishlisted(!isWishlisted);
+      const newWishlistState = !isWishlisted;
+      setIsWishlisted(newWishlistState);
+
+      // Comunicar el cambio al componente padre si existe la función
+      if (onFavoriteToggle) {
+        onFavoriteToggle(id, newWishlistState);
+      }
+
+      // Disparar evento personalizado para actualizar el header
+      window.dispatchEvent(new CustomEvent('favoritesUpdated'));
 
       toast.success(
         isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos',
