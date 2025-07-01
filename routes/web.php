@@ -86,6 +86,31 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified', 'admin'])->name('dashboard');
 
+// Ruta para obtener estadísticas mensuales para el dashboard
+Route::get('/api/dashboard/monthly-stats', [App\Http\Controllers\DashboardController::class, 'getMonthlyStats'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('dashboard.monthly-stats');
+
+Route::get('/api/dashboard/sales-performance', [App\Http\Controllers\DashboardController::class, 'getSalesPerformance'])
+    ->name('dashboard.sales-performance');
+
+// Ruta para obtener estadísticas generales del proyecto
+Route::get('/api/dashboard/project-stats', [App\Http\Controllers\DashboardController::class, 'getProjectStats'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('dashboard.project-stats');
+    
+Route::get('/api/dashboard/recent-activity', [App\Http\Controllers\DashboardController::class, 'getRecentActivity'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('dashboard.recent-activity');
+    
+Route::get('/api/dashboard/recent-orders', [App\Http\Controllers\DashboardController::class, 'getRecentOrders'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('dashboard.recent-orders');
+    
+Route::get('/api/dashboard/cards-stats', [App\Http\Controllers\DashboardController::class, 'getCardsStats'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('dashboard.cards-stats');
+
 
 // Refund Requests (Solicitudes de reembolso)
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
