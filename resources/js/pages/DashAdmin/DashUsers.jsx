@@ -5,7 +5,7 @@ import NavAdmin from '@/Layouts/nav_admin/NavAdmin';
 import { useState, useEffect } from 'react';
 import EditIcon from '@/components/Icons/EditIcon';
 // Importamos los iconos necesarios
-import { Search, Users, ShoppingCart, Mail } from 'lucide-react';
+import { Search, Users, ShoppingCart, X, Package, Calendar, MapPin, CreditCard, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function DashUsers() {
     const { users } = usePage().props;
@@ -15,6 +15,13 @@ export default function DashUsers() {
     const [userToEdit, setUserToEdit] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isCollapsed, setIsCollapsed] = useState(false);
+    
+    // Estados para el modal de órdenes
+    const [ordersModalOpen, setOrdersModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [userOrders, setUserOrders] = useState([]);
+    const [loadingOrders, setLoadingOrders] = useState(false);
+    const [expandedOrders, setExpandedOrders] = useState(new Set());
 
     useEffect(() => {
         if (users) {
@@ -22,19 +29,28 @@ export default function DashUsers() {
         }
     }, [users]);
 
-    // Cambiamos la función para ver compras en lugar de eliminar
-    const handleViewPurchases = (userId) => {
-        // Aquí puedes implementar la navegación a la vista de compras del usuario
-        console.log(`Ver compras del usuario ${userId}`);
-        // Por ejemplo: router.get(route('dashboard.users.purchases', userId));
+    // Función para ver compras del usuario
+    const handleViewPurchases = (user) => {
+        setSelectedUser(user);
+        setUserOrders(user.orders || []);
+        setOrdersModalOpen(true);
+    };
+
+    // Función para expandir/contraer items de una orden
+    const toggleOrderExpansion = (orderId) => {
+        const newExpanded = new Set(expandedOrders);
+        if (newExpanded.has(orderId)) {
+            newExpanded.delete(orderId);
+        } else {
+            newExpanded.add(orderId);
+        }
+        setExpandedOrders(newExpanded);
     };
 
     // Función para cambiar el rol del usuario
     const handleRoleChange = (userId, newRole) => {
-        // Aquí implementarías la lógica para actualizar el rol en la base de datos
         console.log(`Cambiar rol del usuario ${userId} a ${newRole}`);
         
-        // Actualizar el estado local para reflejar el cambio inmediatamente
         setUserList(userList.map(user => {
             if (user.id === userId) {
                 return { ...user, role: newRole };
@@ -43,13 +59,35 @@ export default function DashUsers() {
         }));
   
         router.put(route('dashboard.users.update-role', userId), {
-        role: newRole
+            role: newRole
         });
     };
 
     const handleEditUser = (user) => {
         setUserToEdit(user);
         setEditDialogOpen(true);
+    };
+
+    // Función para cerrar el modal de órdenes
+    const closeOrdersModal = () => {
+        setOrdersModalOpen(false);
+        setSelectedUser(null);
+        setUserOrders([]);
+        setExpandedOrders(new Set());
+    };
+
+    // Función para obtener el color del estado
+    const getStatusColor = (status) => {
+        const statusColors = {
+            'pendiente': 'bg-yellow-100 text-yellow-800',
+            'procesando': 'bg-blue-100 text-blue-800',
+            'enviado': 'bg-purple-100 text-purple-800',
+            'entregado': 'bg-green-100 text-green-800',
+            'cancelado': 'bg-red-100 text-red-800',
+            'pagado': 'bg-green-100 text-green-800',
+            'fallido': 'bg-red-100 text-red-800'
+        };
+        return statusColors[status] || 'bg-gray-100 text-gray-800';
     };
 
     // Filtrar usuarios según el término de búsqueda
@@ -108,7 +146,6 @@ export default function DashUsers() {
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Teléfono</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Email</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Total Órdenes</th>
-                                                    {/* Nueva columna para el rol */}
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Rol</th>
                                                     <th className="p-4 text-left text-sm font-semibold text-gray-600">Acción</th>
                                                 </tr>
@@ -120,7 +157,6 @@ export default function DashUsers() {
                                                             <td className="p-4 text-sm text-gray-600">{index + 1}</td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center">
-                                                                    
                                                                     <div>
                                                                         <span className="text-sm font-medium text-gray-900">{user.name}</span>
                                                                     </div>
@@ -129,7 +165,6 @@ export default function DashUsers() {
                                                             <td className="p-4 text-sm text-gray-600">{user.phone_number}</td>
                                                             <td className="p-4 text-sm text-gray-600">{user.email}</td>
                                                             <td className="p-4 text-sm text-gray-600">{user.total_orders || 0}</td>
-                                                            {/* Nueva celda para el selector de rol */}
                                                             <td className="p-4">
                                                                 <select 
                                                                     value={user.role} 
@@ -145,20 +180,13 @@ export default function DashUsers() {
                                                             </td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center space-x-2">
-                                                                    
                                                                     {/* Botón para ver compras */}
                                                                     <button 
-                                                                        className="text-blue-600 hover:text-blue-900 p-1"
-                                                                        onClick={() => handleViewPurchases(user.id)}
+                                                                        className="text-blue-600 hover:text-blue-900 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                                                                        onClick={() => handleViewPurchases(user)}
+                                                                        title="Ver órdenes"
                                                                     >
                                                                         <ShoppingCart className="h-5 w-5" />
-                                                                    </button>
-                                                                    {/* Nuevo botón para enviar email */}
-                                                                    <button 
-                                                                        className="text-purple-600 hover:text-purple-900 p-1"
-                                                                        onClick={() => handleSendEmail(user.id, user.email)}
-                                                                    >
-                                                                        <Mail className="h-5 w-5" />
                                                                     </button>
                                                                 </div>
                                                             </td>
@@ -181,8 +209,157 @@ export default function DashUsers() {
                 </div>
             </div>
 
-            {/* Aquí podrías añadir componentes de diálogo para editar usuarios si es necesario */}
+            {/* Modal de Órdenes */}
+            {ordersModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+                        {/* Header del modal */}
+                        <div className="bg-gray-700  text-white p-6">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-white bg-opacity-20 p-2 rounded-lg">
+                                        <ShoppingCart className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold">Órdenes de {selectedUser?.name}</h3>
+                                        <p className="text-blue-100">{selectedUser?.email}</p>
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={closeOrdersModal}
+                                    className="hover:bg-white hover:bg-opacity-20 p-2 rounded-lg transition-colors"
+                                >
+                                    <X className="h-6 w-6" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Contenido del modal */}
+                        <div className="p-6 max-h-[calc(90vh-140px)] overflow-y-auto">
+                            {userOrders.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                                    <h4 className="text-lg font-medium text-gray-600 mb-2">Sin órdenes</h4>
+                                    <p className="text-gray-500">Este usuario aún no ha realizado ninguna compra.</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {userOrders.map((order) => (
+                                        <div key={order.id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                                            {/* Encabezado de la orden */}
+                                            <div className="bg-gray-50 p-4 border-b">
+                                                <div className="flex justify-between items-start">
+                                                    <div className="space-y-2">
+                                                        <div className="flex items-center gap-3">
+                                                            <h4 className="font-semibold text-lg">#{order.order_number}</h4>
+                                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.order_status)}`}>
+                                                                {order.order_status.charAt(0).toUpperCase() + order.order_status.slice(1)}
+                                                            </span>
+                                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.payment_status)}`}>
+                                                                {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                                                            <div className="flex items-center gap-1">
+                                                                <Calendar className="h-4 w-4" />
+                                                                <span>{new Date(order.created_at).toLocaleDateString('es-ES')}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-1">
+                                                                <CreditCard className="h-4 w-4" />
+                                                                <span className="font-semibold text-green-600">S/ {parseFloat(order.total_amount).toFixed(2)}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => toggleOrderExpansion(order.id)}
+                                                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium text-sm bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors"
+                                                    >
+                                                        {expandedOrders.has(order.id) ? (
+                                                            <>
+                                                                <ChevronUp className="h-4 w-4" />
+                                                                Ocultar items
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <ChevronDown className="h-4 w-4" />
+                                                                Ver items ({order.items?.length || 0})
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                                
+                                                {/* Información de envío */}
+                                                <div className="mt-3 p-3 bg-white rounded-lg border">
+                                                    <div className="flex items-start gap-2">
+                                                        <MapPin className="h-4 w-4 text-gray-500 mt-0.5" />
+                                                        <div>
+                                                            <p className="text-sm font-medium text-gray-700">{order.customer_name}</p>
+                                                            <p className="text-sm text-gray-600">{order.customer_phone}</p>
+                                                            <p className="text-sm text-gray-600">{order.shipping_address}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Items de la orden (expandible) */}
+                                            {expandedOrders.has(order.id) && (
+                                                <div className="p-4 bg-white">
+                                                    <h5 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                                                        <Package className="h-4 w-4" />
+                                                        Items de la orden
+                                                    </h5>
+                                                    <div className="space-y-3">
+                                                        {order.items && order.items.length > 0 ? (
+                                                            order.items.map((item) => (
+                                                                <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                                    <div className="flex items-center gap-3">
+                                                                        {item.product?.image && (
+                                                                            <img 
+                                                                                src={`/storage/${item.product.image}`}
+                                                                                alt={item.product.name}
+                                                                                className="h-12 w-12 object-cover rounded-lg border"
+                                                                            />
+                                                                        )}
+                                                                        <div>
+                                                                            <p className="font-medium text-gray-900">{item.product?.name || 'Producto eliminado'}</p>
+                                                                            <p className="text-sm text-gray-600">
+                                                                                Cantidad: {item.quantity} × S/ {parseFloat(item.price).toFixed(2)}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <p className="font-semibold text-gray-900">
+                                                                            S/ {(parseFloat(item.price) * item.quantity).toFixed(2)}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <p className="text-gray-500 text-center py-4">No hay items en esta orden</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer del modal */}
+                        <div className="bg-gray-50 px-6 py-4 border-t">
+                            <div className="flex justify-end">
+                                <button 
+                                    onClick={closeOrdersModal}
+                                    className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                                >
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }
-
